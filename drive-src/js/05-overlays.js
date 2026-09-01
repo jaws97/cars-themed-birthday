@@ -18,7 +18,9 @@ rollEl.innerHTML=
   <div><div class="role">neon</div><div class="who">The town, showing off</div></div>
   <div><div class="role">tractors</div><div class="who">Themselves</div></div>
   <div><div class="role">pit crew</div><div class="who">Everyone who brought cake</div></div>
-  <div class="gap"></div>
+  <div class="gap"></div>`
+  +(SHOW.credits||[]).map(([r,w])=>`<div><div class="role">${r}</div><div class="who">${w}</div></div>`).join('')
+  +`<div class="gap"></div>
   <div class="hero" style="font-size:5.4cqh;white-space:normal;max-width:70cqw;margin:0 auto;line-height:1.3">Happy birthday, August people.</div>
   <div class="gap"></div>
   <div class="label" style="opacity:.55">same road next year · press space to drive again</div>`;
