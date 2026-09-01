@@ -75,6 +75,8 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #loader #lcar::after{content:"";position:absolute;bottom:-.45cqh;left:.7cqh;width:1cqh;height:1cqh;border-radius:50%;
   background:#0a0b18;box-shadow:2.6cqh 0 0 #0a0b18,inset 0 0 0 .28cqh #c9cfdd}
 #loader .lpct{font-size:1.8cqh;letter-spacing:.18em;opacity:.7}
+#loader.ready .lpct{font-size:2.2cqh;animation:lblink 1.8s var(--inout) infinite}
+@keyframes lblink{0%,100%{opacity:.95}50%{opacity:.35}}
 
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 #flash.pop{animation:pop 1100ms var(--inout)}

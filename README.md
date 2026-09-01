@@ -72,8 +72,10 @@ it locally:
 python -m http.server 8123
 ```
 
-On party night: open the show, press `F` for fullscreen — that first key press
-also unlocks the attract video's sound if the browser blocked autoplay audio.
+On party night: open the show, let the tank fill, press `F` for fullscreen,
+then any key to start. The show starts from an actual key press, so the
+attract cinema always plays with sound (browsers refuse unmuted autoplay on
+a page nobody has touched).
 
 ## Art assets (optional)
 

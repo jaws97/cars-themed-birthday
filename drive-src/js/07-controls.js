@@ -23,6 +23,14 @@ Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
   boardTexture(0);
   archM.material.map=archTexture();
   cars.forEach(c=>{if(c.userData.redraw)c.userData.redraw()});
-  PRELOAD.done=true;
-  const ld=document.getElementById('loader');ld.classList.add('off');setTimeout(()=>ld.remove(),1100);
-  go(0,0);requestAnimationFrame(frame)});
+  /* the show starts from a real key press: browsers block unmuted autoplay
+     on a fresh page, and that first gesture is what buys the attract cinema
+     its sound. F stays free so fullscreen can go first. */
+  const ld=document.getElementById('loader');
+  ld.classList.add('ready');
+  document.getElementById('ltext').textContent='start your engines · press any key';
+  const begin=e=>{if(e&&(e.key==='f'||e.key==='F'))return;
+    document.removeEventListener('keydown',begin);document.removeEventListener('pointerdown',begin);
+    PRELOAD.done=true;ld.classList.add('off');setTimeout(()=>ld.remove(),1100);
+    go(0,0);requestAnimationFrame(frame)};
+  document.addEventListener('keydown',begin);document.addEventListener('pointerdown',begin)});
