@@ -1,0 +1,28 @@
+/* ======================= controls ======================= */
+document.addEventListener('keydown',e=>{
+  if(!PRELOAD.done&&e.key!=='f'&&e.key!=='F')return; /* only fullscreen works while the tank fills */
+  if([' ','ArrowRight','Enter','PageDown'].includes(e.key)){e.preventDefault();advance()}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(b-1,-1)}
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  else if(e.key==='b'||e.key==='B'||e.key==='.'){document.getElementById('blk').classList.toggle('on')}
+  else if(e.key==='r'||e.key==='R'){kill('z');carZ=0;lastZ=0;go(0,0)}
+  else if(e.key==='h'||e.key==='H'){honk()}
+  else if(/^[0-5]$/.test(e.key)){jumpMile(+e.key)}});
+/* the click that focuses the window shouldn't burn a beat */
+let focusT=-1e9;
+window.addEventListener('focus',()=>focusT=performance.now());
+document.addEventListener('click',()=>{if(!PRELOAD.done||performance.now()-focusT<400)return;advance()});
+function honk(){if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
+
+/* fonts and the asset preload first, so canvas type is the real type and
+   nothing pops in after the show starts */
+const fontsReady=Promise.all(['"Alfa Slab One"','"Racing Sans One"','Nunito','Pacifico'].map(f=>document.fonts.load(`40px ${f}`))).catch(()=>{});
+Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
+  /* textures were drawn at load; redraw the type now the fonts are in */
+  signs.forEach(s=>{s.on.material.map=signTexture(s.t,s.c,true,s.font,s.size);s.off.material.map=signTexture(s.t,s.c,false,s.font,s.size)});
+  boardTexture(0);
+  archM.material.map=archTexture();
+  cars.forEach(c=>{if(c.userData.redraw)c.userData.redraw()});
+  PRELOAD.done=true;
+  const ld=document.getElementById('loader');ld.classList.add('off');setTimeout(()=>ld.remove(),1100);
+  go(0,0);requestAnimationFrame(frame)});

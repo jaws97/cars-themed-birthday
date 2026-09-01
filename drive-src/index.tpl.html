@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ROUTE 08 · the drive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Racing+Sans+One&family=Pacifico&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+/*{{CSS}}*/
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <canvas id="gl"></canvas>
+
+  <div class="dust"></div><div class="glass"></div>
+  <div class="wiper" id="wiper"><div class="arm"></div><div class="blade"></div><div class="smear"></div></div>
+
+  <div class="hud" id="hud"><span class="rule"></span>
+    <div><div class="hero name" id="lname"></div><div class="label team" id="lteam"></div></div>
+    <div class="ring"><span class="num" id="lnum"></span></div></div>
+
+  <div class="cockpit">
+    <div class="roof"></div><div class="pillar l"></div><div class="pillar r"></div>
+    <div class="mirror"><span class="stem"></span><div class="frame"></div><div class="view" id="mirror"><i class="hl a"></i><i class="hl b"></i></div></div>
+    <div class="hood"></div>
+    <div class="dash"><div class="pad"></div><div class="trim"></div>
+      <div class="radio"><span class="band"><i></i></span><span class="knob"></span><span class="knob r"></span></div>
+      <div class="wheel"><b class="horn"></b></div>
+      <div class="dial" id="dial"><svg viewBox="0 0 100 100"><g id="ticks"></g>
+        <circle cx="50" cy="56" r="44" fill="none" stroke="rgba(243,231,207,.28)" stroke-width="1"/>
+        <line class="needle" id="needle" x1="50" y1="56" x2="50" y2="18" stroke="#E23A2E" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="50" cy="56" r="4.6" fill="#C9CFDD"/><circle cx="50" cy="56" r="2" fill="#0E1230"/></svg>
+        <div class="odo"><div class="col"><div class="reel" id="d1"></div></div><div class="col"><div class="reel" id="d2"></div></div></div></div>
+    </div>
+  </div>
+
+  <div id="cap"></div>
+  <div id="tower"></div>
+  <div id="lobby"><div class="panel">
+    <div class="label" style="font-size:2cqh;opacity:.9">scan to race</div>
+    <div id="qr"></div>
+    <div class="joinurl" id="joinurl"></div>
+    <div class="chips" id="chips"></div>
+  </div></div>
+  <div class="big" id="photo"><div class="polaroid"><div class="shot"><div class="checker"></div><h3 id="finTitle"></h3><div class="finishers" id="fin"></div></div><div class="scrawl"></div></div></div>
+  <div class="big" id="trophy"><div id="confetti"></div><div class="stack">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <g fill="#F5B335">
+        <path d="M28 22c-11 0-18 6-18 14 0 11 10 18 24 20l-3-9c-8-2-12-6-12-11 0-4 4-6 10-6z"/>
+        <path d="M92 22c11 0 18 6 18 14 0 11-10 18-24 20l3-9c8-2 12-6 12-11 0-4-4-6-10-6z"/>
+        <path d="M32 14h56v8l-5 34c-3 13-11 20-23 20s-20-7-23-20l-5-34z"/>
+        <rect x="52" y="76" width="16" height="10"/>
+        <rect x="42" y="86" width="36" height="7" rx="2"/>
+        <rect x="34" y="93" width="52" height="9" rx="2"/>
+      </g>
+      <path fill="rgba(255,255,255,.28)" d="M40 18h8l4 40c1 6 3 10 6 13-8-2-13-8-15-17z"/>
+      <text x="60" y="52" text-anchor="middle" font-family="'Racing Sans One'" font-size="26" fill="#0E1230">8</text>
+    </svg>
+    <div class="hero">Everybody wins.</div><div class="label">it&#39;s a birthday, not a competition</div></div></div>
+  <div class="big" id="credits"><div class="roll" id="roll"></div></div>
+  <div id="flash"></div>
+
+  <div id="attract"><video id="avid" muted loop playsinline preload="auto"></video>
+    <div class="atitle"><div class="hero" id="atitleTxt"></div><div class="label" id="asubTxt"></div></div></div>
+
+  <div class="bezel"></div><div class="vignette"></div><div class="grain"></div><div id="blk"></div>
+
+  <div id="loader">
+    <div class="hero lhero">ROUTE 08</div>
+    <div class="label">the august detour</div>
+    <div class="lroad"><i id="lfill"></i><span id="lcar"></span></div>
+    <div class="label lpct" id="ltext">fillin&#39; her up</div>
+  </div>
+</div>
+
+<script>
+//{{JS}}
+</script>
+</body>
+</html>

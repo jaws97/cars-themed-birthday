@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ROUTE 08 · pit lane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Racing+Sans+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{--indigo:#0E1230;--cream:#F3E7CF;--teal:#3EE6D8;--red:#E23A2E;--gold:#F5B335}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%}
+body{background:#0a0c1e;color:var(--cream);font-family:Nunito,'Segoe UI',sans-serif;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4vh;padding:5vw;text-align:center;touch-action:manipulation;overflow:hidden}
+h1{font-family:'Alfa Slab One',serif;font-weight:400;font-size:7vw;letter-spacing:.02em}
+.sub{font-weight:700;font-size:3.4vw;letter-spacing:.3em;text-transform:uppercase;opacity:.6}
+#status{font-weight:700;font-size:4vw;opacity:.75;min-height:5vw}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:3vw;width:100%;max-width:480px}
+.grid button{border:0;border-radius:3vw;padding:4vw 2vw;background:#141838;color:var(--cream);font:inherit;font-weight:700}
+.grid button .num{display:block;font-family:'Racing Sans One',sans-serif;font-size:8vw;color:var(--c)}
+.grid button[disabled]{opacity:.28}
+.grid button:active{transform:scale(.97)}
+#pit,#pick{display:none;flex-direction:column;align-items:center;gap:4vh;width:100%}
+.on{display:flex!important}
+#mash{width:64vw;height:64vw;max-width:340px;max-height:340px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,var(--c),color-mix(in srgb,var(--c) 55%,#000));
+  color:#0E1230;font-family:'Racing Sans One',sans-serif;font-size:18vw;box-shadow:0 2vh 6vh rgba(0,0,0,.5),inset 0 -2vh 4vh rgba(0,0,0,.3);transition:transform 60ms}
+#mash:active{transform:scale(.93)}
+#mash[disabled]{filter:grayscale(.7) brightness(.6)}
+#msg{font-family:'Alfa Slab One',serif;font-size:8vw;line-height:1.25}
+#msg small{display:block;font-family:Nunito;font-weight:700;font-size:3.4vw;letter-spacing:.28em;text-transform:uppercase;opacity:.6;margin-top:1.5vh}
+</style>
+</head>
+<body>
+<h1>ROUTE 08</h1>
+<div class="sub">the august 500</div>
+<div id="status">connecting to the speedway…</div>
+
+<div id="pick"><div class="grid" id="cars"></div></div>
+
+<div id="pit">
+  <button id="mash" disabled>GO</button>
+  <div id="msg">Hold tight.<small>wait for the green</small></div>
+</div>
+
+<script>
+//{{PEOPLE}}
+const statusEl=document.getElementById('status'),pickEl=document.getElementById('pick'),pitEl=document.getElementById('pit'),
+  carsEl=document.getElementById('cars'),mash=document.getElementById('mash'),msg=document.getElementById('msg');
+let conn=null,me=-1,taps=0,green=false;
+const hostId=location.hash.slice(1);
+
+function setMsg(big,small){msg.innerHTML=big+(small?`<small>${small}</small>`:'')}
+function renderPick(claimed){carsEl.innerHTML=people.map((p,i)=>
+  `<button style="--c:${p[3]}" ${claimed&&claimed[i]?'disabled':''} onclick="claim(${i})"><span class="num">${p[0]}</span>${p[1]}</button>`).join('')}
+function claim(i){if(conn)conn.send({type:'join',i})}
+
+if(!hostId){statusEl.textContent='Open this page from the QR code on the big screen.'}
+else{
+  const peer=new Peer();let retries=0,retryTimer=null;
+  function connect(){if(retryTimer){clearTimeout(retryTimer);retryTimer=null}
+    const c=conn=peer.connect(hostId,{reliable:true});
+    c.on('open',()=>{retries=0;
+      if(me>=0)c.send({type:'join',i:me}); /* reconnect: re-claim the same car */
+      else{statusEl.textContent='Pick your car';pickEl.classList.add('on');renderPick()}});
+    c.on('data',d=>{
+      if(d.type==='roster')renderPick(d.claimed);
+      else if(d.type==='assigned'){me=d.i;const p=people[me];
+        statusEl.textContent=`${p[1]} · car ${p[0]}`;
+        pickEl.classList.remove('on');pitEl.classList.add('on');
+        mash.style.setProperty('--c',p[3]);mash.textContent=p[0];
+        setMsg('You&#39;re in.','wait for the green')}
+      else if(d.type==='state'){
+        if(d.phase==='set'){green=false;mash.disabled=true;setMsg('Drivers, ready…','fingers on the button')}
+        else if(d.phase==='green'){green=true;mash.disabled=false;
+          setMsg(d.place?'P'+d.place:'GO GO GO',d.place?'keep tapping!':'tap as fast as you can')}
+        else if(d.phase==='done'){green=false;mash.disabled=true;
+          setMsg(d.place===1?'P1. Winner!':'P'+d.place,d.place===1?'the august 500 is yours':'across the line')}
+        else if(d.phase==='over'){green=false;mash.disabled=true}
+        else if(d.phase==='idle'){green=false;mash.disabled=true;setMsg('Hold tight.','wait for the green')}}});
+    c.on('close',retry);c.on('error',retry)}
+  function retry(){if(conn&&conn.open)return;
+    if(retries++<10){statusEl.textContent='Reconnecting…';retryTimer=setTimeout(connect,500*Math.min(retries,4))}
+    else statusEl.textContent='Disconnected — enjoy the show!'}
+  peer.on('open',connect);
+  peer.on('error',e=>{if(e.type==='peer-unavailable')retry();else statusEl.textContent='Couldn’t connect — enjoy the show!'});
+  peer.on('disconnected',()=>peer.reconnect());
+  /* count taps locally, ship them in small batches; heartbeat keeps the pipe warm */
+  mash.addEventListener('pointerdown',e=>{e.preventDefault();if(green)taps++});
+  setInterval(()=>{if(conn&&conn.open&&taps>0){conn.send({type:'taps',n:taps});taps=0}},150);
+  setInterval(()=>{if(conn&&conn.open)conn.send({type:'hi'})},4000);
+}
+</script>
+</body>
+</html>
