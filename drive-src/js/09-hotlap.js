@@ -141,4 +141,6 @@ function ttTick(dt,now){if(!TT.on)return;
     if(d.conn.open)try{d.conn.send({type:'tt-dnf'})}catch(e){}
     ttAbort(1800);return}
   carAtC(cars[d.car],TT.prog,TT.lat+Math.sin(now/300)*.1);
-  TT.camProg+=(TT.prog-8-TT.camProg)*Math.min(1,dt*1.6)}
+  /* tight chase: a slow lerp lags by spd/rate, so keep the rate high and the
+     gap reads as a steady car-and-a-half even at full song */
+  TT.camProg+=(TT.prog-8-TT.camProg)*Math.min(1,dt*7)}

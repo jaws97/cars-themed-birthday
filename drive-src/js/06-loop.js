@@ -1,6 +1,6 @@
 /* ======================= loop ======================= */
 let last=performance.now(),lastZ=0,lastProg=0;
-const _camP={};
+const _camP={},_camL={};
 function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
   runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
   const racing=NET.live&&NET.phase!=='idle';
@@ -18,8 +18,15 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
     head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
   else if(TT.on){ /* the time trial rides the midnight circuit */
     circuitPos(TT.camProg,_camP);camZ=_camP.z;
-    camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
-    camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
+    if(TT.driver){ /* chase cam: raised behind the car, aimed through it at the
+         road ahead, drifting with the car's line so it stays centred */
+      const nx=-_camP.hz,nz=_camP.hx,lat=TT.lat*.55;
+      camera.position.set(_camP.x+nx*lat+Math.sin(t*1.7)*.03,3.4+Math.sin(t*9.3)*.02,_camP.z+nz*lat);
+      circuitPos(TT.prog+7,_camL);
+      camera.lookAt(_camL.x+(-_camL.hz)*TT.lat*.4,.9,_camL.z+_camL.hx*TT.lat*.4)}
+    else{ /* empty track: the low cruising flyover */
+      camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
+      camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp)}
     head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
   else{
     camera.position.set(Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,carZ);
