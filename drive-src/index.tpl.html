@@ -29,13 +29,51 @@ if(location.protocol==='https:'&&!/^(localhost|127\.)/.test(location.hostname)){
 
   <div class="cockpit">
     <div class="roof"></div><div class="pillar l"></div><div class="pillar r"></div>
-    <div class="mirror"><span class="stem"></span><div class="frame"></div><div class="view" id="mirror"><i class="hl a"></i><i class="hl b"></i></div></div>
+    <div class="visor l"></div><div class="visor r"></div>
+    <div class="mirror"><span class="stem"></span><div class="frame"></div><div class="view" id="mirror"><i class="hl a"></i><i class="hl b"></i></div>
+      <div class="fresh"><svg viewBox="0 0 40 64">
+        <line x1="20" y1="0" x2="20" y2="13" stroke="rgba(243,231,207,.5)" stroke-width="1.6"/>
+        <polygon points="20,11 33,45 7,45" fill="#2fbfb2"/>
+        <polygon points="20,19 30,41 10,41" fill="#3EE6D8" opacity=".5"/>
+        <rect x="17" y="45" width="6" height="7" rx="1.5" fill="#8a6b3f"/>
+        <text x="20" y="39" text-anchor="middle" font-family="'Racing Sans One'" font-size="11" fill="#0E1230">08</text>
+      </svg></div></div>
     <div class="hood"></div>
-    <div class="dash"><div class="pad"></div><div class="trim"></div>
+    <div class="dash"><div class="pad"><span class="grille"></span></div><div class="trim"></div>
+      <div class="vent l"></div><div class="vent r"></div>
+      <div class="column"></div><div class="ign"></div>
+      <div class="keys"><svg viewBox="0 0 30 48">
+        <circle cx="15" cy="8" r="6" fill="none" stroke="#c9cfdd" stroke-width="2.4"/>
+        <g fill="#d9b45a" transform="rotate(16 19 16)"><circle cx="19" cy="19" r="4.6"/><circle cx="19" cy="19" r="1.6" fill="#0b0c1a"/>
+          <rect x="17.6" y="22" width="2.8" height="13" rx="1.2"/><rect x="20.4" y="28" width="2.4" height="2.2"/></g>
+        <g fill="#b9bfcc"><circle cx="12" cy="20" r="5"/><circle cx="12" cy="20" r="1.8" fill="#0b0c1a"/>
+          <rect x="10.5" y="23" width="3" height="15" rx="1.3"/><rect x="13.5" y="30" width="2.8" height="2.4"/><rect x="13.5" y="34" width="2.2" height="2.4"/></g>
+      </svg></div>
+      <div class="wheel" id="wheel"><span class="spoke a"></span><span class="spoke b"></span><span class="spoke c"></span>
+        <b class="horn"></b><span class="hub"><i>8</i></span></div>
+      <div class="cluster">
+        <div class="mini"><svg viewBox="0 0 100 100">
+          <g stroke="#F3E7CF" stroke-opacity=".6" stroke-width="3"><line x1="26" y1="40" x2="31" y2="45"/><line x1="50" y1="30" x2="50" y2="37"/><line x1="74" y1="40" x2="69" y2="45"/></g>
+          <text x="16" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">E</text>
+          <text x="74" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">F</text>
+          <text x="50" y="88" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(243,231,207,.4)" font-family="Nunito" font-weight="700">FUEL</text>
+          <line class="mneedle" id="fneedle" x1="50" y1="60" x2="50" y2="32" stroke="#E23A2E" stroke-width="3" stroke-linecap="round" style="transform:rotate(40deg)"/>
+          <circle cx="50" cy="60" r="4.6" fill="#C9CFDD"/></svg></div>
+        <div class="mini"><svg viewBox="0 0 100 100">
+          <g stroke-width="3"><line x1="26" y1="40" x2="31" y2="45" stroke="#3EE6D8" stroke-opacity=".7"/><line x1="50" y1="30" x2="50" y2="37" stroke="#F3E7CF" stroke-opacity=".6"/><line x1="74" y1="40" x2="69" y2="45" stroke="#E23A2E" stroke-opacity=".8"/></g>
+          <text x="16" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">C</text>
+          <text x="72" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">H</text>
+          <text x="50" y="88" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(243,231,207,.4)" font-family="Nunito" font-weight="700">TEMP</text>
+          <line class="mneedle" id="tneedle" x1="50" y1="60" x2="50" y2="32" stroke="#E23A2E" stroke-width="3" stroke-linecap="round" style="transform:rotate(-38deg)"/>
+          <circle cx="50" cy="60" r="4.6" fill="#C9CFDD"/></svg></div>
+      </div>
+      <span class="pull" style="left:41.6cqw"><b></b>LTS</span>
+      <span class="pull" style="left:43.6cqw"><b></b>WIP</span>
       <div class="radio"><span class="band"><i></i></span><span class="knob"></span><span class="knob r"></span></div>
-      <div class="wheel"><b class="horn"></b></div>
+      <div class="glovebox"><span class="script">Route 08</span><span class="btn"></span></div>
       <div class="dial" id="dial"><svg viewBox="0 0 100 100"><g id="ticks"></g>
         <circle cx="50" cy="56" r="44" fill="none" stroke="rgba(243,231,207,.28)" stroke-width="1"/>
+        <text x="50" y="42" text-anchor="middle" font-family="Nunito" font-weight="700" font-size="5" letter-spacing="2.4" fill="rgba(243,231,207,.55)">MPH</text>
         <line class="needle" id="needle" x1="50" y1="56" x2="50" y2="18" stroke="#E23A2E" stroke-width="2" stroke-linecap="round"/>
         <circle cx="50" cy="56" r="4.6" fill="#C9CFDD"/><circle cx="50" cy="56" r="2" fill="#0E1230"/></svg>
         <div class="odo"><div class="col"><div class="reel" id="d1"></div></div><div class="col"><div class="reel" id="d2"></div></div></div></div>

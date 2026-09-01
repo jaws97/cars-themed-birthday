@@ -1,7 +1,8 @@
 /* ======================= dashboard ======================= */
 const ticks=document.getElementById('ticks');
 for(let i=0;i<=12;i++){const a=(-120+i*20)*Math.PI/180,big=i%3===0,r1=big?36:39,r2=43,col=i>=11?'#E23A2E':'#F3E7CF';
-  ticks.insertAdjacentHTML('beforeend',`<line x1="${50+r1*Math.sin(a)}" y1="${56-r1*Math.cos(a)}" x2="${50+r2*Math.sin(a)}" y2="${56-r2*Math.cos(a)}" stroke="${col}" stroke-opacity="${big?.9:.5}" stroke-width="${big?1.6:1}"/>`)}
+  ticks.insertAdjacentHTML('beforeend',`<line x1="${50+r1*Math.sin(a)}" y1="${56-r1*Math.cos(a)}" x2="${50+r2*Math.sin(a)}" y2="${56-r2*Math.cos(a)}" stroke="${col}" stroke-opacity="${big?.9:.5}" stroke-width="${big?1.6:1}"/>`);
+  if(big)ticks.insertAdjacentHTML('beforeend',`<text x="${(50+28*Math.sin(a)).toFixed(1)}" y="${(59-28*Math.cos(a)).toFixed(1)}" text-anchor="middle" font-family="'Racing Sans One'" font-size="8.5" fill="${i>=11?'#E23A2E':'rgba(243,231,207,.85)'}">${i/3*30}</text>`)}
 ['d1','d2'].forEach(id=>{document.getElementById(id).innerHTML=[0,1,2,3,4,5,6,7,8,9].map(n=>`<span>${n}</span>`).join('')});
 function odo(m){d1.style.transform=`translateY(${-Math.floor(m/10)*2.6}cqh)`;d2.style.transform=`translateY(${-(m%10)*2.6}cqh)`}
 let needleDeg=-120;

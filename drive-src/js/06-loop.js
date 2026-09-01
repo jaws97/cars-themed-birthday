@@ -1,5 +1,6 @@
 /* ======================= loop ======================= */
 let last=performance.now(),lastZ=0,lastProg=0;
+let lastYaw=0,wheelDeg=0,tempDeg=-38; /* cockpit life: steering lock and the temp needle warming up */
 const _camP={},_camL={};
 function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
   runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
@@ -39,4 +40,16 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
     if(!arriveBoardOn&&carZ<-522){arriveBoardOn=true;
       tween(v=>setBoard(v),0,1,1600,ease.inout,null,'board');tween(v=>boardLight.intensity=v*2,0,1,1600,ease.inout,null,'bl')}}
   const target=-120+Math.min(1,vel/72)*240;needleDeg+=(target-needleDeg)*Math.min(1,dt*4);needle.style.transform=`rotate(${needleDeg}deg)`;
+  /* the wheel steers with the road: heading rate becomes steering lock,
+     with a whisper of road jitter so hands are never frozen still */
+  let dyw=camera.rotation.y-lastYaw;lastYaw=camera.rotation.y;
+  if(dyw>Math.PI)dyw-=Math.PI*2;else if(dyw<-Math.PI)dyw+=Math.PI*2;
+  if(Math.abs(dyw)>.5)dyw=0; /* a beat jump is a teleport, not a corner */
+  const lock=Math.max(-1,Math.min(1,(dt>0?-dyw/dt:0)*1.6));
+  wheelDeg+=(lock*34+Math.sin(t*1.3)*1.4+Math.sin(t*5.1)*.7*sp-wheelDeg)*Math.min(1,dt*5);
+  wheel.style.setProperty('--steer',wheelDeg.toFixed(2)+'deg');
+  /* fuel burns down as the route rolls by; temp settles warm and breathes with speed */
+  fneedle.style.transform=`rotate(${(40-62*Math.min(1,Math.max(0,-carZ/730))).toFixed(1)}deg)`;
+  tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
+  tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
   renderer.render(scene,camera);requestAnimationFrame(frame)}

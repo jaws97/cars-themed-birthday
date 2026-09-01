@@ -148,22 +148,48 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .pillar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(243,231,207,.05))}
 .pillar.r::after{background:linear-gradient(270deg,transparent,rgba(243,231,207,.05))}
 .roof{position:absolute;left:0;right:0;top:0;height:7cqh;background:#03040b;clip-path:polygon(0 0,100% 0,100% 40%,50% 100%,0 40%)}
+/* sun visors tucked under the headliner */
+.visor{position:absolute;top:2.1cqh;width:21cqw;height:4.6cqh;border-radius:0 0 1.4cqh 1.4cqh;
+  background:linear-gradient(180deg,#54241b,#3b1610 60%,#260d09);
+  box-shadow:0 .5cqh 1.6cqh rgba(2,3,10,.6),inset 0 -.35cqh 0 rgba(243,231,207,.1),inset 0 .4cqh 1cqh rgba(255,150,110,.1)}
+.visor.l{left:10.5cqw;transform:rotate(-1.6deg)}
+.visor.r{right:10.5cqw;transform:rotate(1.6deg)}
+.visor::before{content:"";position:absolute;top:-1.3cqh;left:12%;width:1cqh;height:2.2cqh;border-radius:.4cqh;
+  background:linear-gradient(90deg,#e9e4d4,#767c8c 70%)}
+.visor.r::before{left:auto;right:12%}
+.visor::after{content:"";position:absolute;left:1.4cqh;right:1.4cqh;bottom:.7cqh;
+  border-top:.24cqh dashed rgba(243,231,207,.2)}
 .mirror{position:absolute;left:50%;top:2.2cqh;transform:translateX(-50%);width:15cqw;height:7.2cqh}
-.mirror .stem{position:absolute;left:50%;top:-2.2cqh;width:.5cqw;height:2.4cqh;background:linear-gradient(90deg,#2b303d,#0b0d16);transform:translateX(-50%)}
-.mirror .frame{position:absolute;inset:0;background:linear-gradient(180deg,#3a3f4e,#12141f 55%,#262b38);border-radius:.8cqh;
-  box-shadow:0 .6cqh 1.8cqh rgba(2,3,10,.55),inset 0 .12cqh 0 rgba(233,228,212,.32)}
-.mirror .view{position:absolute;inset:.4cqh;border-radius:.4cqh;overflow:hidden;background:linear-gradient(180deg,#141a3f 0%,#0a0d24 55%,#050612 56%,#050612 100%)}
+.mirror .stem{position:absolute;left:50%;top:-2.2cqh;width:.5cqw;height:2.4cqh;background:linear-gradient(90deg,#d9d4c4,#565c6c 75%);transform:translateX(-50%)}
+.mirror .frame{position:absolute;inset:0;border-radius:.8cqh;
+  background:linear-gradient(180deg,#e9e4d4 0%,#9aa0ad 26%,#4a4f5e 55%,#232734 78%,#8f95a3 100%);
+  box-shadow:0 .6cqh 1.8cqh rgba(2,3,10,.55),inset 0 .12cqh 0 rgba(233,228,212,.55)}
+.mirror .view{position:absolute;inset:.7cqh;border-radius:.4cqh;overflow:hidden;
+  background:linear-gradient(180deg,#1c2456 0%,#111543 55%,#070a1c 56%,#05060f 100%)}
+.mirror .view::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,rgba(243,231,207,.12) 0%,transparent 30%)}
 .mirror .hl{position:absolute;bottom:22%;width:1.4cqh;height:1.4cqh;border-radius:50%;background:var(--cream);opacity:0;box-shadow:0 0 1.5cqh .6cqh rgba(243,231,207,.6);transition:opacity 1600ms var(--inout),transform 2600ms var(--inout);transform:scale(.4)}
 .mirror .hl.a{left:36%}.mirror .hl.b{left:56%}
 .mirror .view.flash .hl{opacity:1;transform:scale(1.15)}
-.hood{position:absolute;left:0;right:0;bottom:var(--dashH);height:13cqh;background:radial-gradient(ellipse 60% 100% at 50% 100%,#12111c 0%,#0a0a14 60%,#050510 100%);clip-path:ellipse(64% 100% at 50% 100%)}
+/* the pine tree swings from the mirror, the keys swing from the ignition */
+.fresh{position:absolute;left:62%;top:96%;width:1.7cqw;transform-origin:50% 2%;animation:sway 3.4s ease-in-out infinite alternate}
+.fresh svg{display:block;width:100%}
+@keyframes sway{from{transform:rotate(-5.5deg)}to{transform:rotate(4.5deg)}}
+.hood{position:absolute;left:0;right:0;bottom:var(--dashH);height:13cqh;clip-path:ellipse(64% 100% at 50% 100%);background:
+  radial-gradient(ellipse 26% 85% at 15% 100%,rgba(243,231,207,.045),transparent 70%),
+  radial-gradient(ellipse 26% 85% at 85% 100%,rgba(243,231,207,.045),transparent 70%),
+  radial-gradient(ellipse 60% 100% at 50% 100%,#12111c 0%,#0a0a14 60%,#050510 100%)}
 .hood::before{content:"";position:absolute;left:20%;right:20%;top:2cqh;height:1px;background:rgba(245,179,53,.22);clip-path:ellipse(50% 100% at 50% 100%)}
-.dash{position:absolute;left:0;right:0;bottom:0;height:var(--dashH);background:linear-gradient(180deg,#0c0d22 0%,#07081a 42%,#05060f 100%)}
+.dash{position:absolute;left:0;right:0;bottom:0;height:var(--dashH);background:linear-gradient(180deg,#13153c 0%,#0c0e28 42%,#07081a 100%)}
 .dash::after{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(transparent,#03040b)}
 /* padded dash roll with stitching, then a chrome trim strip */
 .dash .pad{position:absolute;left:0;right:0;top:0;height:3.4cqh;background:linear-gradient(180deg,#171935,#0b0c20);
   border-radius:0 0 2cqh 2cqh/0 0 1.2cqh 1.2cqh;box-shadow:0 .5cqh 1.4cqh rgba(2,3,10,.55)}
 .dash .pad::after{content:"";position:absolute;left:2cqw;right:2cqw;top:2.05cqh;border-top:.26cqh dashed rgba(243,231,207,.13)}
+/* the centre speaker grille, set into the dash top */
+.pad .grille{position:absolute;left:50%;top:.55cqh;transform:translateX(-50%);width:17cqh;height:1.9cqh;border-radius:.95cqh;
+  background:repeating-linear-gradient(90deg,rgba(243,231,207,.14) 0 .28cqh,rgba(4,5,14,.9) .28cqh 1cqh);
+  box-shadow:inset 0 .25cqh .6cqh rgba(0,0,0,.7),0 0 0 .2cqh rgba(198,203,214,.25)}
 .dash .trim{position:absolute;left:0;right:0;top:3.4cqh;height:.65cqh;opacity:.9;
   background:linear-gradient(180deg,#e9e4d4 0%,#9aa0ad 30%,#4a4f5e 55%,#232734 76%,#8f95a3 100%);
   box-shadow:0 .35cqh 1.1cqh rgba(2,3,10,.5)}
@@ -190,21 +216,72 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
   background:linear-gradient(202deg,rgba(243,231,207,.09),transparent 62%);pointer-events:none}
 .dial svg{width:100%;height:100%;display:block}
 .dial .needle{transform-origin:50px 56px;transform:rotate(var(--needle,-120deg))}
-.stage.dark .dial{opacity:.12}
+.stage.dark .dial,.stage.dark .cluster,.stage.dark .ign,.stage.dark .keys,
+.stage.dark .glovebox,.stage.dark .vent,.stage.dark .pull{opacity:.12}
 .odo{position:absolute;left:50%;bottom:20%;transform:translateX(-50%);display:flex;gap:.25cqh;padding:.35cqh .5cqh;background:#02030a;
   border:1px solid rgba(243,231,207,.22);border-radius:.3cqh;box-shadow:inset 0 .2cqh .6cqh rgba(0,0,0,.8)}
 .odo .col{width:1.7cqh;height:2.6cqh;overflow:hidden;position:relative}
 .odo .reel{display:flex;flex-direction:column;transition:transform 900ms var(--inout)}
 .odo .reel span{display:block;height:2.6cqh;line-height:2.6cqh;text-align:center;font:2.2cqh var(--race);color:rgba(243,231,207,.85)}
 .odo .col::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.7),transparent 35%,transparent 65%,rgba(0,0,0,.7))}
-.wheel{position:absolute;left:7cqw;bottom:-46cqh;width:70cqh;height:70cqh;border-radius:50%;border:3.6cqh solid #0a0b18;
-  box-shadow:inset 0 0 0 .5cqh rgba(243,231,207,.06),inset 0 2.2cqh 4cqh rgba(243,231,207,.045),0 -1cqh 3cqh rgba(0,0,0,.7)}
-.wheel::before{content:"";position:absolute;left:50%;top:50%;width:14cqh;height:14cqh;border-radius:50%;transform:translate(-50%,-50%);
-  background:radial-gradient(circle at 38% 30%,#232741,#05060f 72%);box-shadow:0 0 0 .4cqh rgba(243,231,207,.08)}
-.wheel::after{content:"";position:absolute;left:50%;top:50%;width:64cqh;height:5cqh;transform:translate(-50%,-50%);
-  background:linear-gradient(180deg,#12142a,#05060f 65%)}
-.wheel .horn{position:absolute;left:50%;top:50%;width:31cqh;height:31cqh;border-radius:50%;transform:translate(-50%,-50%);
-  border:.7cqh solid transparent;border-top-color:rgba(210,214,225,.4);border-left-color:rgba(210,214,225,.14)}
+/* the steering wheel: a real one, tilted away like you're sat behind it.
+   the rim, spokes and hub all live in one tilted plane so the steering
+   rotation (set from the loop as --steer) turns the whole assembly */
+.column{position:absolute;left:14.5cqw;bottom:0;width:10.5cqw;height:7.5cqh;
+  background:linear-gradient(180deg,#3c1712,#160806);clip-path:polygon(16% 0,84% 0,100% 100%,0 100%);
+  box-shadow:inset 0 .4cqh 0 rgba(243,231,207,.07)}
+.ign{position:absolute;left:23.2cqw;bottom:5.4cqh;width:1.6cqh;height:1.6cqh;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f2eede,#8b90a0 55%,#31364a);box-shadow:0 .2cqh .6cqh rgba(0,0,0,.6);
+  transition:opacity 1400ms var(--inout)}
+.keys{position:absolute;left:23.1cqw;bottom:1cqh;width:1.4cqw;transform-origin:50% 6%;
+  animation:sway 2.7s ease-in-out -1.2s infinite alternate;transition:opacity 1400ms var(--inout)}
+.keys svg{display:block;width:100%}
+.wheel{position:absolute;left:6cqw;bottom:-28cqh;width:64cqh;height:64cqh;border-radius:50%;border:3.2cqh solid #74251b;
+  transform:perspective(120cqh) rotateX(53deg) rotate(var(--steer,0deg));will-change:transform;
+  box-shadow:inset 0 0 0 .5cqh rgba(243,231,207,.1),inset 0 2.2cqh 4cqh rgba(255,140,100,.12),
+    0 -1cqh 3cqh rgba(0,0,0,.7),0 .4cqh 1.4cqh rgba(243,231,207,.05)}
+.wheel .spoke{position:absolute;left:50%;top:50%;width:50%;height:3cqh;margin-top:-1.5cqh;transform-origin:0 50%;
+  background:linear-gradient(180deg,#e9e4d4,#9aa0ad 35%,#3a3f4e 65%,#767c8c);
+  clip-path:polygon(0 22%,100% 38%,100% 62%,0 78%)}
+.wheel .spoke.a{transform:rotate(-160deg)}
+.wheel .spoke.b{transform:rotate(-20deg)}
+.wheel .spoke.c{transform:rotate(90deg)}
+.wheel .horn{position:absolute;left:50%;top:50%;width:34cqh;height:34cqh;border-radius:50%;transform:translate(-50%,-50%);
+  border:.65cqh solid transparent;border-top-color:rgba(210,214,225,.5);border-left-color:rgba(210,214,225,.16);border-right-color:rgba(210,214,225,.16)}
+.wheel .hub{position:absolute;left:50%;top:50%;width:12.5cqh;height:12.5cqh;border-radius:50%;transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 36% 28%,#8a2e22,#38100b 70%);
+  box-shadow:0 0 0 .55cqh rgba(210,214,225,.4),0 0 0 .95cqh rgba(30,15,12,.9),0 .6cqh 1.6cqh rgba(0,0,0,.5)}
+.wheel .hub i{font:400 4.6cqh var(--race);font-style:normal;color:var(--gold);text-shadow:0 0 1.2cqh rgba(245,179,53,.4)}
+/* fuel and temp, small chrome dials with a live needle each */
+.cluster{position:absolute;left:34.6cqw;bottom:2cqh;display:flex;gap:1.6cqh;transition:opacity 1400ms var(--inout)}
+.mini{position:relative;width:6.4cqh;height:6.4cqh;border-radius:50%;z-index:0;
+  background:radial-gradient(circle at 50% 40%,#0d0e24,#04050e 78%);box-shadow:inset 0 .4cqh 1cqh rgba(0,0,0,.7)}
+.mini::before{content:"";position:absolute;inset:-.65cqh;z-index:-1;border-radius:50%;
+  background:conic-gradient(from 210deg,#f2eede,#8b90a0 18%,#2c3040 40%,#9aa0ad 54%,#494e5e 70%,#d9d4c4 88%,#f2eede);
+  box-shadow:0 .5cqh 1.4cqh rgba(2,3,10,.55)}
+.mini svg{width:100%;height:100%;display:block}
+.mini .mneedle{transform-origin:50px 60px}
+/* dash furniture: bullet vents, pull knobs, the glovebox with its script badge */
+.vent{position:absolute;top:5.8cqh;width:4.4cqh;height:4.4cqh;border-radius:50%;
+  background:repeating-linear-gradient(180deg,#05060f 0 .5cqh,#171a33 .5cqh .8cqh);
+  box-shadow:0 0 0 .5cqh rgba(20,22,40,.95),0 0 0 .9cqh rgba(155,160,173,.5),inset 0 .3cqh .9cqh rgba(0,0,0,.8);
+  transition:opacity 1400ms var(--inout)}
+.vent.l{left:3.7cqw}.vent.r{left:92.6cqw}
+.pull{position:absolute;bottom:2cqh;width:3.6cqh;text-align:center;font:700 1.1cqh var(--body);letter-spacing:.14em;
+  color:rgba(243,231,207,.4);transition:opacity 1400ms var(--inout)}
+.pull b{display:block;margin:0 auto .45cqh;width:1.9cqh;height:1.9cqh;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f2eede,#8b90a0 55%,#31364a);
+  box-shadow:0 .25cqh .7cqh rgba(0,0,0,.55),inset 0 -.2cqh .3cqh rgba(0,0,0,.35)}
+.glovebox{position:absolute;left:57cqw;top:5.8cqh;width:20cqw;height:10.4cqh;border-radius:1.1cqh;
+  background:linear-gradient(180deg,#181b44,#0e1030 60%,#0a0c24);
+  box-shadow:inset 0 0 0 .22cqh rgba(198,203,214,.28),inset 0 .5cqh 1.4cqh rgba(243,231,207,.04),0 .6cqh 1.6cqh rgba(2,3,10,.5);
+  transition:opacity 1400ms var(--inout)}
+.glovebox .btn{position:absolute;left:50%;bottom:.9cqh;transform:translateX(-50%);width:3.2cqh;height:1.2cqh;border-radius:.6cqh;
+  background:linear-gradient(180deg,#e9e4d4,#767c8c);box-shadow:0 .2cqh .5cqh rgba(0,0,0,.5)}
+.glovebox .script{position:absolute;inset:0 0 1.2cqh;display:flex;align-items:center;justify-content:center;
+  font:3.1cqh Pacifico,cursive;color:var(--gold);opacity:.85;transform:rotate(-2deg);
+  text-shadow:0 0 1.4cqh rgba(245,179,53,.25)}
 
 .hud{position:absolute;left:14cqw;bottom:calc(var(--dashH) + 15cqh);display:flex;align-items:center;gap:2.6cqw;opacity:0;transform:translateY(1.4cqh);transition:opacity 900ms var(--out),transform 900ms var(--out);filter:drop-shadow(0 .4cqh 1.6cqh rgba(0,0,0,.6))}
 .hud.on{opacity:1;transform:none}
@@ -238,13 +315,51 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
   <div class="cockpit">
     <div class="roof"></div><div class="pillar l"></div><div class="pillar r"></div>
-    <div class="mirror"><span class="stem"></span><div class="frame"></div><div class="view" id="mirror"><i class="hl a"></i><i class="hl b"></i></div></div>
+    <div class="visor l"></div><div class="visor r"></div>
+    <div class="mirror"><span class="stem"></span><div class="frame"></div><div class="view" id="mirror"><i class="hl a"></i><i class="hl b"></i></div>
+      <div class="fresh"><svg viewBox="0 0 40 64">
+        <line x1="20" y1="0" x2="20" y2="13" stroke="rgba(243,231,207,.5)" stroke-width="1.6"/>
+        <polygon points="20,11 33,45 7,45" fill="#2fbfb2"/>
+        <polygon points="20,19 30,41 10,41" fill="#3EE6D8" opacity=".5"/>
+        <rect x="17" y="45" width="6" height="7" rx="1.5" fill="#8a6b3f"/>
+        <text x="20" y="39" text-anchor="middle" font-family="'Racing Sans One'" font-size="11" fill="#0E1230">08</text>
+      </svg></div></div>
     <div class="hood"></div>
-    <div class="dash"><div class="pad"></div><div class="trim"></div>
+    <div class="dash"><div class="pad"><span class="grille"></span></div><div class="trim"></div>
+      <div class="vent l"></div><div class="vent r"></div>
+      <div class="column"></div><div class="ign"></div>
+      <div class="keys"><svg viewBox="0 0 30 48">
+        <circle cx="15" cy="8" r="6" fill="none" stroke="#c9cfdd" stroke-width="2.4"/>
+        <g fill="#d9b45a" transform="rotate(16 19 16)"><circle cx="19" cy="19" r="4.6"/><circle cx="19" cy="19" r="1.6" fill="#0b0c1a"/>
+          <rect x="17.6" y="22" width="2.8" height="13" rx="1.2"/><rect x="20.4" y="28" width="2.4" height="2.2"/></g>
+        <g fill="#b9bfcc"><circle cx="12" cy="20" r="5"/><circle cx="12" cy="20" r="1.8" fill="#0b0c1a"/>
+          <rect x="10.5" y="23" width="3" height="15" rx="1.3"/><rect x="13.5" y="30" width="2.8" height="2.4"/><rect x="13.5" y="34" width="2.2" height="2.4"/></g>
+      </svg></div>
+      <div class="wheel" id="wheel"><span class="spoke a"></span><span class="spoke b"></span><span class="spoke c"></span>
+        <b class="horn"></b><span class="hub"><i>8</i></span></div>
+      <div class="cluster">
+        <div class="mini"><svg viewBox="0 0 100 100">
+          <g stroke="#F3E7CF" stroke-opacity=".6" stroke-width="3"><line x1="26" y1="40" x2="31" y2="45"/><line x1="50" y1="30" x2="50" y2="37"/><line x1="74" y1="40" x2="69" y2="45"/></g>
+          <text x="16" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">E</text>
+          <text x="74" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">F</text>
+          <text x="50" y="88" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(243,231,207,.4)" font-family="Nunito" font-weight="700">FUEL</text>
+          <line class="mneedle" id="fneedle" x1="50" y1="60" x2="50" y2="32" stroke="#E23A2E" stroke-width="3" stroke-linecap="round" style="transform:rotate(40deg)"/>
+          <circle cx="50" cy="60" r="4.6" fill="#C9CFDD"/></svg></div>
+        <div class="mini"><svg viewBox="0 0 100 100">
+          <g stroke-width="3"><line x1="26" y1="40" x2="31" y2="45" stroke="#3EE6D8" stroke-opacity=".7"/><line x1="50" y1="30" x2="50" y2="37" stroke="#F3E7CF" stroke-opacity=".6"/><line x1="74" y1="40" x2="69" y2="45" stroke="#E23A2E" stroke-opacity=".8"/></g>
+          <text x="16" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">C</text>
+          <text x="72" y="68" font-size="15" fill="rgba(243,231,207,.7)" font-family="'Racing Sans One'">H</text>
+          <text x="50" y="88" text-anchor="middle" font-size="10" letter-spacing="2" fill="rgba(243,231,207,.4)" font-family="Nunito" font-weight="700">TEMP</text>
+          <line class="mneedle" id="tneedle" x1="50" y1="60" x2="50" y2="32" stroke="#E23A2E" stroke-width="3" stroke-linecap="round" style="transform:rotate(-38deg)"/>
+          <circle cx="50" cy="60" r="4.6" fill="#C9CFDD"/></svg></div>
+      </div>
+      <span class="pull" style="left:41.6cqw"><b></b>LTS</span>
+      <span class="pull" style="left:43.6cqw"><b></b>WIP</span>
       <div class="radio"><span class="band"><i></i></span><span class="knob"></span><span class="knob r"></span></div>
-      <div class="wheel"><b class="horn"></b></div>
+      <div class="glovebox"><span class="script">Route 08</span><span class="btn"></span></div>
       <div class="dial" id="dial"><svg viewBox="0 0 100 100"><g id="ticks"></g>
         <circle cx="50" cy="56" r="44" fill="none" stroke="rgba(243,231,207,.28)" stroke-width="1"/>
+        <text x="50" y="42" text-anchor="middle" font-family="Nunito" font-weight="700" font-size="5" letter-spacing="2.4" fill="rgba(243,231,207,.55)">MPH</text>
         <line class="needle" id="needle" x1="50" y1="56" x2="50" y2="18" stroke="#E23A2E" stroke-width="2" stroke-linecap="round"/>
         <circle cx="50" cy="56" r="4.6" fill="#C9CFDD"/><circle cx="50" cy="56" r="2" fill="#0E1230"/></svg>
         <div class="odo"><div class="col"><div class="reel" id="d1"></div></div><div class="col"><div class="reel" id="d2"></div></div></div></div>
@@ -1037,7 +1152,8 @@ function jumpMile(m){const i=beats.findIndex(x=>x.mile===m);if(i<0)return;kill('
 /* ======================= dashboard ======================= */
 const ticks=document.getElementById('ticks');
 for(let i=0;i<=12;i++){const a=(-120+i*20)*Math.PI/180,big=i%3===0,r1=big?36:39,r2=43,col=i>=11?'#E23A2E':'#F3E7CF';
-  ticks.insertAdjacentHTML('beforeend',`<line x1="${50+r1*Math.sin(a)}" y1="${56-r1*Math.cos(a)}" x2="${50+r2*Math.sin(a)}" y2="${56-r2*Math.cos(a)}" stroke="${col}" stroke-opacity="${big?.9:.5}" stroke-width="${big?1.6:1}"/>`)}
+  ticks.insertAdjacentHTML('beforeend',`<line x1="${50+r1*Math.sin(a)}" y1="${56-r1*Math.cos(a)}" x2="${50+r2*Math.sin(a)}" y2="${56-r2*Math.cos(a)}" stroke="${col}" stroke-opacity="${big?.9:.5}" stroke-width="${big?1.6:1}"/>`);
+  if(big)ticks.insertAdjacentHTML('beforeend',`<text x="${(50+28*Math.sin(a)).toFixed(1)}" y="${(59-28*Math.cos(a)).toFixed(1)}" text-anchor="middle" font-family="'Racing Sans One'" font-size="8.5" fill="${i>=11?'#E23A2E':'rgba(243,231,207,.85)'}">${i/3*30}</text>`)}
 ['d1','d2'].forEach(id=>{document.getElementById(id).innerHTML=[0,1,2,3,4,5,6,7,8,9].map(n=>`<span>${n}</span>`).join('')});
 function odo(m){d1.style.transform=`translateY(${-Math.floor(m/10)*2.6}cqh)`;d2.style.transform=`translateY(${-(m%10)*2.6}cqh)`}
 let needleDeg=-120;
@@ -1067,6 +1183,7 @@ function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
 
 /* ======================= loop ======================= */
 let last=performance.now(),lastZ=0,lastProg=0;
+let lastYaw=0,wheelDeg=0,tempDeg=-38; /* cockpit life: steering lock and the temp needle warming up */
 const _camP={},_camL={};
 function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
   runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
@@ -1106,6 +1223,18 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
     if(!arriveBoardOn&&carZ<-522){arriveBoardOn=true;
       tween(v=>setBoard(v),0,1,1600,ease.inout,null,'board');tween(v=>boardLight.intensity=v*2,0,1,1600,ease.inout,null,'bl')}}
   const target=-120+Math.min(1,vel/72)*240;needleDeg+=(target-needleDeg)*Math.min(1,dt*4);needle.style.transform=`rotate(${needleDeg}deg)`;
+  /* the wheel steers with the road: heading rate becomes steering lock,
+     with a whisper of road jitter so hands are never frozen still */
+  let dyw=camera.rotation.y-lastYaw;lastYaw=camera.rotation.y;
+  if(dyw>Math.PI)dyw-=Math.PI*2;else if(dyw<-Math.PI)dyw+=Math.PI*2;
+  if(Math.abs(dyw)>.5)dyw=0; /* a beat jump is a teleport, not a corner */
+  const lock=Math.max(-1,Math.min(1,(dt>0?-dyw/dt:0)*1.6));
+  wheelDeg+=(lock*34+Math.sin(t*1.3)*1.4+Math.sin(t*5.1)*.7*sp-wheelDeg)*Math.min(1,dt*5);
+  wheel.style.setProperty('--steer',wheelDeg.toFixed(2)+'deg');
+  /* fuel burns down as the route rolls by; temp settles warm and breathes with speed */
+  fneedle.style.transform=`rotate(${(40-62*Math.min(1,Math.max(0,-carZ/730))).toFixed(1)}deg)`;
+  tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
+  tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
   renderer.render(scene,camera);requestAnimationFrame(frame)}
 
 
