@@ -45,6 +45,9 @@ if(SHOW.video){PRELOAD.ready.then(()=>{avid.src=PRELOAD.videoURL||encodeURI('ass
   avid.addEventListener('pause',()=>{if(attractOK&&beats[b]&&beats[b].name==='walkin')avid.play().catch(()=>{})})}
 
 const slot=i=>({x:i%2?3.3:-3.3,z:-565-i*4.2});
+/* parked cars turn to face the cockpit, so their windshield eyes meet the
+   audience during the introductions (a car at yaw 0 faces away, down -z) */
+const faceCam=(s,camZ)=>Math.atan2(s.x,s.z-camZ);
 function showPerson(i){const p=people[i];lname.textContent=p[1];lteam.textContent=p[2];lnum.textContent=p[0];hud.classList.add('on')}
 
 /* attract loop: the roster cycles while people walk in */
@@ -63,16 +66,20 @@ function setBoard(a){if(Math.abs(a-boardAlpha)<.03&&a!==0&&a!==1)return;boardAlp
 /* car and tractor placement per beat; correct after jumps in either direction */
 function layout(nx,dir){
   kill('park');
-  if(nx.name==='walkin'){cars.forEach((c,i)=>{c.position.set(i%2?1.9:-1.9,0,-6-i*3.6);setCarO(c,0)})}
+  if(nx.name==='walkin'){cars.forEach((c,i)=>{c.position.set(i%2?1.9:-1.9,0,-6-i*3.6);c.rotation.y=0;setCarO(c,0)})}
   else if(nx.town){
     const shown=nx.intro||4;
     const parked=dir>0&&nx.intro?shown-1:shown;
-    cars.forEach((c,i)=>{const s=slot(i);if(i<parked){c.position.set(s.x,0,s.z);setCarO(c,1)}else if(i>=shown)setCarO(c,0)});
+    cars.forEach((c,i)=>{const s=slot(i);
+      if(i<parked){c.position.set(s.x,0,s.z);c.rotation.y=faceCam(s,nx.z);setCarO(c,1)}
+      else if(i>=shown){setCarO(c,0);c.rotation.y=0}});
     if(nx.intro){
-      if(dir>0){const i=shown-1,c=cars[i],s=slot(i),lane=i%2?2:-2;
+      if(dir>0){const i=shown-1,c=cars[i],s=slot(i),lane=i%2?2:-2,yaw=faceCam(s,nx.z);
         mirror.classList.add('flash');townTimers.push(setTimeout(()=>mirror.classList.remove('flash'),1600));
-        townTimers.push(setTimeout(()=>{setCarO(c,1);
-          tween(v=>{c.position.z=carZ+9+(s.z-(carZ+9))*v;c.position.x=lane+(s.x-lane)*Math.min(1,v*1.5);c.position.y=0},0,1,2600,ease.inout,null,'park')},600));
+        townTimers.push(setTimeout(()=>{setCarO(c,1);c.rotation.y=0;
+          /* drive in facing forward, then swing around on the final approach */
+          tween(v=>{c.position.z=carZ+9+(s.z-(carZ+9))*v;c.position.x=lane+(s.x-lane)*Math.min(1,v*1.5);c.position.y=0;
+            c.rotation.y=yaw*Math.max(0,(v-.68)/.32)},0,1,2600,ease.inout,null,'park')},600));
         townTimers.push(setTimeout(()=>showPerson(i),2900))}
       else showPerson(shown-1)}
     else hud.classList.remove('on')}
