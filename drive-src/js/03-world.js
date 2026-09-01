@@ -256,7 +256,7 @@ const tractors=[0,1].map(i=>{let g;
   if(trAsset){g=new THREE.Group();const s=new THREE.Sprite(new THREE.SpriteMaterial({map:trAsset,transparent:true}));
     s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
   else{g=buildTractor();g.rotation.y=-Math.PI/2}
-  g.position.set(-34,0,-570-i*2.2);scene.add(g);return g});
+  g.position.set(-34,0,-578.5-i*2.2);scene.add(g);return g});
 
 /* ======================= time of day ======================= */
 /* 0 = cars-country daylight, 1 = full night; beats carry a night value */

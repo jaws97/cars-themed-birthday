@@ -6,9 +6,11 @@ const beats=[
   /* one press, one drive: dusk falls on the highway, the neon ignites as you
      pass each sign, and you roll to a stop under the lit welcome board */
   {name:'arrive',z:-538,mile:1,dur:16000,night:1,nightDur:9000},
-  {name:'town',z:-555.5,mile:2,town:1,intro:1,night:1},{name:'town',z:-557,mile:2,town:1,intro:2,night:1},{name:'town',z:-558.5,mile:2,town:1,intro:3,night:1},{name:'town',z:-560,mile:2,town:1,intro:4,night:1},
-  {name:'tractors',z:-560,mile:2,town:1,night:1,cap:'Tractors. It happens every August.'},
-  {name:'town',z:-561.5,mile:2,town:1,intro:5,night:1},{name:'town',z:-563,mile:2,town:1,intro:6,night:1},{name:'town',z:-564.5,mile:2,town:1,intro:7,night:1},{name:'town',z:-566,mile:2,town:1,intro:8,night:1},
+  /* the cockpit rolls one parking slot (4.2) per press, so every newly
+     introduced car parks at the same close, readable distance */
+  {name:'town',z:-554.5,mile:2,town:1,intro:1,night:1},{name:'town',z:-558.7,mile:2,town:1,intro:2,night:1},{name:'town',z:-562.9,mile:2,town:1,intro:3,night:1},{name:'town',z:-567.1,mile:2,town:1,intro:4,night:1},
+  {name:'tractors',z:-567.1,mile:2,town:1,night:1,cap:'Tractors. It happens every August.'},
+  {name:'town',z:-571.3,mile:2,town:1,intro:5,night:1},{name:'town',z:-575.5,mile:2,town:1,intro:6,night:1},{name:'town',z:-579.7,mile:2,town:1,intro:7,night:1},{name:'town',z:-583.9,mile:2,town:1,intro:8,night:1},
   {name:'grid500',z:-748,mile:3,night:.45,cap:'Eight cars. Two laps. One cake.'},
   {name:'race',z:-730,mile:3,night:.12},
   {name:'photo',z:-730,mile:4,dark:true,night:.12},
