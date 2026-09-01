@@ -195,7 +195,7 @@ const festTex=['rgb(245,179,53)','rgb(62,230,216)','rgb(255,92,168)','rgb(243,23
    two straights and two 180-degree turns. the front straight lies on the main
    road, so the arch at -700 is the track entrance. everything race-related is
    parameterized by arc length s along the centerline via trackPos(). */
-const TRACK={S:190,R:40,SF:95,LAPS:2};TRACK.L=2*TRACK.S+2*Math.PI*TRACK.R;
+const TRACK={S:250,R:40,SF:95,LAPS:2};TRACK.L=2*TRACK.S+2*Math.PI*TRACK.R;
 function trackPos(s,out){out=out||{};const S=TRACK.S,R=TRACK.R,L=TRACK.L;
   const u=s<0?s:((s%L)+L)%L;
   if(u<=S){out.x=0;out.z=-760-u;out.hx=0;out.hz=-1}
@@ -207,12 +207,14 @@ function trackPos(s,out){out=out||{};const S=TRACK.S,R=TRACK.R,L=TRACK.L;
     out.x=R+R*Math.cos(f);out.z=-760+R*Math.sin(f);out.hx=-Math.sin(f);out.hz=Math.cos(f)}
   return out}
 const _car_p={};
-function carAt(c,i,prog,wobble){trackPos(prog,_car_p);
-  const nx=-_car_p.hz,nz=_car_p.hx,off=(i%2?1.9:-1.9)+(wobble||0);
+/* lat is the live lateral offset (+ = right of travel, the inside of the
+   oval); omitted, it falls back to the staggered grid lanes */
+function carAt(c,i,prog,lat){trackPos(prog,_car_p);
+  const nx=-_car_p.hz,nz=_car_p.hx,off=lat===undefined?(i%2?1.9:-1.9):lat;
   c.position.set(_car_p.x+nx*off,0,_car_p.z+nz*off);
   c.rotation.y=Math.atan2(-_car_p.hx,-_car_p.hz)}
 /* the track ribbon */
-{const pts=[],uvs=[],idx=[],W=4.75,steps=280,p={};
+{const pts=[],uvs=[],idx=[],W=4.75,steps=340,p={};
   for(let i=0;i<=steps;i++){const s=i/steps*TRACK.L;trackPos(s,p);
     const nx=-p.hz,nz=p.hx;
     pts.push(p.x+nx*W,.035,p.z+nz*W,p.x-nx*W,.035,p.z-nz*W);
@@ -259,6 +261,13 @@ const tractors=[0,1].map(i=>{let g;
     s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
   else{g=buildTractor();g.rotation.y=-Math.PI/2}
   g.position.set(-34,0,-578.5-i*2.2);scene.add(g);return g});
+/* a third tractor for the speedway: it wanders across the back straight on
+   the final lap (netTick drives it) */
+const trackTractor=(()=>{let g;
+  if(trAsset){g=new THREE.Group();const s=new THREE.Sprite(new THREE.SpriteMaterial({map:trAsset,transparent:true}));
+    s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
+  else g=buildTractor();
+  g.visible=false;scene.add(g);return g})();
 
 /* ======================= time of day ======================= */
 /* 0 = cars-country daylight, 1 = full night; beats carry a night value */

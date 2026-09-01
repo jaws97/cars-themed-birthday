@@ -32,6 +32,11 @@ h1{font-family:'Alfa Slab One',serif;font-weight:400;font-size:7vw;letter-spacin
 #mash[disabled]{filter:grayscale(.7) brightness(.6)}
 #msg{font-family:'Alfa Slab One',serif;font-size:8vw;line-height:1.25}
 #msg small{display:block;font-family:Nunito;font-weight:700;font-size:3.4vw;letter-spacing:.28em;text-transform:uppercase;opacity:.6;margin-top:1.5vh}
+#steer{display:flex;gap:3vw;width:100%;max-width:480px}
+#steer button{flex:1;height:14vh;border:0;border-radius:3vw;background:#141838;color:var(--cream);
+  font-size:9vw;box-shadow:inset 0 -1vh 2.5vh rgba(0,0,0,.4);touch-action:none}
+#steer button.held{background:#232b66;transform:scale(.97)}
+#steer button[disabled]{opacity:.28}
 </style>
 </head>
 <body>
@@ -43,14 +48,19 @@ h1{font-family:'Alfa Slab One',serif;font-weight:400;font-size:7vw;letter-spacin
 
 <div id="pit">
   <button id="mash" disabled>GO</button>
+  <div id="steer"><button id="sl" disabled>&#9664;</button><button id="sr" disabled>&#9654;</button></div>
   <div id="msg">Hold tight.<small>wait for the green</small></div>
 </div>
 
 <script>
 //{{PEOPLE}}
 const statusEl=document.getElementById('status'),pickEl=document.getElementById('pick'),pitEl=document.getElementById('pit'),
-  carsEl=document.getElementById('cars'),mash=document.getElementById('mash'),msg=document.getElementById('msg');
-let conn=null,me=-1,taps=0,green=false;
+  carsEl=document.getElementById('cars'),mash=document.getElementById('mash'),msg=document.getElementById('msg'),
+  sl=document.getElementById('sl'),sr=document.getElementById('sr');
+let conn=null,me=-1,taps=0,green=false,steer=0;
+function racing(on){mash.disabled=sl.disabled=sr.disabled=!on;
+  if(!on){sl.classList.remove('held');sr.classList.remove('held');sendSteer(0)}}
+function sendSteer(v){if(steer===v)return;steer=v;if(conn&&conn.open)conn.send({type:'steer',v})}
 const hostId=location.hash.slice(1);
 
 function setMsg(big,small){msg.innerHTML=big+(small?`<small>${small}</small>`:'')}
@@ -74,13 +84,13 @@ else{
         mash.style.setProperty('--c',p[3]);mash.textContent=p[0];
         setMsg('You&#39;re in.','wait for the green')}
       else if(d.type==='state'){
-        if(d.phase==='set'){green=false;mash.disabled=true;setMsg('Drivers, ready…','fingers on the button')}
-        else if(d.phase==='green'){green=true;mash.disabled=false;
-          setMsg(d.place?'P'+d.place:'GO GO GO',d.place?'keep tapping!':'tap as fast as you can')}
-        else if(d.phase==='done'){green=false;mash.disabled=true;
+        if(d.phase==='set'){green=false;racing(false);setMsg('Drivers, ready…','fingers on the button')}
+        else if(d.phase==='green'){green=true;racing(true);
+          setMsg(d.place?'P'+d.place:'GO GO GO',d.place?'tap to go · steer around the cones':'tap fast · hold &#9664; &#9654; to steer')}
+        else if(d.phase==='done'){green=false;racing(false);
           setMsg(d.place===1?'P1. Winner!':'P'+d.place,d.place===1?'the august 500 is yours':'across the line')}
-        else if(d.phase==='over'){green=false;mash.disabled=true}
-        else if(d.phase==='idle'){green=false;mash.disabled=true;setMsg('Hold tight.','wait for the green')}}});
+        else if(d.phase==='over'){green=false;racing(false)}
+        else if(d.phase==='idle'){green=false;racing(false);setMsg('Hold tight.','wait for the green')}}});
     c.on('close',retry);c.on('error',retry)}
   function retry(){if(conn&&conn.open)return;
     if(retries++<10){statusEl.textContent='Reconnecting…';retryTimer=setTimeout(connect,500*Math.min(retries,4))}
@@ -92,6 +102,12 @@ else{
   mash.addEventListener('pointerdown',e=>{e.preventDefault();if(green)taps++});
   setInterval(()=>{if(conn&&conn.open&&taps>0){conn.send({type:'taps',n:taps});taps=0}},150);
   setInterval(()=>{if(conn&&conn.open)conn.send({type:'hi'})},4000);
+  /* steering: hold ◀ or ▶ — state-based, so lag can't eat a tap */
+  const hold=(el,v)=>{
+    el.addEventListener('pointerdown',e=>{e.preventDefault();if(!green)return;el.classList.add('held');sendSteer(v)});
+    const up=()=>{el.classList.remove('held');if(steer===v)sendSteer(0)};
+    el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('pointerleave',up)};
+  hold(sl,-1);hold(sr,1);
 }
 </script>
 </body>

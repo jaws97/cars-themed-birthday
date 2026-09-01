@@ -53,13 +53,21 @@ through the corners. Every car runs live physics — nothing is choreographed.
 
 Guests can drive: serve the folder over HTTP(S) (see deploying, below) and a
 QR code appears on the starting-grid beat. Scan it, pick a car, and when the
-lights go green, mash the big button to accelerate; the projector page hosts
-the race over peer-to-peer WebRTC ([PeerJS](https://peerjs.com)). Unclaimed
-cars are driven by AI pacers, real finishing order lands in the finish photo,
-and dropped phones auto-reconnect and keep their car. With no phones joined
-(or no internet) the same race runs between the AI drivers — the show never
-depends on the network. Race physics integrate wall-clock time, so a stuttering
-projector can't slow the race down.
+lights go green, mash the big button to accelerate and hold ◀ ▶ to steer;
+the projector page hosts the race over peer-to-peer WebRTC
+([PeerJS](https://peerjs.com)). Steering is rate-based (hold to drift across
+the track), so phone lag can't ruin it.
+
+Steering matters: every race scatters a fresh set of cones and oil slicks
+down the track (cones scrub your speed, oil sends you sliding), a tractor
+ambles across the back straight on the final lap, and the corners have real
+geometry — hugging the inside line is genuinely shorter. Unclaimed cars are
+driven by AI pacers that hunt the racing line and dodge the cones, but not
+perfectly. Real finishing order lands in the finish photo, and dropped
+phones auto-reconnect and keep their car. With no phones joined (or no
+internet) the same race runs between the AI drivers — the show never
+depends on the network. Race physics integrate wall-clock time, so a
+stuttering projector can't slow the race down.
 
 ## Deploying
 
