@@ -7,7 +7,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='b'||e.key==='B'||e.key==='.'){document.getElementById('blk').classList.toggle('on')}
   else if(e.key==='r'||e.key==='R'){kill('z');carZ=0;lastZ=0;go(0,0)}
   else if(e.key==='h'||e.key==='H'){honk()}
-  else if(/^[0-5]$/.test(e.key)){jumpMile(+e.key)}});
+  else if(/^[0-6]$/.test(e.key)){jumpMile(+e.key)}});
 /* the click that focuses the window shouldn't burn a beat */
 let focusT=-1e9;
 window.addEventListener('focus',()=>focusT=performance.now());

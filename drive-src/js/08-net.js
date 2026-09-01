@@ -3,7 +3,7 @@
    PeerJS (free public broker, no account) and send tap counts; the host runs the
    race. If there's no internet, no PeerJS, or nobody joins, the scripted race
    runs untouched — multiplayer is additive, never load-bearing. */
-const NET={peer:null,ready:false,conns:{},claimed:Array(8).fill(false),live:false,phase:'idle',
+const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(8).fill(false),live:false,phase:'idle',
   taps:Array(8).fill(0),rate:Array(8).fill(0),prog:Array(8).fill(0),spd:Array(8).fill(0),
   lat:Array(8).fill(0),st:Array(8).fill(0),slip:Array(8).fill(0),slipDir:Array(8).fill(0),hitCd:Array(8).fill(0),
   haz:[],hazMeshes:[],trac:null,done:[],greenT0:0,camProg:0,lastLap:0,lastPlaceT:0};
@@ -12,8 +12,11 @@ const lobbyEl=document.getElementById('lobby'),chipsEl=document.getElementById('
 function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='undefined')return;
   const id='r08-'+Math.random().toString(36).slice(2,7);
   try{NET.peer=new Peer(id)}catch(e){return}
-  NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&beats[b].name==='grid500')showLobby(true)});
-  NET.peer.on('connection',c=>{c.on('data',d=>onMsg(c,d));c.on('close',()=>dropConn(c))});
+  NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='hotlap'))showLobby(true)});
+  NET.peer.on('connection',c=>{NET.all.add(c);
+    c.on('open',()=>{if(TT.on)try{c.send({type:'tt',on:true})}catch(e){}});
+    c.on('data',d=>onMsg(c,d));
+    c.on('close',()=>{NET.all.delete(c);dropConn(c);ttDrop(c)})});
   NET.peer.on('error',()=>{})}
 function drawLobby(id){const url=location.origin+location.pathname.replace(/[^/]*$/,'')+'play/#'+id;
   const q=qrcode(0,'M');q.addData(url);q.make();const n=q.getModuleCount();
@@ -35,8 +38,11 @@ function onMsg(c,d){
       NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
       c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby()}
     else c.send({type:'roster',claimed:NET.claimed})}
-  else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n}
-  else if(d.type==='steer'){const i=c._idx;if(i!==undefined)NET.st[i]=Math.max(-1,Math.min(1,+d.v||0))}}
+  else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n;
+    if(TT.phase==='run'&&TT.driver&&TT.driver.conn===c)TT.taps+=d.n}
+  else if(d.type==='steer'){const v=Math.max(-1,Math.min(1,+d.v||0));c._st=v;
+    const i=c._idx;if(i!==undefined)NET.st[i]=v}
+  else if(d.type==='tt-join')ttJoin(c,d.name,d.car)}
 function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;
   if(!NET.live){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
 

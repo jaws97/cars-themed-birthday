@@ -49,6 +49,20 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #tower .row.fin{opacity:.55}
 
 /* multiplayer lobby, lives on the grid beat */
+/* midnight time trial: the leaderboard column and the live clock */
+#ttpanel{position:absolute;left:3.2cqw;top:10cqh;width:26cqw;display:none;flex-direction:column;gap:.9cqh;pointer-events:none}
+#ttpanel.on{display:flex}
+#ttpanel .tthead{font:400 2.7cqh var(--race);color:var(--gold);letter-spacing:.14em;text-shadow:0 .3cqh 1.6cqh rgba(0,0,0,.8)}
+#ttdriver{font:700 1.9cqh var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cream);opacity:.85;min-height:2.3cqh}
+#ttclock{font:400 6.4cqh var(--race);color:var(--cream);text-shadow:0 .4cqh 2cqh rgba(0,0,0,.75);font-variant-numeric:tabular-nums}
+#ttrows{display:flex;flex-direction:column;gap:.45cqh}
+#ttrows .row{display:flex;align-items:center;gap:.8cqh;background:rgba(4,5,16,.72);border-radius:.4cqh;padding:.4cqh 1.1cqh .4cqh .6cqh;font:700 2.1cqh var(--body);color:var(--cream)}
+#ttrows .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
+#ttrows .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
+#ttrows .row span{margin-left:auto;font:400 2.1cqh var(--race);font-variant-numeric:tabular-nums}
+#ttrows .row.me{outline:.25cqh solid var(--gold)}
+#lobby.tt .chips{display:none}
+
 #lobby{position:absolute;right:13cqw;top:9cqh;opacity:0;transform:translateY(1.2cqh);transition:opacity 700ms var(--out),transform 700ms var(--out);pointer-events:none}
 #lobby.on{opacity:1;transform:none}
 #lobby .panel{background:rgba(4,5,16,.84);border:1px solid rgba(243,231,207,.25);border-radius:1cqh;padding:2cqh 2.2cqh;display:flex;flex-direction:column;gap:1.2cqh;align-items:center}

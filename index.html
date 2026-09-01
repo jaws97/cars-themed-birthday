@@ -64,6 +64,20 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #tower .row.fin{opacity:.55}
 
 /* multiplayer lobby, lives on the grid beat */
+/* midnight time trial: the leaderboard column and the live clock */
+#ttpanel{position:absolute;left:3.2cqw;top:10cqh;width:26cqw;display:none;flex-direction:column;gap:.9cqh;pointer-events:none}
+#ttpanel.on{display:flex}
+#ttpanel .tthead{font:400 2.7cqh var(--race);color:var(--gold);letter-spacing:.14em;text-shadow:0 .3cqh 1.6cqh rgba(0,0,0,.8)}
+#ttdriver{font:700 1.9cqh var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cream);opacity:.85;min-height:2.3cqh}
+#ttclock{font:400 6.4cqh var(--race);color:var(--cream);text-shadow:0 .4cqh 2cqh rgba(0,0,0,.75);font-variant-numeric:tabular-nums}
+#ttrows{display:flex;flex-direction:column;gap:.45cqh}
+#ttrows .row{display:flex;align-items:center;gap:.8cqh;background:rgba(4,5,16,.72);border-radius:.4cqh;padding:.4cqh 1.1cqh .4cqh .6cqh;font:700 2.1cqh var(--body);color:var(--cream)}
+#ttrows .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
+#ttrows .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
+#ttrows .row span{margin-left:auto;font:400 2.1cqh var(--race);font-variant-numeric:tabular-nums}
+#ttrows .row.me{outline:.25cqh solid var(--gold)}
+#lobby.tt .chips{display:none}
+
 #lobby{position:absolute;right:13cqw;top:9cqh;opacity:0;transform:translateY(1.2cqh);transition:opacity 700ms var(--out),transform 700ms var(--out);pointer-events:none}
 #lobby.on{opacity:1;transform:none}
 #lobby .panel{background:rgba(4,5,16,.84);border:1px solid rgba(243,231,207,.25);border-radius:1cqh;padding:2cqh 2.2cqh;display:flex;flex-direction:column;gap:1.2cqh;align-items:center}
@@ -239,6 +253,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
   <div id="cap"></div>
   <div id="tower"></div>
+  <div id="ttpanel"><div class="tthead">MIDNIGHT TIME TRIAL</div><div id="ttdriver"></div><div id="ttclock">--:--.--</div><div id="ttrows"></div></div>
   <div id="lobby"><div class="panel">
     <div class="label" style="font-size:2cqh;opacity:.9">scan to race</div>
     <div id="qr"></div>
@@ -612,10 +627,14 @@ if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
 for(let z=-75;z>-440;z-=24){const p=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,7.5,6),dark);p.position.set(6.6,3.75,z);scene.add(p);
   const b=new THREE.Mesh(new THREE.BoxGeometry(1.6,.12,.12),dark);b.position.set(6.6,7,z);scene.add(b)}
 const rockG=new THREE.DodecahedronGeometry(1,0),rockM=new THREE.MeshLambertMaterial({color:0x1c1720});
-for(let i=0;i<90;i++){const r=new THREE.Mesh(rockG,rockM);const side=Math.random()<.5?-1:1;r.position.set(side*(7+Math.random()*40),0,-50-Math.random()*400);const s=.4+Math.random()*1.6;r.scale.set(s*1.4,s*.7,s);r.rotation.y=Math.random()*3;scene.add(r)}
+for(let i=0;i<90;i++){const r=new THREE.Mesh(rockG,rockM);const side=Math.random()<.5?-1:1;r.position.set(side*(7+Math.random()*40),0,-50-Math.random()*400);const s=.4+Math.random()*1.6;r.scale.set(s*1.4,s*.7,s);r.rotation.y=Math.random()*3;
+  if(r.position.x<0&&r.position.z<-405)r.position.x=-58-Math.random()*18; /* keep the circuit hairpin clear */
+  scene.add(r)}
 for(let i=0;i<22;i++){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.22,.28,4,7),rockM);t.position.y=2;g.add(t);
   const a=new THREE.Mesh(new THREE.CylinderGeometry(.16,.18,1.8,6),rockM);a.position.set(.6,2.6,0);g.add(a);const a2=a.clone();a2.position.set(-.55,2.2,0);a2.scale.y=.8;g.add(a2);
-  const side=Math.random()<.5?-1:1;g.position.set(side*(9+Math.random()*30),0,-80-Math.random()*360);g.rotation.y=Math.random()*3;const s=.7+Math.random()*.8;g.scale.set(s,s,s);scene.add(g)}
+  const side=Math.random()<.5?-1:1;g.position.set(side*(9+Math.random()*30),0,-80-Math.random()*360);g.rotation.y=Math.random()*3;const s=.7+Math.random()*.8;g.scale.set(s,s,s);
+  if(side<0&&g.position.z<-405)g.position.x=-55-Math.random()*15; /* keep the circuit hairpin clear */
+  scene.add(g)}
 
 /* exit sign */
 {const post=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,3,6),dark);post.position.set(6.2,1.5,-150);scene.add(post);
@@ -702,11 +721,11 @@ function carAt(c,i,prog,lat){trackPos(prog,_car_p);
   const nx=-_car_p.hz,nz=_car_p.hx,off=lat===undefined?(i%2?1.9:-1.9):lat;
   c.position.set(_car_p.x+nx*off,0,_car_p.z+nz*off);
   c.rotation.y=Math.atan2(-_car_p.hx,-_car_p.hz)}
-/* the track ribbon */
-{const pts=[],uvs=[],idx=[],W=4.75,steps=340,p={};
-  for(let i=0;i<=steps;i++){const s=i/steps*TRACK.L;trackPos(s,p);
+/* the track ribbon: shared by the oval and the midnight circuit */
+function buildRibbon(fn,s0,s1,W,y){const pts=[],uvs=[],idx=[],p={},steps=Math.max(24,Math.round((s1-s0)/2.2));
+  for(let i=0;i<=steps;i++){const s=s0+(s1-s0)*i/steps;fn(s,p);
     const nx=-p.hz,nz=p.hx;
-    pts.push(p.x+nx*W,.035,p.z+nz*W,p.x-nx*W,.035,p.z-nz*W);
+    pts.push(p.x+nx*W,y,p.z+nz*W,p.x-nx*W,y,p.z-nz*W);
     const v=s/12;uvs.push(0,v,1,v);
     if(i<steps){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}}
   const g=new THREE.BufferGeometry();
@@ -714,7 +733,8 @@ function carAt(c,i,prog,lat){trackPos(prog,_car_p);
   g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
   g.setIndex(idx);g.computeVertexNormals();
   const ringTex=roadTex.clone();ringTex.needsUpdate=true;ringTex.repeat.set(1,1);
-  scene.add(new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:ringTex,side:THREE.DoubleSide})))}
+  const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:ringTex,side:THREE.DoubleSide}));scene.add(m);return m}
+buildRibbon(trackPos,0,TRACK.L,4.75,.035);
 /* entrance arch, start/finish line and banner, pit wall, stands, floods */
 [-7.4,7.4].forEach(px=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,8.2,8),dark);p.position.set(px,4.1,-700);scene.add(p)});
 const archM=new THREE.Mesh(new THREE.PlaneGeometry(14,3.5),new THREE.MeshBasicMaterial({map:archTexture(),transparent:true}));
@@ -757,6 +777,70 @@ const trackTractor=(()=>{let g;
     s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
   else g=buildTractor();
   g.visible=false;scene.add(g);return g})();
+
+/* ======================= the midnight circuit =======================
+   the big lap for the post-credits time trial: north up main street and
+   through the town, a hairpin past the last shopfront, a long back road
+   behind the west grandstand with a proper chicane each way, then home
+   along the speedway front straight to the entrance arch — the lap line.
+   built from a segment table (straights and circular arcs) integrated
+   into exact start poses, so the loop closes to the millimetre and
+   everything is parameterized by arc length via circuitPos(). */
+const CIRCUIT={segs:[],L:0};
+{const P=Math.PI,defs=[
+   ['S',255],            /* main street north, under the welcome board */
+   ['A',22, 1,P],        /* town hairpin */
+   ['S',195],            /* back road south */
+   ['A',20,-1,P/4],['A',20,1,P/4],   /* chicane out */
+   ['S',190],            /* behind the west grandstand */
+   ['A',20, 1,P/4],['A',20,-1,P/4],  /* chicane back */
+   ['S',101.44],
+   ['A',22, 1,P],        /* speedway hairpin, onto the front straight */
+   ['S',288]];           /* front straight home to the arch */
+ let x=0,z=-700,th=0,acc=0; /* heading h=(-sin th, cos th); th 0 points north (+z) */
+ CIRCUIT.segs=defs.map(f=>{
+   const arc=f[0]==='A',R=arc?f[1]:0,dir=arc?f[2]:0,len=arc?R*f[3]:f[1];
+   const hx=-Math.sin(th),hz=Math.cos(th);
+   const seg={arc,x,z,th,R,dir,s0:acc,s1:acc+len,cx:x-hz*R*dir,cz:z+hx*R*dir};
+   if(arc){const ph=dir*f[3],c=Math.cos(ph),sn=Math.sin(ph),px=x-seg.cx,pz=z-seg.cz;
+     x=seg.cx+px*c-pz*sn;z=seg.cz+px*sn+pz*c;th+=ph}
+   else{x+=hx*len;z+=hz*len}
+   acc+=len;return seg});
+ CIRCUIT.L=acc;
+ console.assert(Math.hypot(x,z+700)<.01,'circuit does not close',x,z)}
+function circuitPos(s,out){out=out||{};const L=CIRCUIT.L,u=((s%L)+L)%L;
+  let g=CIRCUIT.segs[CIRCUIT.segs.length-1];
+  for(const q of CIRCUIT.segs){if(u<=q.s1+1e-6){g=q;break}}
+  const d=u-g.s0;
+  if(!g.arc){const hx=-Math.sin(g.th),hz=Math.cos(g.th);
+    out.x=g.x+hx*d;out.z=g.z+hz*d;out.hx=hx;out.hz=hz;out.R=0;out.dir=0}
+  else{const ph=g.dir*d/g.R,c=Math.cos(ph),sn=Math.sin(ph),px=g.x-g.cx,pz=g.z-g.cz;
+    out.x=g.cx+px*c-pz*sn;out.z=g.cz+px*sn+pz*c;
+    const th=g.th+ph;out.hx=-Math.sin(th);out.hz=Math.cos(th);out.R=g.R;out.dir=g.dir}
+  return out}
+const _cc_p={};
+function carAtC(c,prog,lat){circuitPos(prog,_cc_p);
+  const nx=-_cc_p.hz,nz=_cc_p.hx;
+  c.position.set(_cc_p.x+nx*lat,0,_cc_p.z+nz*lat);
+  c.rotation.y=Math.atan2(-_cc_p.hx,-_cc_p.hz)}
+/* new pavement only where the show has none: the main street and the
+   speedway front straight already carry the circuit's first and last legs */
+buildRibbon(circuitPos,255,942.51,4.75,.032);
+/* the lap line, under the entrance arch */
+{const lp=new THREE.Mesh(new THREE.PlaneGeometry(9.5,1.2),new THREE.MeshBasicMaterial({map:checkerTexture()}));
+  lp.rotation.x=-Math.PI/2;lp.position.set(0,.045,-700.2);scene.add(lp)}
+/* cats-eye posts trace the new pavement through the dark */
+{const p={};for(let s=262;s<940;s+=34){circuitPos(s,p);const nx=-p.hz,nz=p.hx;
+  [-5.7,5.7].forEach(o=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(.07,.09,1,6),dark);
+    post.position.set(p.x+nx*o,.5,p.z+nz*o);scene.add(post);
+    const dot=new THREE.Sprite(new THREE.SpriteMaterial({map:festTex[3],transparent:true,depthWrite:false}));
+    dot.scale.set(.5,.5,1);dot.position.set(p.x+nx*o,1.05,p.z+nz*o);scene.add(glowAtNight(dot,.7))})}}
+/* corner floods at the two hairpins */
+[290,905].forEach(s=>{const q=circuitPos(s,{});
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.18,16,8),dark);pole.position.set(q.x,8,q.z);scene.add(pole);
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:floodTex,transparent:true,opacity:.95,depthWrite:false}));
+  gl.scale.set(6,6,1);gl.position.set(q.x,16.4,q.z);scene.add(glowAtNight(gl,.95));
+  const l=new THREE.PointLight(0xf3e7cf,0,60,1);l.position.set(q.x,14,q.z);scene.add(lightAtNight(l,1.2))});
 
 /* ======================= time of day ======================= */
 /* 0 = cars-country daylight, 1 = full night; beats carry a night value */
@@ -805,7 +889,10 @@ const beats=[
   {name:'race',z:-730,mile:3,night:.12},
   {name:'photo',z:-730,mile:4,dark:true,night:.12},
   {name:'trophy',z:-730,mile:4,dark:true,night:.12},
-  {name:'credits',z:-730,mile:5,dark:true,night:.5}];
+  {name:'credits',z:-730,mile:5,dark:true,night:.5},
+  /* the after-party: the show hands over the wheel. one driver at a time,
+     the big circuit, a clock, and a leaderboard that lasts all night */
+  {name:'hotlap',z:-700,mile:6,night:1}];
 
 let b=-1,carZ=0,vel=0,camYaw=0,wiperRight=false,walkTimer=null,walkIdx=0,walkTos=[],townTimers=[],tractorsOn=false,arriveBoardOn=false;
 const stageEl=document.getElementById('stage'),hud=document.getElementById('hud'),mirror=document.getElementById('mirror'),
@@ -879,6 +966,7 @@ function layout(nx,dir){
     else hud.classList.remove('on')}
   else if(nx.name==='grid500'){hud.classList.remove('on');cars.forEach((c,i)=>{setCarO(c,1);carAt(c,i,gridProg(i))})}
   else if(nx.name==='race'){hud.classList.remove('on')} /* netStartRace/netTick own the cars */
+  else if(nx.name==='hotlap'){hud.classList.remove('on');cars.forEach(c=>setCarO(c,0))} /* ttNext stages each driver */
   else hud.classList.remove('on');
   /* tractors cross the road mid-introductions */
   if(nx.name==='tractors'){tractorsOn=true;
@@ -906,6 +994,7 @@ function go(i,dir){
   cap.textContent=nx.cap||'';cap.classList.toggle('on',!!nx.cap);
   /* the race is always live: phones drive claimed cars, AI drives the rest */
   if(nx.name==='grid500'){netInit();showLobby(true)}else showLobby(false);
+  if(nx.name==='hotlap')ttOpen();else ttClose();
   const onTrack=nx.name==='grid500'||nx.name==='race';
   cars.forEach(c=>{if(c.userData.tag)c.userData.tag.visible=onTrack});
   document.getElementById('tower').classList.toggle('on',nx.name==='race');
@@ -939,7 +1028,9 @@ function go(i,dir){
 /* clickers double-fire; a stray second press mid-race would end the August 500 */
 let advT=-1e9;
 function advance(){const n=performance.now();if(n-advT<450)return;advT=n;
-  if(b>=beats.length-1){kill('z');carZ=0;lastZ=0;go(0,0)}else go(b+1,1)}
+  /* the time trial is the after-party: the show parks there and stays.
+     R still restarts the whole night from the top */
+  if(b<beats.length-1)go(b+1,1)}
 function jumpMile(m){const i=beats.findIndex(x=>x.mile===m);if(i<0)return;kill('z');carZ=beats[i].z;lastZ=carZ;go(i,0)}
 
 
@@ -968,7 +1059,7 @@ rollEl.innerHTML=
   <div class="gap"></div>
   <div class="hero" style="font-size:5.4cqh;white-space:normal;max-width:70cqw;margin:0 auto;line-height:1.3">Happy birthday, August people.</div>
   <div class="gap"></div>
-  <div class="label" style="opacity:.55">same road next year · press space to drive again</div>`;
+  <div class="label" style="opacity:.55">same road next year · press space — the track is yours</div>`;
 function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
   const H=stageEl.clientHeight,fin=rollEl.lastElementChild,end=-(H*.5+fin.offsetTop+fin.offsetHeight*.5);
   tween(v=>rollEl.style.transform=`translateY(${v}px)`,0,end,40000,ease.lin,null,'roll')}
@@ -978,16 +1069,22 @@ function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
 let last=performance.now(),lastZ=0,lastProg=0;
 const _camP={};
 function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
-  runTweens(now);netTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
+  runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
   const racing=NET.live&&NET.phase!=='idle';
   let v;
   if(racing){v=dt>0?Math.max(0,NET.camProg-lastProg)/dt:0;lastProg=NET.camProg}
+  else if(TT.on){v=dt>0?Math.max(0,TT.camProg-lastProg)/dt:0;lastProg=TT.camProg}
   else{v=dt>0?Math.abs(carZ-lastZ)/dt:0;lastZ=carZ;lastProg=NET.camProg}
   vel+=(v-vel)*Math.min(1,dt*6);
   const t=now/1000,sp=Math.min(1,vel/40);
   let camZ=carZ;
   if(racing){ /* the cockpit drives the oval, chasing the pack */
     trackPos(NET.camProg,_camP);camZ=_camP.z;
+    camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
+    camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
+    head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
+  else if(TT.on){ /* the time trial rides the midnight circuit */
+    circuitPos(TT.camProg,_camP);camZ=_camP.z;
     camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
     head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
@@ -1014,7 +1111,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='b'||e.key==='B'||e.key==='.'){document.getElementById('blk').classList.toggle('on')}
   else if(e.key==='r'||e.key==='R'){kill('z');carZ=0;lastZ=0;go(0,0)}
   else if(e.key==='h'||e.key==='H'){honk()}
-  else if(/^[0-5]$/.test(e.key)){jumpMile(+e.key)}});
+  else if(/^[0-6]$/.test(e.key)){jumpMile(+e.key)}});
 /* the click that focuses the window shouldn't burn a beat */
 let focusT=-1e9;
 window.addEventListener('focus',()=>focusT=performance.now());
@@ -1048,7 +1145,7 @@ Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
    PeerJS (free public broker, no account) and send tap counts; the host runs the
    race. If there's no internet, no PeerJS, or nobody joins, the scripted race
    runs untouched — multiplayer is additive, never load-bearing. */
-const NET={peer:null,ready:false,conns:{},claimed:Array(8).fill(false),live:false,phase:'idle',
+const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(8).fill(false),live:false,phase:'idle',
   taps:Array(8).fill(0),rate:Array(8).fill(0),prog:Array(8).fill(0),spd:Array(8).fill(0),
   lat:Array(8).fill(0),st:Array(8).fill(0),slip:Array(8).fill(0),slipDir:Array(8).fill(0),hitCd:Array(8).fill(0),
   haz:[],hazMeshes:[],trac:null,done:[],greenT0:0,camProg:0,lastLap:0,lastPlaceT:0};
@@ -1057,8 +1154,11 @@ const lobbyEl=document.getElementById('lobby'),chipsEl=document.getElementById('
 function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='undefined')return;
   const id='r08-'+Math.random().toString(36).slice(2,7);
   try{NET.peer=new Peer(id)}catch(e){return}
-  NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&beats[b].name==='grid500')showLobby(true)});
-  NET.peer.on('connection',c=>{c.on('data',d=>onMsg(c,d));c.on('close',()=>dropConn(c))});
+  NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='hotlap'))showLobby(true)});
+  NET.peer.on('connection',c=>{NET.all.add(c);
+    c.on('open',()=>{if(TT.on)try{c.send({type:'tt',on:true})}catch(e){}});
+    c.on('data',d=>onMsg(c,d));
+    c.on('close',()=>{NET.all.delete(c);dropConn(c);ttDrop(c)})});
   NET.peer.on('error',()=>{})}
 function drawLobby(id){const url=location.origin+location.pathname.replace(/[^/]*$/,'')+'play/#'+id;
   const q=qrcode(0,'M');q.addData(url);q.make();const n=q.getModuleCount();
@@ -1080,8 +1180,11 @@ function onMsg(c,d){
       NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
       c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby()}
     else c.send({type:'roster',claimed:NET.claimed})}
-  else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n}
-  else if(d.type==='steer'){const i=c._idx;if(i!==undefined)NET.st[i]=Math.max(-1,Math.min(1,+d.v||0))}}
+  else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n;
+    if(TT.phase==='run'&&TT.driver&&TT.driver.conn===c)TT.taps+=d.n}
+  else if(d.type==='steer'){const v=Math.max(-1,Math.min(1,+d.v||0));c._st=v;
+    const i=c._idx;if(i!==undefined)NET.st[i]=v}
+  else if(d.type==='tt-join')ttJoin(c,d.name,d.car)}
 function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;
   if(!NET.live){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
 
@@ -1206,6 +1309,152 @@ function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finish
 
 function updateFin(order){document.getElementById('fin').innerHTML=order.map((idx,pl)=>{const p=people[idx];
   return `<div class="p"><span class="n" style="background:${p[3]}">${p[0]}</span><span class="who">${pl+1}. ${p[1]}<small>${p[2]}</small></span></div>`}).join('')}
+
+
+/* ======================= midnight time trial =======================
+   the post-credits playground: one driver at a time takes the big
+   circuit, the host times the lap, and the leaderboard remembers the
+   night's legends. phones queue with a typed name — nobody claims a
+   roster car, they just borrow a paint job for one lap. */
+const TT={on:false,phase:'idle',queue:[],driver:null,timers:[],
+  prog:0,spd:0,rate:0,taps:0,lat:0,slip:0,slipDir:0,stun:0,hitCd:0,t0:0,camProg:0,
+  cones:[],coneMeshes:[],board:[]};
+const ttPanel=document.getElementById('ttpanel'),ttRows=document.getElementById('ttrows'),
+  ttClock=document.getElementById('ttclock'),ttDriver=document.getElementById('ttdriver');
+try{TT.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
+const ttEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ttFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
+function ttSave(){try{localStorage.setItem('r08-laps',JSON.stringify(TT.board.slice(0,50)))}catch(e){}}
+function ttCast(m){if(NET.all)NET.all.forEach(c=>{if(c.open)try{c.send(m)}catch(e){}})}
+function ttSetCap(t){cap.textContent=t||'';cap.classList.toggle('on',!!t)}
+const TT_INVITE='scan the code · one lap · fastest tonight wins';
+
+function ttRenderBoard(hl){ttRows.innerHTML=TT.board.slice(0,8).map((e,i)=>
+  `<div class="row${e===hl?' me':''}"><b>${i+1}</b><i style="background:${people[e.car][3]}"></i>${ttEsc(e.n)}<span>${ttFmt(e.ms)}</span></div>`).join('')
+  ||'<div class="row">no laps yet — be the first</div>'}
+function ttStatus(){
+  if(TT.driver)ttDriver.textContent='at the wheel — '+TT.driver.name;
+  else if(TT.queue.length)ttDriver.textContent='next up: '+TT.queue[0].name+(TT.queue.length>1?' · '+(TT.queue.length-1)+' more in line':'');
+  else ttDriver.textContent='the track is open';
+  if(TT.phase!=='run')ttClock.textContent=TT.board[0]?'★ '+ttFmt(TT.board[0].ms):'--:--.--'}
+
+function ttOpen(){if(TT.on)return;TT.on=true;TT.phase='idle';TT.camProg=0;
+  netInit();showLobby(true);lobbyEl.classList.add('tt');
+  ttPanel.classList.add('on');ttBuildCones();ttRenderBoard(null);ttStatus();
+  ttSetCap(TT_INVITE);
+  ttCast({type:'tt',on:true})}
+function ttClose(){if(!TT.on)return;TT.on=false;
+  TT.timers.forEach(clearTimeout);TT.timers=[];
+  if(TT.driver&&TT.driver.conn.open)try{TT.driver.conn.send({type:'tt-dnf'})}catch(e){}
+  if(TT.driver)setCarO(cars[TT.driver.car],0);
+  TT.driver=null;TT.queue=[];TT.phase='idle';
+  TT.coneMeshes.forEach(m=>scene.remove(m));TT.coneMeshes=[];TT.cones=[];
+  ttPanel.classList.remove('on');lobbyEl.classList.remove('tt');
+  ttCast({type:'tt',on:false})}
+
+/* track furniture: one fixed layout per session, so every lap is the same test */
+function ttBuildCones(){TT.coneMeshes.forEach(m=>scene.remove(m));TT.coneMeshes=[];TT.cones=[];
+  const used=[],p={};
+  for(let k=0;k<11;k++){let s=null;
+    for(let t=0;t<40;t++){const q=130+Math.random()*(CIRCUIT.L-190);
+      if(used.every(u=>Math.abs(u-q)>26)){s=q;used.push(q);break}}
+    if(s===null)break;
+    TT.cones.push({p:s,lat:Math.random()*5.4-2.7,type:k<8?'cone':'oil'})}
+  TT.cones.forEach(h=>{circuitPos(h.p,p);const nx=-p.hz,nz=p.hx;let m;
+    if(h.type==='cone')m=new THREE.Mesh(new THREE.ConeGeometry(.4,.8,10),new THREE.MeshLambertMaterial({color:0xF5B335}));
+    else{m=new THREE.Mesh(new THREE.CircleGeometry(.95,16),new THREE.MeshBasicMaterial({color:0x0a0c18,transparent:true,opacity:.8}));m.rotation.x=-Math.PI/2}
+    m.position.set(p.x+nx*h.lat,h.type==='cone'?.4:.05,p.z+nz*h.lat);
+    h.mesh=m;h.x0=m.position.x;h.z0=m.position.z;h.nx=nx;h.nz=nz;h.gone=false;
+    scene.add(m);TT.coneMeshes.push(m)})}
+/* a struck cone gets punted off the racing line, then walks back for the
+   next driver — the layout stays identical for everyone */
+function ttThump(h,side){if(h.gone)return;h.gone=true;const m=h.mesh;
+  tween(v=>{m.position.y=.4+Math.sin(v*Math.PI)*1.8;
+    m.position.x=h.x0+h.nx*side*2.4*v;m.position.z=h.z0+h.nz*side*2.4*v;
+    m.rotation.z=v*6.5},0,1,650,ease.out,null,'cone'+h.p);
+  TT.timers.push(setTimeout(()=>{h.gone=false;m.position.set(h.x0,.4,h.z0);m.rotation.z=0},3200))}
+function ttFlash(t){if(TT.phase!=='run')return;ttSetCap(t);
+  TT.timers.push(setTimeout(()=>{if(TT.phase==='run')ttSetCap('')},1400))}
+
+/* the queue: phones ask in with a name, the host stages them one by one */
+function ttJoin(c,name,car){if(!TT.on)return;
+  name=String(name||'').replace(/\s+/g,' ').trim().slice(0,14)||'mystery driver';
+  car=Math.abs(car|0)%8;
+  if(TT.driver&&TT.driver.conn===c)return;
+  const q=TT.queue.find(e=>e.conn===c);
+  if(q){q.name=name;q.car=car}else TT.queue.push({conn:c,name,car});
+  ttQPos();ttStatus();
+  if(!TT.driver)ttNext()}
+function ttQPos(){TT.queue.forEach((e,i)=>{if(e.conn.open)try{e.conn.send({type:'tt-q',pos:i+1})}catch(x){}})}
+function ttDrop(c){if(!TT.on)return;
+  const n=TT.queue.length;TT.queue=TT.queue.filter(e=>e.conn!==c);
+  if(TT.queue.length!==n){ttQPos();ttStatus()}
+  if(TT.driver&&TT.driver.conn===c){ttSetCap(TT.driver.name+' lost the pits — next driver');ttAbort(1800)}}
+function ttAbort(delay){TT.timers.forEach(clearTimeout);TT.timers=[];TT.phase='idle';
+  if(TT.driver)setCarO(cars[TT.driver.car],0);TT.driver=null;ttStatus();
+  TT.timers.push(setTimeout(ttNext,delay||0))}
+
+function ttNext(){if(!TT.on||TT.driver)return;
+  let d=null;while(TT.queue.length&&!d){const e=TT.queue.shift();if(e.conn.open)d=e}
+  ttQPos();
+  if(!d){TT.phase='idle';ttStatus();ttSetCap(TT_INVITE);return}
+  TT.driver=d;TT.phase='staged';
+  TT.prog=0;TT.spd=0;TT.rate=0;TT.taps=0;TT.lat=0;TT.slip=0;TT.stun=0;TT.hitCd=0;TT.camProg=-16;
+  cars.forEach(c=>setCarO(c,0));setCarO(cars[d.car],1);carAtC(cars[d.car],0,0);
+  try{d.conn.send({type:'tt-stage'})}catch(e){}
+  ttStatus();ttSetCap(d.name+' to the line…');
+  [['READY…',1600],['3',2600],['2',3400],['1',4200]].forEach(([t,ms])=>TT.timers.push(setTimeout(()=>ttSetCap(t),ms)));
+  TT.timers.push(setTimeout(()=>{if(TT.driver!==d)return;
+    TT.phase='run';TT.t0=performance.now();
+    ttSetCap('GO!');try{d.conn.send({type:'tt-go'})}catch(e){}
+    TT.timers.push(setTimeout(()=>{if(TT.phase==='run')ttSetCap('')},2200))},5000))}
+
+function ttFinish(ms){const d=TT.driver;TT.phase='cool';
+  const entry={n:d.name,car:d.car,ms:Math.round(ms)};
+  TT.board.push(entry);TT.board.sort((a,b)=>a.ms-b.ms);ttSave();
+  const rank=TT.board.indexOf(entry);
+  ttRenderBoard(entry);ttClock.textContent=ttFmt(ms);
+  ttSetCap(rank===0?d.name+' — '+ttFmt(ms)+' — TRACK RECORD!':d.name+' — '+ttFmt(ms));
+  try{d.conn.send({type:'tt-done',ms:entry.ms,rank:rank+1,of:TT.board.length})}catch(e){}
+  TT.timers.push(setTimeout(()=>{if(TT.driver!==d)return;
+    setCarO(cars[d.car],0);TT.driver=null;TT.phase='idle';ttStatus();
+    if(TT.queue.length)ttNext();else ttSetCap(TT_INVITE)},4500))}
+
+const _tt_p={};
+function ttTick(dt,now){if(!TT.on)return;
+  if(TT.phase==='idle'){TT.camProg+=dt*16;return} /* empty track: a slow flying tour */
+  if(TT.phase==='staged'){TT.camProg+=(-16-TT.camProg)*Math.min(1,dt*3);return}
+  const d=TT.driver;if(!d)return;
+  const L=CIRCUIT.L,u=((TT.prog%L)+L)%L;
+  if(TT.phase==='run'){
+    TT.rate=Math.min(14,TT.rate*(1-Math.min(1,dt*1.5))+TT.taps*1.5);TT.taps=0;
+    if(TT.stun>0)TT.stun-=dt; /* a hit kills the throttle until the car recovers */
+    const target=TT.stun>0?0:(12+TT.rate*1.9)*(TT.slip>0?.72:1);
+    TT.spd+=(target-TT.spd)*Math.min(1,dt*(TT.stun>0?4:1.8));
+    ttClock.textContent=ttFmt(now-TT.t0)}
+  else TT.spd+=(0-TT.spd)*Math.min(1,dt*1.2); /* cool: roll it out past the line */
+  const st=(d.conn&&d.conn._st)||0;
+  if(TT.slip>0){TT.slip-=dt;TT.lat+=TT.slipDir*2.6*dt}
+  else{TT.lat+=st*4.6*dt;if(!st)TT.lat+=(0-TT.lat)*Math.min(1,dt*.3)}
+  TT.lat=Math.max(-3.4,Math.min(3.4,TT.lat));
+  if(TT.phase==='run'&&now-TT.hitCd>2000){
+    for(const h of TT.cones){if(h.gone)continue;
+      const d0=Math.abs(u-h.p),dd=Math.min(d0,L-d0);
+      if(dd<1.7&&Math.abs(TT.lat-h.lat)<1.15){TT.hitCd=now;
+        if(h.type==='cone'){TT.spd*=.1;TT.stun=.6;ttThump(h,TT.lat>=h.lat?-1:1);ttFlash('CONE!')}
+        else{TT.slip=.9;TT.slipDir=TT.lat>=h.lat?1:-1;ttFlash('OIL SLICK!')}
+        break}}}
+  /* real corner geometry, same as the race: the inside line is shorter */
+  circuitPos(u,_tt_p);
+  const cf=_tt_p.R?_tt_p.R/(_tt_p.R-_tt_p.dir*TT.lat):1;
+  TT.prog+=TT.spd*dt*cf;
+  if(TT.phase==='run'&&TT.prog>=L)ttFinish(now-TT.t0);
+  else if(TT.phase==='run'&&now-TT.t0>150000){ /* a dead phone can't hold the track */
+    ttSetCap(d.name+' ran out of night');
+    if(d.conn.open)try{d.conn.send({type:'tt-dnf'})}catch(e){}
+    ttAbort(1800);return}
+  carAtC(cars[d.car],TT.prog,TT.lat+Math.sin(now/300)*.1);
+  TT.camProg+=(TT.prog-8-TT.camProg)*Math.min(1,dt*1.6)}
 
 </script>
 </body>

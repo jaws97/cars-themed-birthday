@@ -23,7 +23,7 @@ rollEl.innerHTML=
   <div class="gap"></div>
   <div class="hero" style="font-size:5.4cqh;white-space:normal;max-width:70cqw;margin:0 auto;line-height:1.3">Happy birthday, August people.</div>
   <div class="gap"></div>
-  <div class="label" style="opacity:.55">same road next year · press space to drive again</div>`;
+  <div class="label" style="opacity:.55">same road next year · press space — the track is yours</div>`;
 function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
   const H=stageEl.clientHeight,fin=rollEl.lastElementChild,end=-(H*.5+fin.offsetTop+fin.offsetHeight*.5);
   tween(v=>rollEl.style.transform=`translateY(${v}px)`,0,end,40000,ease.lin,null,'roll')}

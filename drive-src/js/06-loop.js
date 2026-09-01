@@ -2,16 +2,22 @@
 let last=performance.now(),lastZ=0,lastProg=0;
 const _camP={};
 function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
-  runTweens(now);netTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
+  runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
   const racing=NET.live&&NET.phase!=='idle';
   let v;
   if(racing){v=dt>0?Math.max(0,NET.camProg-lastProg)/dt:0;lastProg=NET.camProg}
+  else if(TT.on){v=dt>0?Math.max(0,TT.camProg-lastProg)/dt:0;lastProg=TT.camProg}
   else{v=dt>0?Math.abs(carZ-lastZ)/dt:0;lastZ=carZ;lastProg=NET.camProg}
   vel+=(v-vel)*Math.min(1,dt*6);
   const t=now/1000,sp=Math.min(1,vel/40);
   let camZ=carZ;
   if(racing){ /* the cockpit drives the oval, chasing the pack */
     trackPos(NET.camProg,_camP);camZ=_camP.z;
+    camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
+    camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
+    head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
+  else if(TT.on){ /* the time trial rides the midnight circuit */
+    circuitPos(TT.camProg,_camP);camZ=_camP.z;
     camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
     head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}

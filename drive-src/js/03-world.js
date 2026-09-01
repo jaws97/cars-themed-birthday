@@ -123,10 +123,14 @@ if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
 for(let z=-75;z>-440;z-=24){const p=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,7.5,6),dark);p.position.set(6.6,3.75,z);scene.add(p);
   const b=new THREE.Mesh(new THREE.BoxGeometry(1.6,.12,.12),dark);b.position.set(6.6,7,z);scene.add(b)}
 const rockG=new THREE.DodecahedronGeometry(1,0),rockM=new THREE.MeshLambertMaterial({color:0x1c1720});
-for(let i=0;i<90;i++){const r=new THREE.Mesh(rockG,rockM);const side=Math.random()<.5?-1:1;r.position.set(side*(7+Math.random()*40),0,-50-Math.random()*400);const s=.4+Math.random()*1.6;r.scale.set(s*1.4,s*.7,s);r.rotation.y=Math.random()*3;scene.add(r)}
+for(let i=0;i<90;i++){const r=new THREE.Mesh(rockG,rockM);const side=Math.random()<.5?-1:1;r.position.set(side*(7+Math.random()*40),0,-50-Math.random()*400);const s=.4+Math.random()*1.6;r.scale.set(s*1.4,s*.7,s);r.rotation.y=Math.random()*3;
+  if(r.position.x<0&&r.position.z<-405)r.position.x=-58-Math.random()*18; /* keep the circuit hairpin clear */
+  scene.add(r)}
 for(let i=0;i<22;i++){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.22,.28,4,7),rockM);t.position.y=2;g.add(t);
   const a=new THREE.Mesh(new THREE.CylinderGeometry(.16,.18,1.8,6),rockM);a.position.set(.6,2.6,0);g.add(a);const a2=a.clone();a2.position.set(-.55,2.2,0);a2.scale.y=.8;g.add(a2);
-  const side=Math.random()<.5?-1:1;g.position.set(side*(9+Math.random()*30),0,-80-Math.random()*360);g.rotation.y=Math.random()*3;const s=.7+Math.random()*.8;g.scale.set(s,s,s);scene.add(g)}
+  const side=Math.random()<.5?-1:1;g.position.set(side*(9+Math.random()*30),0,-80-Math.random()*360);g.rotation.y=Math.random()*3;const s=.7+Math.random()*.8;g.scale.set(s,s,s);
+  if(side<0&&g.position.z<-405)g.position.x=-55-Math.random()*15; /* keep the circuit hairpin clear */
+  scene.add(g)}
 
 /* exit sign */
 {const post=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,3,6),dark);post.position.set(6.2,1.5,-150);scene.add(post);
@@ -213,11 +217,11 @@ function carAt(c,i,prog,lat){trackPos(prog,_car_p);
   const nx=-_car_p.hz,nz=_car_p.hx,off=lat===undefined?(i%2?1.9:-1.9):lat;
   c.position.set(_car_p.x+nx*off,0,_car_p.z+nz*off);
   c.rotation.y=Math.atan2(-_car_p.hx,-_car_p.hz)}
-/* the track ribbon */
-{const pts=[],uvs=[],idx=[],W=4.75,steps=340,p={};
-  for(let i=0;i<=steps;i++){const s=i/steps*TRACK.L;trackPos(s,p);
+/* the track ribbon: shared by the oval and the midnight circuit */
+function buildRibbon(fn,s0,s1,W,y){const pts=[],uvs=[],idx=[],p={},steps=Math.max(24,Math.round((s1-s0)/2.2));
+  for(let i=0;i<=steps;i++){const s=s0+(s1-s0)*i/steps;fn(s,p);
     const nx=-p.hz,nz=p.hx;
-    pts.push(p.x+nx*W,.035,p.z+nz*W,p.x-nx*W,.035,p.z-nz*W);
+    pts.push(p.x+nx*W,y,p.z+nz*W,p.x-nx*W,y,p.z-nz*W);
     const v=s/12;uvs.push(0,v,1,v);
     if(i<steps){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}}
   const g=new THREE.BufferGeometry();
@@ -225,7 +229,8 @@ function carAt(c,i,prog,lat){trackPos(prog,_car_p);
   g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
   g.setIndex(idx);g.computeVertexNormals();
   const ringTex=roadTex.clone();ringTex.needsUpdate=true;ringTex.repeat.set(1,1);
-  scene.add(new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:ringTex,side:THREE.DoubleSide})))}
+  const m=new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:ringTex,side:THREE.DoubleSide}));scene.add(m);return m}
+buildRibbon(trackPos,0,TRACK.L,4.75,.035);
 /* entrance arch, start/finish line and banner, pit wall, stands, floods */
 [-7.4,7.4].forEach(px=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,8.2,8),dark);p.position.set(px,4.1,-700);scene.add(p)});
 const archM=new THREE.Mesh(new THREE.PlaneGeometry(14,3.5),new THREE.MeshBasicMaterial({map:archTexture(),transparent:true}));
@@ -268,6 +273,70 @@ const trackTractor=(()=>{let g;
     s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
   else g=buildTractor();
   g.visible=false;scene.add(g);return g})();
+
+/* ======================= the midnight circuit =======================
+   the big lap for the post-credits time trial: north up main street and
+   through the town, a hairpin past the last shopfront, a long back road
+   behind the west grandstand with a proper chicane each way, then home
+   along the speedway front straight to the entrance arch — the lap line.
+   built from a segment table (straights and circular arcs) integrated
+   into exact start poses, so the loop closes to the millimetre and
+   everything is parameterized by arc length via circuitPos(). */
+const CIRCUIT={segs:[],L:0};
+{const P=Math.PI,defs=[
+   ['S',255],            /* main street north, under the welcome board */
+   ['A',22, 1,P],        /* town hairpin */
+   ['S',195],            /* back road south */
+   ['A',20,-1,P/4],['A',20,1,P/4],   /* chicane out */
+   ['S',190],            /* behind the west grandstand */
+   ['A',20, 1,P/4],['A',20,-1,P/4],  /* chicane back */
+   ['S',101.44],
+   ['A',22, 1,P],        /* speedway hairpin, onto the front straight */
+   ['S',288]];           /* front straight home to the arch */
+ let x=0,z=-700,th=0,acc=0; /* heading h=(-sin th, cos th); th 0 points north (+z) */
+ CIRCUIT.segs=defs.map(f=>{
+   const arc=f[0]==='A',R=arc?f[1]:0,dir=arc?f[2]:0,len=arc?R*f[3]:f[1];
+   const hx=-Math.sin(th),hz=Math.cos(th);
+   const seg={arc,x,z,th,R,dir,s0:acc,s1:acc+len,cx:x-hz*R*dir,cz:z+hx*R*dir};
+   if(arc){const ph=dir*f[3],c=Math.cos(ph),sn=Math.sin(ph),px=x-seg.cx,pz=z-seg.cz;
+     x=seg.cx+px*c-pz*sn;z=seg.cz+px*sn+pz*c;th+=ph}
+   else{x+=hx*len;z+=hz*len}
+   acc+=len;return seg});
+ CIRCUIT.L=acc;
+ console.assert(Math.hypot(x,z+700)<.01,'circuit does not close',x,z)}
+function circuitPos(s,out){out=out||{};const L=CIRCUIT.L,u=((s%L)+L)%L;
+  let g=CIRCUIT.segs[CIRCUIT.segs.length-1];
+  for(const q of CIRCUIT.segs){if(u<=q.s1+1e-6){g=q;break}}
+  const d=u-g.s0;
+  if(!g.arc){const hx=-Math.sin(g.th),hz=Math.cos(g.th);
+    out.x=g.x+hx*d;out.z=g.z+hz*d;out.hx=hx;out.hz=hz;out.R=0;out.dir=0}
+  else{const ph=g.dir*d/g.R,c=Math.cos(ph),sn=Math.sin(ph),px=g.x-g.cx,pz=g.z-g.cz;
+    out.x=g.cx+px*c-pz*sn;out.z=g.cz+px*sn+pz*c;
+    const th=g.th+ph;out.hx=-Math.sin(th);out.hz=Math.cos(th);out.R=g.R;out.dir=g.dir}
+  return out}
+const _cc_p={};
+function carAtC(c,prog,lat){circuitPos(prog,_cc_p);
+  const nx=-_cc_p.hz,nz=_cc_p.hx;
+  c.position.set(_cc_p.x+nx*lat,0,_cc_p.z+nz*lat);
+  c.rotation.y=Math.atan2(-_cc_p.hx,-_cc_p.hz)}
+/* new pavement only where the show has none: the main street and the
+   speedway front straight already carry the circuit's first and last legs */
+buildRibbon(circuitPos,255,942.51,4.75,.032);
+/* the lap line, under the entrance arch */
+{const lp=new THREE.Mesh(new THREE.PlaneGeometry(9.5,1.2),new THREE.MeshBasicMaterial({map:checkerTexture()}));
+  lp.rotation.x=-Math.PI/2;lp.position.set(0,.045,-700.2);scene.add(lp)}
+/* cats-eye posts trace the new pavement through the dark */
+{const p={};for(let s=262;s<940;s+=34){circuitPos(s,p);const nx=-p.hz,nz=p.hx;
+  [-5.7,5.7].forEach(o=>{const post=new THREE.Mesh(new THREE.CylinderGeometry(.07,.09,1,6),dark);
+    post.position.set(p.x+nx*o,.5,p.z+nz*o);scene.add(post);
+    const dot=new THREE.Sprite(new THREE.SpriteMaterial({map:festTex[3],transparent:true,depthWrite:false}));
+    dot.scale.set(.5,.5,1);dot.position.set(p.x+nx*o,1.05,p.z+nz*o);scene.add(glowAtNight(dot,.7))})}}
+/* corner floods at the two hairpins */
+[290,905].forEach(s=>{const q=circuitPos(s,{});
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.18,16,8),dark);pole.position.set(q.x,8,q.z);scene.add(pole);
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:floodTex,transparent:true,opacity:.95,depthWrite:false}));
+  gl.scale.set(6,6,1);gl.position.set(q.x,16.4,q.z);scene.add(glowAtNight(gl,.95));
+  const l=new THREE.PointLight(0xf3e7cf,0,60,1);l.position.set(q.x,14,q.z);scene.add(lightAtNight(l,1.2))});
 
 /* ======================= time of day ======================= */
 /* 0 = cars-country daylight, 1 = full night; beats carry a night value */

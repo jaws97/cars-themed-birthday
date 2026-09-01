@@ -15,7 +15,10 @@ const beats=[
   {name:'race',z:-730,mile:3,night:.12},
   {name:'photo',z:-730,mile:4,dark:true,night:.12},
   {name:'trophy',z:-730,mile:4,dark:true,night:.12},
-  {name:'credits',z:-730,mile:5,dark:true,night:.5}];
+  {name:'credits',z:-730,mile:5,dark:true,night:.5},
+  /* the after-party: the show hands over the wheel. one driver at a time,
+     the big circuit, a clock, and a leaderboard that lasts all night */
+  {name:'hotlap',z:-700,mile:6,night:1}];
 
 let b=-1,carZ=0,vel=0,camYaw=0,wiperRight=false,walkTimer=null,walkIdx=0,walkTos=[],townTimers=[],tractorsOn=false,arriveBoardOn=false;
 const stageEl=document.getElementById('stage'),hud=document.getElementById('hud'),mirror=document.getElementById('mirror'),
@@ -89,6 +92,7 @@ function layout(nx,dir){
     else hud.classList.remove('on')}
   else if(nx.name==='grid500'){hud.classList.remove('on');cars.forEach((c,i)=>{setCarO(c,1);carAt(c,i,gridProg(i))})}
   else if(nx.name==='race'){hud.classList.remove('on')} /* netStartRace/netTick own the cars */
+  else if(nx.name==='hotlap'){hud.classList.remove('on');cars.forEach(c=>setCarO(c,0))} /* ttNext stages each driver */
   else hud.classList.remove('on');
   /* tractors cross the road mid-introductions */
   if(nx.name==='tractors'){tractorsOn=true;
@@ -116,6 +120,7 @@ function go(i,dir){
   cap.textContent=nx.cap||'';cap.classList.toggle('on',!!nx.cap);
   /* the race is always live: phones drive claimed cars, AI drives the rest */
   if(nx.name==='grid500'){netInit();showLobby(true)}else showLobby(false);
+  if(nx.name==='hotlap')ttOpen();else ttClose();
   const onTrack=nx.name==='grid500'||nx.name==='race';
   cars.forEach(c=>{if(c.userData.tag)c.userData.tag.visible=onTrack});
   document.getElementById('tower').classList.toggle('on',nx.name==='race');
@@ -149,5 +154,7 @@ function go(i,dir){
 /* clickers double-fire; a stray second press mid-race would end the August 500 */
 let advT=-1e9;
 function advance(){const n=performance.now();if(n-advT<450)return;advT=n;
-  if(b>=beats.length-1){kill('z');carZ=0;lastZ=0;go(0,0)}else go(b+1,1)}
+  /* the time trial is the after-party: the show parks there and stays.
+     R still restarts the whole night from the top */
+  if(b<beats.length-1)go(b+1,1)}
 function jumpMile(m){const i=beats.findIndex(x=>x.mile===m);if(i<0)return;kill('z');carZ=beats[i].z;lastZ=carZ;go(i,0)}
