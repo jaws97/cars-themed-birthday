@@ -331,12 +331,12 @@ buildRibbon(circuitPos,255,942.51,4.75,.032);
     post.position.set(p.x+nx*o,.5,p.z+nz*o);scene.add(post);
     const dot=new THREE.Sprite(new THREE.SpriteMaterial({map:festTex[3],transparent:true,depthWrite:false}));
     dot.scale.set(.5,.5,1);dot.position.set(p.x+nx*o,1.05,p.z+nz*o);scene.add(glowAtNight(dot,.7))})}}
-/* corner floods at the two hairpins */
-[290,905].forEach(s=>{const q=circuitPos(s,{});
-  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.18,16,8),dark);pole.position.set(q.x,8,q.z);scene.add(pole);
+/* corner floods at the two hairpins, planted on the infield clear of the racing line */
+[290,905].forEach(s=>{const q=circuitPos(s,{}),nx=-q.hz,nz=q.hx,px=q.x+nx*9,pz=q.z+nz*9;
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.18,16,8),dark);pole.position.set(px,8,pz);scene.add(pole);
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:floodTex,transparent:true,opacity:.95,depthWrite:false}));
-  gl.scale.set(6,6,1);gl.position.set(q.x,16.4,q.z);scene.add(glowAtNight(gl,.95));
-  const l=new THREE.PointLight(0xf3e7cf,0,60,1);l.position.set(q.x,14,q.z);scene.add(lightAtNight(l,1.2))});
+  gl.scale.set(6,6,1);gl.position.set(px,16.4,pz);scene.add(glowAtNight(gl,.95));
+  const l=new THREE.PointLight(0xf3e7cf,0,60,1);l.position.set(px,14,pz);scene.add(lightAtNight(l,1.2))});
 
 /* ======================= time of day ======================= */
 /* 0 = cars-country daylight, 1 = full night; beats carry a night value */
