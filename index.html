@@ -194,7 +194,9 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
 .hud{position:absolute;left:14cqw;bottom:calc(var(--dashH) + 15cqh);display:flex;align-items:center;gap:2.6cqw;opacity:0;transform:translateY(1.4cqh);transition:opacity 900ms var(--out),transform 900ms var(--out);filter:drop-shadow(0 .4cqh 1.6cqh rgba(0,0,0,.6))}
 .hud.on{opacity:1;transform:none}
+.hud.right{left:auto;right:14cqw;flex-direction:row-reverse;text-align:right}
 .hud .rule{position:absolute;left:0;top:-2.2cqh;width:22cqw;height:1px;background:linear-gradient(90deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
+.hud.right .rule{left:auto;right:0;background:linear-gradient(270deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
 .hud .name{font-size:8.5cqh}.hud .team{margin-top:1.1cqh}
 .hud .ring{width:10.5cqh;height:10.5cqh;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;
   box-shadow:inset 0 -.5cqh 0 rgba(14,18,48,.14)}
@@ -838,7 +840,9 @@ const slot=i=>({x:i%2?3.3:-3.3,z:-565-i*4.2});
 /* parked cars turn to face the cockpit, so their windshield eyes meet the
    audience during the introductions (a car at yaw 0 faces away, down -z) */
 const faceCam=(s,camZ)=>Math.atan2(s.x,s.z-camZ);
-function showPerson(i){const p=people[i];lname.textContent=p[1];lteam.textContent=p[2];lnum.textContent=p[0];hud.classList.add('on')}
+function showPerson(i){const p=people[i];lname.textContent=p[1];lteam.textContent=p[2];lnum.textContent=p[0];
+  /* the card sits on whichever side the car parked: odd slots are +x, the right lane */
+  hud.classList.toggle('right',i%2===1);hud.classList.add('on')}
 
 /* attract loop: the roster cycles while people walk in */
 function showWalk(n){walkIdx=n;hud.classList.remove('on');mirror.classList.add('flash');
