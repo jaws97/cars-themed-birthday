@@ -22,20 +22,6 @@ function assetTex(name){const src=typeof ASSETS!=='undefined'&&ASSETS[name];if(!
     if(hit)x.putImageData(d,0,0);
     t.image=cc;t.needsUpdate=true};
   im.src=src;return t}
-function mesaTexture(near){const[c,x]=cv(2048,256);
-  const g=x.createLinearGradient(0,40,0,256);g.addColorStop(0,near?'#B4653A':'#C99772');g.addColorStop(1,near?'#6E3B20':'#A9744F');x.fillStyle=g;
-  x.beginPath();x.moveTo(0,256);let X=0;const base=near?110:80;
-  while(X<2048){const w=140+Math.random()*260,h=base+Math.random()*(near?90:60),s=22+Math.random()*30;
-    x.lineTo(X+10,256-(18+Math.random()*20));
-    x.lineTo(X+s,256-h);x.lineTo(X+w-s,256-h+(Math.random()*10-5));x.lineTo(X+w,256-(14+Math.random()*20));
-    X+=w+50+Math.random()*180}
-  x.lineTo(2048,256);x.closePath();x.fill();
-  x.globalCompositeOperation='source-atop';
-  x.strokeStyle='rgba(0,0,0,.12)';x.lineWidth=3;
-  for(let y=112;y<250;y+=18){x.beginPath();x.moveTo(0,y);x.lineTo(2048,y);x.stroke()}
-  x.fillStyle='rgba(255,240,220,.22)';x.fillRect(0,238,2048,18);
-  x.globalCompositeOperation='source-over';
-  return tex(c)}
 /* a warm 50s main-street facade: parapet trim, windows (some lit), storefront,
    sometimes an awning. returns [color map, emissive map] — lit windows glow */
 function facadeTexture(seed){const W=256,H=320;const[c,x]=cv(W,H);const[c2,x2]=cv(W,H);

@@ -24,12 +24,14 @@ let starsM;
 const sunSprite=new THREE.Sprite(new THREE.SpriteMaterial({map:sunTexture(),transparent:true,opacity:0,fog:false,depthWrite:false}));
 sunSprite.scale.set(200,200,1);sunSprite.position.set(330,250,-640);sky.add(sunSprite);
 const sunL=new THREE.DirectionalLight(0xffe9c4,0);sunL.position.set(40,70,20);scene.add(sunL);
-/* painted mesa layers on the horizon, follow the car; swap the drawn
-   textures for assets/mesa-far.png and assets/mesa-near.png when supplied */
-const mesaFar=new THREE.Mesh(new THREE.PlaneGeometry(1600,200),new THREE.MeshBasicMaterial({map:assetTex('mesa-far')||mesaTexture(false),transparent:true,fog:false,depthWrite:false}));
-mesaFar.position.set(0,82,-540);scene.add(mesaFar);
-const mesaNear=new THREE.Mesh(new THREE.PlaneGeometry(1300,162),new THREE.MeshBasicMaterial({map:assetTex('mesa-near')||mesaTexture(true),transparent:true,fog:false,depthWrite:false}));
-mesaNear.position.set(0,64,-450);scene.add(mesaNear);
+/* mesa skyline layers on the horizon, following the car. they render only
+   when assets/mesa-far.png / assets/mesa-near.png are supplied — the GLB
+   scenery dresses the desert on its own otherwise */
+const mesaFarT=assetTex('mesa-far'),mesaNearT=assetTex('mesa-near');
+const mesaFar=new THREE.Mesh(new THREE.PlaneGeometry(1600,200),new THREE.MeshBasicMaterial({map:mesaFarT,transparent:true,fog:false,depthWrite:false}));
+mesaFar.visible=!!mesaFarT;mesaFar.position.set(0,82,-540);scene.add(mesaFar);
+const mesaNear=new THREE.Mesh(new THREE.PlaneGeometry(1300,162),new THREE.MeshBasicMaterial({map:mesaNearT,transparent:true,fog:false,depthWrite:false}));
+mesaNear.visible=!!mesaNearT;mesaNear.position.set(0,64,-450);scene.add(mesaNear);
 /* painted clouds, ride with the sky dome */
 const cloudTex=assetTex('cloud')||cloudTexture();
 const dayClouds=[[-620,300,-520,300],[-260,340,-620,360],[90,310,-660,320],[430,280,-560,380],[700,250,-420,300],[-450,220,-380,240],[260,370,-700,420]].map(([x,y,z,w])=>{
