@@ -1692,7 +1692,7 @@ function rmFeature(i,now){if(RM.feat===i||now-RM.cutT<4000)return;RM.feat=i;RM.f
 /* ---- checkpoints: one per person, the reason to leave the infield.
    each ring carries a guest's number and colour; finding them all is
    visiting everyone at the party ---- */
-const RM_PLACES=['the diner','the gas station','the town hairpin','the back road','the far hairpin','turn two','the infield','the pits'];
+const RM_PLACES=['diner','gas station','town hairpin','back road','far hairpin','turn two','infield','pits'];
 function rmBuildCheckpoints(){RM.cps.forEach(c=>scene.remove(c.g));RM.cps=[];
   const p={},at=s=>{circuitPos(s,p);return[p.x,p.z]};
   const spots=[[0,-463],[0,-570],at(290),at(560),at(905),[TRACK.R,-760-TRACK.S-TRACK.R],[70,-880],[12,-855]];
