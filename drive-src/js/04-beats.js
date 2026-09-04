@@ -87,11 +87,11 @@ function layout(nx,dir){
     if(nx.intro){
       if(dir>0){const i=shown-1,c=cars[i],s=slot(i),lane=i%2?2:-2,yaw=faceCam(s,nx.z);
         mirror.classList.add('flash');townTimers.push(setTimeout(()=>mirror.classList.remove('flash'),1600));
-        townTimers.push(setTimeout(()=>{setCarO(c,1);c.rotation.y=0;
+        townTimers.push(setTimeout(()=>{setCarO(c,1);c.rotation.y=0;sndRev(2.5);
           /* drive in facing forward, then swing around on the final approach */
           tween(v=>{c.position.z=carZ+9+(s.z-(carZ+9))*v;c.position.x=lane+(s.x-lane)*Math.min(1,v*1.5);c.position.y=0;
             c.rotation.y=yaw*Math.max(0,(v-.68)/.32)},0,1,2600,ease.inout,null,'park')},600));
-        townTimers.push(setTimeout(()=>showPerson(i),2900))}
+        townTimers.push(setTimeout(()=>{showPerson(i);sndToot()},2900))}
       else showPerson(shown-1)}
     else hud.classList.remove('on')}
   else if(nx.name==='grid500'){hud.classList.remove('on');cars.forEach((c,i)=>{setCarO(c,1);carAt(c,i,gridProg(i))})}

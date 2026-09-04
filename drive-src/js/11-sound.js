@@ -40,5 +40,17 @@ function sndFanfare(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;
   [523,659,784,1047].forEach((f,i)=>sndTone(f,t+i*.12,.7,.3,'triangle'))}
 function sndHorn(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;
   sndTone(392,t,.55,.35,'square');sndTone(494,t,.55,.25,'square')}
+/* a car pulling in: the engine climbs, settles, and dies as it parks */
+function sndRev(dur){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime,d=dur||2.4;
+  const o=ctx.createOscillator(),o2=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain(),o2g=ctx.createGain();
+  o.type='sawtooth';o2.type='square';f.type='lowpass';f.Q.value=3;o2g.gain.value=.35;
+  [[o,48,150,40],[o2,48.6,151,40.5]].forEach(([osc,a,b,c])=>{osc.frequency.setValueAtTime(a,t);
+    osc.frequency.exponentialRampToValueAtTime(b,t+d*.55);osc.frequency.exponentialRampToValueAtTime(c,t+d)});
+  f.frequency.setValueAtTime(300,t);f.frequency.exponentialRampToValueAtTime(1400,t+d*.55);f.frequency.exponentialRampToValueAtTime(250,t+d);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.25);g.gain.setValueAtTime(.16,t+d*.6);g.gain.linearRampToValueAtTime(0,t+d);
+  o.connect(f);o2.connect(o2g);o2g.connect(f);f.connect(g);g.connect(SND.master);
+  o.start(t);o2.start(t);o.stop(t+d+.1);o2.stop(t+d+.1)}
+/* a friendly hello: two short notes, lighter than the horn */
+function sndToot(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;sndTone(523,t,.14,.22,'square');sndTone(659,t+.17,.2,.22,'square')}
 function sndMute(){SND.muted=!SND.muted;
   if(SND.master)SND.master.gain.setTargetAtTime(SND.muted?0:.7,SND.ctx.currentTime,.05);return SND.muted}
