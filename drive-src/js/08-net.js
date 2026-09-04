@@ -111,7 +111,7 @@ function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finish
   /* the tractor ambles across the back straight on the final lap, timed so
      it's mid-crossing when the leaders arrive */
   if(NET.trac&&!NET.trac.done&&!NET.trac.on&&NET.phase==='green'&&lead>=(TRACK.LAPS-1)*L+NET.trac.prog-110){
-    NET.trac.on=true;
+    NET.trac.on=true;sndPutt(5.5,.12);
     townTimers.push(setTimeout(()=>{if(NET.live&&NET.trac&&NET.trac.on)cap.textContent='Tractor on the back straight.'},1800))}
   if(NET.trac&&NET.trac.on){NET.trac.lat+=dt*1.5;
     if(NET.trac.lat>7.2){NET.trac.on=false;NET.trac.done=true;trackTractor.visible=false}

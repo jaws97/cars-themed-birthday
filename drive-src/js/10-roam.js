@@ -136,7 +136,7 @@ function rmEventsTick(now){if(now<RM.evT)return;RM.evT=now+90000;
   const ev=['tractor','flicker','train'][RM.evN++%3];
   if(ev==='tractor')rmTractor();else if(ev==='flicker')rmFlicker();else rmTrain()}
 /* a tractor ambles across the infield: it is solid, mind it */
-function rmTractor(){const t=trackTractor;t.visible=true;t.rotation.y=-Math.PI/2;
+function rmTractor(){const t=trackTractor;t.visible=true;t.rotation.y=-Math.PI/2;sndPutt(26,.09);
   tween(v=>{t.position.set(4+74*v,0,-905+Math.sin(v*9)*3)},0,1,26000,ease.lin,null,'rmtr');
   RM.timers.push(setTimeout(()=>{t.visible=false},26100));
   rmFlash('tractor on the infield · it happens every august')}

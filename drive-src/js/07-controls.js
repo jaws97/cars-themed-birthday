@@ -15,7 +15,7 @@ document.addEventListener('keyup',e=>{if(/^[wasd]$/i.test(e.key))RM.keys[e.key.t
 let focusT=-1e9;
 window.addEventListener('focus',()=>focusT=performance.now());
 document.addEventListener('click',()=>{if(!PRELOAD.done||performance.now()-focusT<400)return;advance()});
-function honk(){if(RM.on)sndHorn();if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
+function honk(){if(RM.on)sndHorn();if(beats[b]&&beats[b].name==='tractors')sndMoo();if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
 
 /* fonts and the asset preload first, so canvas type is the real type and
    nothing pops in after the show starts */

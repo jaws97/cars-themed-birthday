@@ -41,5 +41,5 @@ function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.
   fneedle.style.transform=`rotate(${(40-62*Math.min(1,Math.max(0,-carZ/730))).toFixed(1)}deg)`;
   tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
   tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
-  sndEngine(vel,RM.on||racing);
+  sndEngine(vel,RM.on||racing,RM.on?RM.feat:-1);
   renderer.render(scene,camera);requestAnimationFrame(frame)}
