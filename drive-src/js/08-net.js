@@ -77,7 +77,7 @@ function buildHazards(){clearHazards();
     m.position.set(_hz_p.x+nx*h.lat,h.type==='cone'?.4:.05,_hz_p.z+nz*h.lat);
     scene.add(m);NET.hazMeshes.push(m)})}
 
-function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;
+function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;RD.until=0;RD.n=0;RD.shot='';
   for(let i=0;i<8;i++){NET.prog[i]=gridProg(i);NET.spd[i]=0;NET.taps[i]=0;NET.rate[i]=0;
     NET.lat[i]=i%2?1.9:-1.9;NET.st[i]=0;NET.slip[i]=0;NET.hitCd[i]=0;
     setCarO(cars[i],1);carAt(cars[i],i,NET.prog[i],NET.lat[i])}
@@ -91,7 +91,7 @@ function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;
   cap.textContent='Drivers, ready…';
   broadcast({type:'state',phase:'set'});broadcast(raceWorld());
   townTimers.push(setTimeout(()=>{NET.phase='green';NET.greenT0=performance.now();
-    broadcast({type:'state',phase:'green'});cap.textContent='GREEN. GREEN. GREEN.';sndFanfare()},2600))}
+    broadcast({type:'state',phase:'green'});cap.textContent='GREEN. GREEN. GREEN.';sndFanfare();rdEvent('green')},2600))}
 function netEndRace(){NET.live=false;NET.phase='idle';clearHazards();trackTractor.visible=false;
   cars.forEach(c=>c.rotation.z=0);RM.dust.forEach(d=>d.s.visible=false);
   broadcast({type:'state',phase:'idle'})}
@@ -127,7 +127,7 @@ function netTick(dt,now){if(NET.live)netFeed(now);
   /* the tractor ambles across the back straight on the final lap, timed so
      it's mid-crossing when the leaders arrive */
   if(NET.trac&&!NET.trac.done&&!NET.trac.on&&NET.phase==='green'&&lead>=(TRACK.LAPS-1)*L+NET.trac.prog-110){
-    NET.trac.on=true;sndPutt(5.5,.12);
+    NET.trac.on=true;sndPutt(5.5,.12);rdEvent('tractor');
     townTimers.push(setTimeout(()=>{if(NET.live&&NET.trac&&NET.trac.on)cap.textContent='Tractor on the back straight.'},1800))}
   if(NET.trac&&NET.trac.on){NET.trac.lat+=dt*1.5;
     if(NET.trac.lat>7.2){NET.trac.on=false;NET.trac.done=true;trackTractor.visible=false}
@@ -153,7 +153,7 @@ function netTick(dt,now){if(NET.live)netFeed(now);
     if(now-NET.hitCd[i]>2500){
       for(const h of NET.haz){const d=Math.abs(u-h.p),dd=Math.min(d,L-d);
         if(dd<1.7&&Math.abs(NET.lat[i]-h.lat)<1.15){NET.hitCd[i]=now;
-          if(h.type==='cone'){NET.spd[i]*=.4;sndThud();const c=cars[i];for(let k=0;k<3;k++)rmPuff({x:c.position.x,z:c.position.z,h:c.rotation.y},30)}
+          if(h.type==='cone'){NET.spd[i]*=.4;sndThud();rdEvent('hit',i);const c=cars[i];for(let k=0;k<3;k++)rmPuff({x:c.position.x,z:c.position.z,h:c.rotation.y},30)}
           else{NET.slip[i]=.9;NET.slipDir[i]=NET.lat[i]>=h.lat?1:-1}
           break}}
       if(NET.trac&&NET.trac.on&&now-NET.hitCd[i]>2500){const d=Math.abs(u-NET.trac.prog),dd=Math.min(d,L-d);
@@ -163,7 +163,7 @@ function netTick(dt,now){if(NET.live)netFeed(now);
     const cf=inTurn?R/(R-NET.lat[i]):1;
     const crossed=NET.done.includes(i);
     NET.prog[i]+=NET.spd[i]*dt*cf*(crossed?.4:1);
-    if(!crossed&&NET.prog[i]>=F){NET.done.push(i);
+    if(!crossed&&NET.prog[i]>=F){NET.done.push(i);if(NET.done.length===1)rdEvent('winner',i);
       if(NET.conns[i])NET.conns[i].send({type:'state',phase:'done',place:NET.done.length})}}
   /* 120-second cap so a dead phone can't stall the show */
   if(NET.phase==='green'&&now-NET.greenT0>120000){[...Array(8).keys()].filter(i=>!NET.done.includes(i))
@@ -192,7 +192,7 @@ function netTick(dt,now){if(NET.live)netFeed(now);
   rmDustTick(dt);
   /* lap board on the caption */
   if(NET.phase==='green'){const lap=Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1);
-    if(lap>NET.lastLap){NET.lastLap=lap;cap.textContent=lap===TRACK.LAPS?'FINAL LAP':`LAP ${lap} OF ${TRACK.LAPS}`}}
+    if(lap>NET.lastLap){NET.lastLap=lap;cap.textContent=lap===TRACK.LAPS?'FINAL LAP':`LAP ${lap} OF ${TRACK.LAPS}`;if(lap===TRACK.LAPS)rdEvent('final')}}
   /* standings: position tower on screen, live place on each phone, once a second */
   if(now-NET.lastPlaceT>1000){NET.lastPlaceT=now;
     const order=[...NET.done,...[...Array(8).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];

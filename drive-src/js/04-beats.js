@@ -131,7 +131,7 @@ function go(i,dir){
   /* lamps glow on the grid, in the race and on the sand */
   const lampsOn=['grid500','race','roam','goodnight'].includes(nx.name);cars.forEach(c=>c.userData.lamps.visible=lampsOn);
   /* the after-party is watched on the speedway's big screen, not from the cockpit */
-  stageEl.classList.toggle('roam',nx.name==='roam');
+  stageEl.classList.toggle('roam',nx.name==='roam'||nx.name==='race');
   const onTrack=nx.name==='grid500'||nx.name==='race'||nx.name==='roam';
   cars.forEach(c=>{if(c.userData.tag)c.userData.tag.visible=onTrack});
   document.getElementById('tower').classList.toggle('on',nx.name==='race');

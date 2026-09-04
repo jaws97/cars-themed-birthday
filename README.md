@@ -17,7 +17,7 @@ August birthdays on a projector.
 | 0 | Attract cinema — the landing video plays with sound under a "20 Years of Cars" title while people walk in (falls back to a roster loop if no video is present) |
 | 1 | The arrival — one press drives the whole highway: dusk falls, each neon sign ignites as you pass it, and you roll to a stop under the welcome board |
 | 2 | The town takes you in — one press per person; tractors interrupt halfway |
-| 3 | The August 500 — two laps of a real stadium oval at sunrise, raced live from phones, each phone watching its own car, with bumping, skid marks and dust |
+| 3 | The August 500 — two laps of a real stadium oval at sunrise, raced live from phones, each phone watching its own car while the projector runs a broadcast: trackside cameras in the turns, onboard behind the leader, a helicopter over the pack, cuts to cones and the tractor, and a finish-line camera for the flag |
 | 4 | Finish photo, then the trophy and confetti |
 | 5 | Credits |
 | 6 | The open desert — everyone drives at once from their phones, no rails, each phone showing its own car from behind while the speedway's big screen cuts between drivers; guests can type their own name for the board: an arcade car with headlights, dust and skid marks, cones to flatten, one checkpoint per guest to find across the town and the circuit, a lap clock under the arch with a leaderboard that lasts all night, a director cam that hops between drivers, a minimap, and things that happen to the world every ninety seconds. One more press is last call: the cars come home to the arch, the lamps go out, the board says goodnight |

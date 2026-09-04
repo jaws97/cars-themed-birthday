@@ -12,17 +12,13 @@ function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.
   vel+=(v-vel)*Math.min(1,dt*6);
   const t=now/1000,sp=Math.min(1,vel/40);
   let camZ=carZ;
-  if(racing){ /* the cockpit drives the oval, chasing the pack */
-    trackPos(NET.camProg,_camP);camZ=_camP.z;
-    camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
-    camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
-    head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
+  if(racing)camZ=rdCam(t,dt,now); /* the race is a broadcast: the director cuts the shots */
   else if(RM.on)camZ=rmCam(t,dt,now); /* the open desert: the director cam */
   else{
     camera.position.set(Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,carZ);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,camYaw,Math.sin(t*2.3)*.004*sp);
     head.position.set(camera.position.x,.75,carZ+.4);head.target.position.set(0,-.2,carZ-38)}
-  const fv=58+sp*8;if(Math.abs(fv-camera.fov)>.05){camera.fov=fv;camera.updateProjectionMatrix()}
+  const fv=racing?camera.fov+(RD.fov-camera.fov)*Math.min(1,dt*5):58+sp*8;if(Math.abs(fv-camera.fov)>.05){camera.fov=fv;camera.updateProjectionMatrix()}
   sky.position.z=camZ;mesaFar.position.z=camZ-540;mesaNear.position.z=camZ-450;
   /* the arrival drive: neon ignites as the car passes each sign, then the board */
   if(beats[b]&&beats[b].name==='arrive'){signs.forEach(s=>{if(!s.lit&&carZ<s.z+26)lightSign(s)});
