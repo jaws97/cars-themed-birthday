@@ -72,9 +72,9 @@ function signTexture(text,color,lit,font,size){const[c,x]=cv(1024,512);x.textAli
   else{x.fillStyle='#161a3d';x.fillText(text,512,256,960);x.strokeStyle='#1d2250';x.lineWidth=3;x.strokeText(text,512,256,960)}
   return tex(c)}
 const boardCv=cv(2048,512),boardTex=tex(boardCv[0]);
-function boardTexture(alpha){const[c,x]=boardCv;x.globalAlpha=1;x.letterSpacing='0px';x.fillStyle='#0a0c1e';x.fillRect(0,0,2048,512);x.strokeStyle=`rgba(243,231,207,${.15+.45*alpha})`;x.lineWidth=10;x.strokeRect(30,30,1988,452);
-  x.textAlign='center';x.textBaseline='middle';x.globalAlpha=alpha;x.fillStyle=CREAM;x.font='150px "Alfa Slab One"';x.fillText(SHOW.board,1024,220,1880);
-  x.font='700 46px Nunito';x.letterSpacing='12px';x.fillText(SHOW.boardSub,1024,380,1880);boardTex.needsUpdate=true;return boardTex}
+function boardTexture(alpha,txt,subTxt){const[c,x]=boardCv;x.globalAlpha=1;x.letterSpacing='0px';x.fillStyle='#0a0c1e';x.fillRect(0,0,2048,512);x.strokeStyle=`rgba(243,231,207,${.15+.45*alpha})`;x.lineWidth=10;x.strokeRect(30,30,1988,452);
+  x.textAlign='center';x.textBaseline='middle';x.globalAlpha=alpha;x.fillStyle=CREAM;x.font='150px "Alfa Slab One"';x.fillText(txt||SHOW.board,1024,220,1880);
+  x.font='700 46px Nunito';x.letterSpacing='12px';x.fillText(subTxt||SHOW.boardSub,1024,380,1880);boardTex.needsUpdate=true;return boardTex}
 function exitTexture(){const[c,x]=cv(512,256);x.fillStyle='#0f1330';x.fillRect(0,0,512,256);x.strokeStyle='rgba(243,231,207,.7)';x.lineWidth=8;x.strokeRect(12,12,488,232);
   x.fillStyle=CREAM;x.textAlign='center';x.textBaseline='middle';x.font='700 44px Nunito';x.letterSpacing='10px';x.fillText('EXIT',256,72);x.font='120px "Racing Sans One"';x.fillText('8',256,168);
   x.font='700 60px Nunito';x.fillText('↗',430,170);return tex(c)}
@@ -89,10 +89,10 @@ function carTexture(color,n){const[c,x]=cv(256,180);
 function plateTexture(n){const[c,x]=cv(128,128);x.fillStyle='#F3E7CF';x.beginPath();x.arc(64,64,60,0,7);x.fill();
   x.fillStyle='#0E1230';x.textAlign='center';x.textBaseline='middle';x.font='64px "Racing Sans One"';x.fillText(n,64,70);return tex(c)}
 function roundRect(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();x.fill()}
-function archTexture(){const[c,x]=cv(1024,256);x.fillStyle='#0a0c1e';x.fillRect(0,0,1024,256);
+function archTexture(txt){const t=txt||SHOW.race;const[c,x]=cv(1024,256);x.fillStyle='#0a0c1e';x.fillRect(0,0,1024,256);
   x.strokeStyle='rgba(243,231,207,.55)';x.lineWidth=8;x.strokeRect(14,14,996,228);
   x.textAlign='center';x.textBaseline='middle';x.font='118px "Racing Sans One"';
-  x.shadowColor='#F5B335';x.shadowBlur=46;x.fillStyle='#F5B335';x.fillText(SHOW.race,512,128);x.shadowBlur=14;x.fillText(SHOW.race,512,128);x.shadowBlur=0;
+  x.shadowColor='#F5B335';x.shadowBlur=46;x.fillStyle='#F5B335';x.fillText(t,512,128,930);x.shadowBlur=14;x.fillText(t,512,128,930);x.shadowBlur=0;
   x.fillStyle='#F3E7CF';for(let i=0;i<20;i++){const bx=52+i*(920/19);x.beginPath();x.arc(bx,38,7,0,7);x.fill();x.beginPath();x.arc(bx,218,7,0,7);x.fill()}
   return tex(c)}
 function checkerTexture(){const[c,x]=cv(512,128);for(let i=0;i<16;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#0E1230':'#F3E7CF';x.fillRect(i*32,j*32,32,32)}return tex(c)}

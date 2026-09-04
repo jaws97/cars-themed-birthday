@@ -16,9 +16,13 @@ const beats=[
   {name:'photo',z:-730,mile:4,dark:true,night:.12},
   {name:'trophy',z:-730,mile:4,dark:true,night:.12},
   {name:'credits',z:-730,mile:5,dark:true,night:.5},
-  /* the after-party: the show hands over the wheel. one driver at a time,
-     the big circuit, a clock, and a leaderboard that lasts all night */
-  {name:'hotlap',z:-700,mile:6,night:1}];
+  /* the after-party: the show hands over the wheel. everyone at once, no
+     rails — the infield is a playground, the circuit is a lap with a clock,
+     and the leaderboard lasts all night */
+  {name:'roam',z:-700,mile:6,night:.7},
+  /* last call: the cars come home to the arch, the lamps go out one by one,
+     the board says goodnight and the credits roll once more */
+  {name:'goodnight',z:-650,mile:6,night:1,cap:'last call · goodnight, august'}];
 
 let b=-1,carZ=0,vel=0,camYaw=0,wiperRight=false,walkTimer=null,walkIdx=0,walkTos=[],townTimers=[],tractorsOn=false,arriveBoardOn=false;
 const stageEl=document.getElementById('stage'),hud=document.getElementById('hud'),mirror=document.getElementById('mirror'),
@@ -92,7 +96,7 @@ function layout(nx,dir){
     else hud.classList.remove('on')}
   else if(nx.name==='grid500'){hud.classList.remove('on');cars.forEach((c,i)=>{setCarO(c,1);carAt(c,i,gridProg(i))})}
   else if(nx.name==='race'){hud.classList.remove('on')} /* netStartRace/netTick own the cars */
-  else if(nx.name==='hotlap'){hud.classList.remove('on');cars.forEach(c=>setCarO(c,0))} /* ttNext stages each driver */
+  else if(nx.name==='roam'){hud.classList.remove('on')} /* rmOpen places the cars */
   else hud.classList.remove('on');
   /* tractors cross the road mid-introductions */
   if(nx.name==='tractors'){tractorsOn=true;
@@ -107,6 +111,8 @@ function go(i,dir){
   if(i<0||i>=beats.length)return;const prev=beats[b],nx=beats[i];b=i;
   townTimers.forEach(clearTimeout);townTimers=[];
   if(prev&&prev.name==='walkin'&&nx.name!=='walkin')stopWalk();
+  if(prev&&prev.name==='goodnight'){archM.material.map=archTexture(); /* the arch says the race's name again */
+    ['cityL','cityR'].forEach(k=>{if(_propReg[k])_propReg[k].visible=true})}
   if(nx.name==='walkin'){
     if(attractOK){attractEl.classList.add('on');playAttract()}
     else if(!walkTimer)startWalk()}
@@ -120,8 +126,13 @@ function go(i,dir){
   cap.textContent=nx.cap||'';cap.classList.toggle('on',!!nx.cap);
   /* the race is always live: phones drive claimed cars, AI drives the rest */
   if(nx.name==='grid500'){netInit();showLobby(true)}else showLobby(false);
-  if(nx.name==='hotlap')ttOpen();else ttClose();
-  const onTrack=nx.name==='grid500'||nx.name==='race';
+  if(nx.name==='roam')rmOpen();else rmClose();
+  if(nx.name==='goodnight')rmGoodnight();
+  /* lamps glow on the grid, in the race and on the sand */
+  const lampsOn=['grid500','race','roam','goodnight'].includes(nx.name);cars.forEach(c=>c.userData.lamps.visible=lampsOn);
+  /* the after-party is watched on the speedway's big screen, not from the cockpit */
+  stageEl.classList.toggle('roam',nx.name==='roam');
+  const onTrack=nx.name==='grid500'||nx.name==='race'||nx.name==='roam';
   cars.forEach(c=>{if(c.userData.tag)c.userData.tag.visible=onTrack});
   document.getElementById('tower').classList.toggle('on',nx.name==='race');
   if(NET.live&&nx.name!=='race')netEndRace();
@@ -145,7 +156,7 @@ function go(i,dir){
   if(nx.name==='arrive'){kill('board');kill('bl');
     if(dir>=0){arriveBoardOn=false;signs.forEach(darkenSign);setBoard(0);boardLight.intensity=0}
     else{arriveBoardOn=true;signs.forEach(lightSign);setBoard(1);boardLight.intensity=2}}
-  else if(nx.town){signs.forEach(lightSign);kill('board');kill('bl');setBoard(1);boardLight.intensity=1.1}
+  else if(nx.town||nx.name==='roam'||nx.name==='goodnight'){signs.forEach(lightSign);kill('board');kill('bl');setBoard(1);boardLight.intensity=1.1}
   else{signs.forEach(darkenSign);kill('board');kill('bl');setBoard(0);boardLight.intensity=0}
   layout(nx,dir);
   odo(nx.mile);
@@ -154,7 +165,7 @@ function go(i,dir){
 /* clickers double-fire; a stray second press mid-race would end the August 500 */
 let advT=-1e9;
 function advance(){const n=performance.now();if(n-advT<450)return;advT=n;
-  /* the time trial is the after-party: the show parks there and stays.
-     R still restarts the whole night from the top */
+  /* the open desert is the after-party; one more press is last call, and
+     the show parks there. R still restarts the whole night from the top */
   if(b<beats.length-1)go(b+1,1)}
 function jumpMile(m){const i=beats.findIndex(x=>x.mile===m);if(i<0)return;kill('z');carZ=beats[i].z;lastZ=carZ;go(i,0)}

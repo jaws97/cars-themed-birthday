@@ -64,19 +64,23 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #tower .row.fin{opacity:.55}
 
 /* multiplayer lobby, lives on the grid beat */
-/* midnight time trial: the leaderboard column and the live clock */
-#ttpanel{position:absolute;left:3.2cqw;top:10cqh;width:26cqw;display:none;flex-direction:column;gap:.9cqh;pointer-events:none}
-#ttpanel.on{display:flex}
-#ttpanel .tthead{font:400 2.7cqh var(--race);color:var(--gold);letter-spacing:.14em;text-shadow:0 .3cqh 1.6cqh rgba(0,0,0,.8)}
-#ttdriver{font:700 1.9cqh var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cream);opacity:.85;min-height:2.3cqh}
-#ttclock{font:400 6.4cqh var(--race);color:var(--cream);text-shadow:0 .4cqh 2cqh rgba(0,0,0,.75);font-variant-numeric:tabular-nums}
-#ttrows{display:flex;flex-direction:column;gap:.45cqh}
-#ttrows .row{display:flex;align-items:center;gap:.8cqh;background:rgba(4,5,16,.72);border-radius:.4cqh;padding:.4cqh 1.1cqh .4cqh .6cqh;font:700 2.1cqh var(--body);color:var(--cream)}
-#ttrows .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
-#ttrows .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
-#ttrows .row span{margin-left:auto;font:400 2.1cqh var(--race);font-variant-numeric:tabular-nums}
-#ttrows .row.me{outline:.25cqh solid var(--gold)}
-#lobby.tt .chips{display:none}
+/* the open desert: the board, the map and the lap clock */
+#rmpanel{position:absolute;left:3.2cqw;top:10cqh;width:26cqw;display:none;flex-direction:column;gap:.9cqh;pointer-events:none}
+#rmpanel.on{display:flex}
+#rmsub{font:700 1.9cqh var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cream);opacity:.85}
+#rmclock{font:400 4.2cqh var(--race);color:var(--cream);text-shadow:0 .4cqh 2cqh rgba(0,0,0,.75);font-variant-numeric:tabular-nums;min-height:4.6cqh}
+#rmmap{width:100%;height:auto;border-radius:.6cqh;border:1px solid rgba(243,231,207,.25)}
+#rmpanel .tthead{font:400 2.7cqh var(--race);color:var(--gold);letter-spacing:.14em;text-shadow:0 .3cqh 1.6cqh rgba(0,0,0,.8)}
+#rmrows,#rmlaps{display:flex;flex-direction:column;gap:.45cqh}
+#rmlaps{display:none;width:100%}
+#lobby.roam #rmlaps{display:flex}
+#lobby.roam .chips{display:none}
+#rmlaps .label{font-size:1.7cqh;opacity:.7;text-align:center;margin-top:.4cqh}
+#rmrows .row,#rmlaps .row{display:flex;align-items:center;gap:.8cqh;background:rgba(4,5,16,.72);border-radius:.4cqh;padding:.4cqh 1.1cqh .4cqh .6cqh;font:700 2.1cqh var(--body);color:var(--cream)}
+#rmrows .row b,#rmlaps .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
+#rmrows .row i,#rmlaps .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
+#rmrows .row span,#rmlaps .row span{margin-left:auto;font:400 2.1cqh var(--race);font-variant-numeric:tabular-nums}
+#rmrows .row.me,#rmlaps .row.me{outline:.25cqh solid var(--gold)}
 
 #lobby{position:absolute;right:13cqw;top:9cqh;opacity:0;transform:translateY(1.2cqh);transition:opacity 700ms var(--out),transform 700ms var(--out);pointer-events:none}
 #lobby.on{opacity:1;transform:none}
@@ -133,7 +137,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .dust{position:absolute;inset:0;pointer-events:none;opacity:.5;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='d'><feTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23d)'/></svg>")}
 
-.wiper{position:absolute;left:60%;bottom:calc(var(--dashH) - 9cqh);width:2.2cqw;height:118cqh;transform-origin:50% 100%;
+.wiper{transition:opacity 1400ms var(--inout);position:absolute;left:60%;bottom:calc(var(--dashH) - 9cqh);width:2.2cqw;height:118cqh;transform-origin:50% 100%;
   transform:translateX(-50%) rotate(-108deg);transition:transform 1150ms var(--inout);pointer-events:none}
 .wiper.right{transform:translateX(-50%) rotate(108deg)}
 .wiper .arm{position:absolute;left:40%;right:40%;top:0;bottom:0;background:#04050c}
@@ -141,7 +145,13 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .wiper .smear{position:absolute;left:100%;top:0;height:72%;width:1.6cqw;background:linear-gradient(90deg,rgba(243,231,207,.06),transparent)}
 
 /* cockpit */
-.cockpit{position:absolute;inset:0;pointer-events:none}
+.cockpit{position:absolute;inset:0;pointer-events:none;transition:opacity 1400ms var(--inout)}
+/* the after-party is watched on the speedway's big screen: the cockpit fades, a chrome frame takes over */
+.stage.roam .cockpit,.stage.roam .wiper{opacity:0}
+.stage.roam #cap{bottom:7cqh}
+#screenframe{position:absolute;inset:2.4cqh 2.4cqw;border:.45cqh solid rgba(201,207,221,.32);border-radius:1.4cqh;opacity:0;transition:opacity 1400ms var(--inout);pointer-events:none;box-shadow:inset 0 0 4cqh rgba(0,0,0,.55)}
+#screenframe span{position:absolute;top:0;left:50%;transform:translate(-50%,-55%);background:#0E1230;padding:.35cqh 1.8cqw;border:.3cqh solid rgba(201,207,221,.32);border-radius:2cqh;font:700 1.6cqh var(--body);letter-spacing:.3em;text-transform:uppercase;color:var(--cream)}
+.stage.roam #screenframe{opacity:1}
 .pillar{position:absolute;top:0;bottom:0;width:11cqw;background:#03040b}
 .pillar.l{left:0;clip-path:polygon(0 0,58% 0,22% 100%,0 100%)}
 .pillar.r{right:0;clip-path:polygon(42% 0,100% 0,100% 100%,78% 100%)}
@@ -368,12 +378,13 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
   <div id="cap"></div>
   <div id="tower"></div>
-  <div id="ttpanel"><div class="tthead">MIDNIGHT TIME TRIAL</div><div id="ttdriver"></div><div id="ttclock">--:--.--</div><div id="ttrows"></div></div>
+  <div id="rmpanel"><div class="tthead">THE OPEN DESERT</div><div id="rmsub">cones · people found</div><div id="rmclock"></div><canvas id="rmmap"></canvas><div id="rmrows"></div></div>
   <div id="lobby"><div class="panel">
     <div class="label" style="font-size:2cqh;opacity:.9">scan to race</div>
     <div id="qr"></div>
     <div class="joinurl" id="joinurl"></div>
     <div class="chips" id="chips"></div>
+    <div id="rmlaps"></div>
   </div></div>
   <div class="big" id="photo"><div class="polaroid"><div class="shot"><div class="checker"></div><h3 id="finTitle"></h3><div class="finishers" id="fin"></div></div><div class="scrawl"></div></div></div>
   <div class="big" id="trophy"><div id="confetti"></div><div class="stack">
@@ -396,6 +407,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
   <div id="attract"><video id="avid" muted loop playsinline preload="auto"></video>
     <div class="atitle"><div class="hero" id="atitleTxt"></div><div class="label" id="asubTxt"></div></div></div>
 
+  <div id="screenframe"><span>speedway vision · live</span></div>
   <div class="bezel"></div><div class="vignette"></div><div class="grain"></div><div id="blk"></div>
 
   <div id="loader">
@@ -577,9 +589,9 @@ function signTexture(text,color,lit,font,size){const[c,x]=cv(1024,512);x.textAli
   else{x.fillStyle='#161a3d';x.fillText(text,512,256,960);x.strokeStyle='#1d2250';x.lineWidth=3;x.strokeText(text,512,256,960)}
   return tex(c)}
 const boardCv=cv(2048,512),boardTex=tex(boardCv[0]);
-function boardTexture(alpha){const[c,x]=boardCv;x.globalAlpha=1;x.letterSpacing='0px';x.fillStyle='#0a0c1e';x.fillRect(0,0,2048,512);x.strokeStyle=`rgba(243,231,207,${.15+.45*alpha})`;x.lineWidth=10;x.strokeRect(30,30,1988,452);
-  x.textAlign='center';x.textBaseline='middle';x.globalAlpha=alpha;x.fillStyle=CREAM;x.font='150px "Alfa Slab One"';x.fillText(SHOW.board,1024,220,1880);
-  x.font='700 46px Nunito';x.letterSpacing='12px';x.fillText(SHOW.boardSub,1024,380,1880);boardTex.needsUpdate=true;return boardTex}
+function boardTexture(alpha,txt,subTxt){const[c,x]=boardCv;x.globalAlpha=1;x.letterSpacing='0px';x.fillStyle='#0a0c1e';x.fillRect(0,0,2048,512);x.strokeStyle=`rgba(243,231,207,${.15+.45*alpha})`;x.lineWidth=10;x.strokeRect(30,30,1988,452);
+  x.textAlign='center';x.textBaseline='middle';x.globalAlpha=alpha;x.fillStyle=CREAM;x.font='150px "Alfa Slab One"';x.fillText(txt||SHOW.board,1024,220,1880);
+  x.font='700 46px Nunito';x.letterSpacing='12px';x.fillText(subTxt||SHOW.boardSub,1024,380,1880);boardTex.needsUpdate=true;return boardTex}
 function exitTexture(){const[c,x]=cv(512,256);x.fillStyle='#0f1330';x.fillRect(0,0,512,256);x.strokeStyle='rgba(243,231,207,.7)';x.lineWidth=8;x.strokeRect(12,12,488,232);
   x.fillStyle=CREAM;x.textAlign='center';x.textBaseline='middle';x.font='700 44px Nunito';x.letterSpacing='10px';x.fillText('EXIT',256,72);x.font='120px "Racing Sans One"';x.fillText('8',256,168);
   x.font='700 60px Nunito';x.fillText('↗',430,170);return tex(c)}
@@ -594,10 +606,10 @@ function carTexture(color,n){const[c,x]=cv(256,180);
 function plateTexture(n){const[c,x]=cv(128,128);x.fillStyle='#F3E7CF';x.beginPath();x.arc(64,64,60,0,7);x.fill();
   x.fillStyle='#0E1230';x.textAlign='center';x.textBaseline='middle';x.font='64px "Racing Sans One"';x.fillText(n,64,70);return tex(c)}
 function roundRect(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();x.fill()}
-function archTexture(){const[c,x]=cv(1024,256);x.fillStyle='#0a0c1e';x.fillRect(0,0,1024,256);
+function archTexture(txt){const t=txt||SHOW.race;const[c,x]=cv(1024,256);x.fillStyle='#0a0c1e';x.fillRect(0,0,1024,256);
   x.strokeStyle='rgba(243,231,207,.55)';x.lineWidth=8;x.strokeRect(14,14,996,228);
   x.textAlign='center';x.textBaseline='middle';x.font='118px "Racing Sans One"';
-  x.shadowColor='#F5B335';x.shadowBlur=46;x.fillStyle='#F5B335';x.fillText(SHOW.race,512,128);x.shadowBlur=14;x.fillText(SHOW.race,512,128);x.shadowBlur=0;
+  x.shadowColor='#F5B335';x.shadowBlur=46;x.fillStyle='#F5B335';x.fillText(t,512,128,930);x.shadowBlur=14;x.fillText(t,512,128,930);x.shadowBlur=0;
   x.fillStyle='#F3E7CF';for(let i=0;i<20;i++){const bx=52+i*(920/19);x.beginPath();x.arc(bx,38,7,0,7);x.fill();x.beginPath();x.arc(bx,218,7,0,7);x.fill()}
   return tex(c)}
 function checkerTexture(){const[c,x]=cv(512,128);for(let i=0;i<16;i++)for(let j=0;j<4;j++){x.fillStyle=(i+j)%2?'#0E1230':'#F3E7CF';x.fillRect(i*32,j*32,32,32)}return tex(c)}
@@ -714,6 +726,19 @@ function tagTexture(p){const[c,x]=cv(128,128);x.fillStyle=p[3];x.beginPath();x.a
   x.fillStyle='#0E1230';x.textAlign='center';x.textBaseline='middle';x.font='54px "Racing Sans One"';x.fillText(p[0],64,68);return tex(c)}
 cars.forEach((g,i)=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tagTexture(people[i]),transparent:true,depthWrite:false}));
   s.scale.set(.85,.85,1);s.position.y=2.7;s.visible=false;s.userData.isTag=true;g.add(s);g.userData.tag=s});
+/* lamps for the open desert: two headlamp glows, a pool of light on the sand
+   ahead, two tail glows. no real lights — eight cars of point lights would
+   sink the laptop — so they only ever show after dark */
+const lampTex=glowTexture('rgb(255,228,184)'),tailTex=glowTexture('rgb(255,70,50)'),lampGlows=[];
+const lampAt=(o,base)=>{o.userData.base=base;lampGlows.push(o);return o};
+cars.forEach(g=>{const L=new THREE.Group();L.visible=false;L.userData.keep=true;
+  [-.58,.58].forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:lampTex,transparent:true,opacity:.95,depthWrite:false}));
+    s.scale.set(.75,.75,1);s.position.set(x,.6,-1.5);L.add(lampAt(s,.95))});
+  [-.55,.55].forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tailTex,transparent:true,opacity:.8,depthWrite:false}));
+    s.scale.set(.4,.4,1);s.position.set(x,.72,1.62);L.add(lampAt(s,.8))});
+  const pool=new THREE.Mesh(new THREE.PlaneGeometry(8,12),new THREE.MeshBasicMaterial({map:lampTex,transparent:true,opacity:.55,depthWrite:false}));
+  pool.rotation.x=-Math.PI/2;pool.position.set(0,.045,-6.2);L.add(lampAt(pool,.55));
+  g.add(L);g.userData.lamps=L});
 
 /* real 3D car models: any .glb named in the roster replaces the box car once
    it loads — normalized to the same footprint, box car kept on any failure */
@@ -732,7 +757,7 @@ function loadCarModel(g,file,yaw){
     m.position.set(-c.x,-b2.min.y,-c.z);
     const mats=[];m.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(mm=>{mm.transparent=true;mats.push(mm)})});
     const keep=carO(g);
-    [...g.children].forEach(ch=>{if(!ch.userData.isTag)g.remove(ch)});
+    [...g.children].forEach(ch=>{if(!ch.userData.isTag&&!ch.userData.keep)g.remove(ch)});
     g.add(m);g.userData.mats=mats;delete g.userData.redraw;setCarO(g,keep);
   })}
 if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
@@ -742,14 +767,15 @@ if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
 for(let z=-75;z>-440;z-=24){const p=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,7.5,6),dark);p.position.set(6.6,3.75,z);scene.add(p);
   const b=new THREE.Mesh(new THREE.BoxGeometry(1.6,.12,.12),dark);b.position.set(6.6,7,z);scene.add(b)}
 const rockG=new THREE.DodecahedronGeometry(1,0),rockM=new THREE.MeshLambertMaterial({color:0x1c1720});
+const desertRocks=[]; /* footprints for the free-roam collisions */
 for(let i=0;i<90;i++){const r=new THREE.Mesh(rockG,rockM);const side=Math.random()<.5?-1:1;r.position.set(side*(7+Math.random()*40),0,-50-Math.random()*400);const s=.4+Math.random()*1.6;r.scale.set(s*1.4,s*.7,s);r.rotation.y=Math.random()*3;
   if(r.position.x<0&&r.position.z<-405)r.position.x=-58-Math.random()*18; /* keep the circuit hairpin clear */
-  scene.add(r)}
+  desertRocks.push({x:r.position.x,z:r.position.z,r:s*1.1});scene.add(r)}
 for(let i=0;i<22;i++){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.22,.28,4,7),rockM);t.position.y=2;g.add(t);
   const a=new THREE.Mesh(new THREE.CylinderGeometry(.16,.18,1.8,6),rockM);a.position.set(.6,2.6,0);g.add(a);const a2=a.clone();a2.position.set(-.55,2.2,0);a2.scale.y=.8;g.add(a2);
   const side=Math.random()<.5?-1:1;g.position.set(side*(9+Math.random()*30),0,-80-Math.random()*360);g.rotation.y=Math.random()*3;const s=.7+Math.random()*.8;g.scale.set(s,s,s);
   if(side<0&&g.position.z<-405)g.position.x=-55-Math.random()*15; /* keep the circuit hairpin clear */
-  scene.add(g)}
+  desertRocks.push({x:g.position.x,z:g.position.z,r:.5*s});scene.add(g)}
 
 /* exit sign */
 {const post=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,3,6),dark);post.position.set(6.2,1.5,-150);scene.add(post);
@@ -983,7 +1009,8 @@ function setNight(t){nightT=t;
   dayClouds.forEach(c=>c.material.opacity=Math.max(0,1-t*1.15)*.92);
   sunSprite.material.opacity=Math.max(0,1-t*1.25)*.95;sunL.intensity=1.05*(1-t);
   nightGlows.forEach(g=>g.material.opacity=g.userData.base*t);
-  nightLights.forEach(l=>l.intensity=l.userData.base*t)}
+  nightLights.forEach(l=>l.intensity=l.userData.base*t);
+  lampGlows.forEach(g=>g.material.opacity=g.userData.base*(.35+.65*t))}
 setNight(.08);
 
 
@@ -1005,9 +1032,13 @@ const beats=[
   {name:'photo',z:-730,mile:4,dark:true,night:.12},
   {name:'trophy',z:-730,mile:4,dark:true,night:.12},
   {name:'credits',z:-730,mile:5,dark:true,night:.5},
-  /* the after-party: the show hands over the wheel. one driver at a time,
-     the big circuit, a clock, and a leaderboard that lasts all night */
-  {name:'hotlap',z:-700,mile:6,night:1}];
+  /* the after-party: the show hands over the wheel. everyone at once, no
+     rails — the infield is a playground, the circuit is a lap with a clock,
+     and the leaderboard lasts all night */
+  {name:'roam',z:-700,mile:6,night:.7},
+  /* last call: the cars come home to the arch, the lamps go out one by one,
+     the board says goodnight and the credits roll once more */
+  {name:'goodnight',z:-650,mile:6,night:1,cap:'last call · goodnight, august'}];
 
 let b=-1,carZ=0,vel=0,camYaw=0,wiperRight=false,walkTimer=null,walkIdx=0,walkTos=[],townTimers=[],tractorsOn=false,arriveBoardOn=false;
 const stageEl=document.getElementById('stage'),hud=document.getElementById('hud'),mirror=document.getElementById('mirror'),
@@ -1081,7 +1112,7 @@ function layout(nx,dir){
     else hud.classList.remove('on')}
   else if(nx.name==='grid500'){hud.classList.remove('on');cars.forEach((c,i)=>{setCarO(c,1);carAt(c,i,gridProg(i))})}
   else if(nx.name==='race'){hud.classList.remove('on')} /* netStartRace/netTick own the cars */
-  else if(nx.name==='hotlap'){hud.classList.remove('on');cars.forEach(c=>setCarO(c,0))} /* ttNext stages each driver */
+  else if(nx.name==='roam'){hud.classList.remove('on')} /* rmOpen places the cars */
   else hud.classList.remove('on');
   /* tractors cross the road mid-introductions */
   if(nx.name==='tractors'){tractorsOn=true;
@@ -1096,6 +1127,8 @@ function go(i,dir){
   if(i<0||i>=beats.length)return;const prev=beats[b],nx=beats[i];b=i;
   townTimers.forEach(clearTimeout);townTimers=[];
   if(prev&&prev.name==='walkin'&&nx.name!=='walkin')stopWalk();
+  if(prev&&prev.name==='goodnight'){archM.material.map=archTexture(); /* the arch says the race's name again */
+    ['cityL','cityR'].forEach(k=>{if(_propReg[k])_propReg[k].visible=true})}
   if(nx.name==='walkin'){
     if(attractOK){attractEl.classList.add('on');playAttract()}
     else if(!walkTimer)startWalk()}
@@ -1109,8 +1142,13 @@ function go(i,dir){
   cap.textContent=nx.cap||'';cap.classList.toggle('on',!!nx.cap);
   /* the race is always live: phones drive claimed cars, AI drives the rest */
   if(nx.name==='grid500'){netInit();showLobby(true)}else showLobby(false);
-  if(nx.name==='hotlap')ttOpen();else ttClose();
-  const onTrack=nx.name==='grid500'||nx.name==='race';
+  if(nx.name==='roam')rmOpen();else rmClose();
+  if(nx.name==='goodnight')rmGoodnight();
+  /* lamps glow on the grid, in the race and on the sand */
+  const lampsOn=['grid500','race','roam','goodnight'].includes(nx.name);cars.forEach(c=>c.userData.lamps.visible=lampsOn);
+  /* the after-party is watched on the speedway's big screen, not from the cockpit */
+  stageEl.classList.toggle('roam',nx.name==='roam');
+  const onTrack=nx.name==='grid500'||nx.name==='race'||nx.name==='roam';
   cars.forEach(c=>{if(c.userData.tag)c.userData.tag.visible=onTrack});
   document.getElementById('tower').classList.toggle('on',nx.name==='race');
   if(NET.live&&nx.name!=='race')netEndRace();
@@ -1134,7 +1172,7 @@ function go(i,dir){
   if(nx.name==='arrive'){kill('board');kill('bl');
     if(dir>=0){arriveBoardOn=false;signs.forEach(darkenSign);setBoard(0);boardLight.intensity=0}
     else{arriveBoardOn=true;signs.forEach(lightSign);setBoard(1);boardLight.intensity=2}}
-  else if(nx.town){signs.forEach(lightSign);kill('board');kill('bl');setBoard(1);boardLight.intensity=1.1}
+  else if(nx.town||nx.name==='roam'||nx.name==='goodnight'){signs.forEach(lightSign);kill('board');kill('bl');setBoard(1);boardLight.intensity=1.1}
   else{signs.forEach(darkenSign);kill('board');kill('bl');setBoard(0);boardLight.intensity=0}
   layout(nx,dir);
   odo(nx.mile);
@@ -1143,8 +1181,8 @@ function go(i,dir){
 /* clickers double-fire; a stray second press mid-race would end the August 500 */
 let advT=-1e9;
 function advance(){const n=performance.now();if(n-advT<450)return;advT=n;
-  /* the time trial is the after-party: the show parks there and stays.
-     R still restarts the whole night from the top */
+  /* the open desert is the after-party; one more press is last call, and
+     the show parks there. R still restarts the whole night from the top */
   if(b<beats.length-1)go(b+1,1)}
 function jumpMile(m){const i=beats.findIndex(x=>x.mile===m);if(i<0)return;kill('z');carZ=beats[i].z;lastZ=carZ;go(i,0)}
 
@@ -1184,13 +1222,13 @@ function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
 /* ======================= loop ======================= */
 let last=performance.now(),lastZ=0,lastProg=0;
 let lastYaw=0,wheelDeg=0,tempDeg=-38; /* cockpit life: steering lock and the temp needle warming up */
-const _camP={},_camL={};
-function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
-  runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
+const _camP={};
+function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.min(.05,dtRaw);last=now;
+  runTweens(now);netTick(dtRaw,now);rmTick(dt,now); /* the race integrates true elapsed time, so lag can't slow it */
   const racing=NET.live&&NET.phase!=='idle';
   let v;
   if(racing){v=dt>0?Math.max(0,NET.camProg-lastProg)/dt:0;lastProg=NET.camProg}
-  else if(TT.on){v=dt>0?Math.max(0,TT.camProg-lastProg)/dt:0;lastProg=TT.camProg}
+  else if(RM.on)v=rmSpeed();
   else{v=dt>0?Math.abs(carZ-lastZ)/dt:0;lastZ=carZ;lastProg=NET.camProg}
   vel+=(v-vel)*Math.min(1,dt*6);
   const t=now/1000,sp=Math.min(1,vel/40);
@@ -1200,18 +1238,7 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
     camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
     head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
-  else if(TT.on){ /* the time trial rides the midnight circuit */
-    circuitPos(TT.camProg,_camP);camZ=_camP.z;
-    if(TT.driver){ /* chase cam: raised behind the car, aimed through it at the
-         road ahead, drifting with the car's line so it stays centred */
-      const nx=-_camP.hz,nz=_camP.hx,lat=TT.lat*.55;
-      camera.position.set(_camP.x+nx*lat+Math.sin(t*1.7)*.03,3.4+Math.sin(t*9.3)*.02,_camP.z+nz*lat);
-      circuitPos(TT.prog+7,_camL);
-      camera.lookAt(_camL.x+(-_camL.hz)*TT.lat*.4,.9,_camL.z+_camL.hx*TT.lat*.4)}
-    else{ /* empty track: the low cruising flyover */
-      camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
-      camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp)}
-    head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
+  else if(RM.on)camZ=rmCam(t,dt,now); /* the open desert: the director cam */
   else{
     camera.position.set(Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,carZ);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,camYaw,Math.sin(t*2.3)*.004*sp);
@@ -1235,6 +1262,7 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
   fneedle.style.transform=`rotate(${(40-62*Math.min(1,Math.max(0,-carZ/730))).toFixed(1)}deg)`;
   tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
   tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
+  sndEngine(vel,RM.on||racing);
   renderer.render(scene,camera);requestAnimationFrame(frame)}
 
 
@@ -1247,12 +1275,15 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='b'||e.key==='B'||e.key==='.'){document.getElementById('blk').classList.toggle('on')}
   else if(e.key==='r'||e.key==='R'){kill('z');carZ=0;lastZ=0;go(0,0)}
   else if(e.key==='h'||e.key==='H'){honk()}
-  else if(/^[0-6]$/.test(e.key)){jumpMile(+e.key)}});
+  else if(e.key==='m'||e.key==='M'){sndMute()}
+  else if(/^[0-6]$/.test(e.key)){jumpMile(+e.key)}
+  else if(/^[wasd]$/i.test(e.key)){RM.keys[e.key.toLowerCase()]=true}}); /* the projector drives a spare car on the sand */
+document.addEventListener('keyup',e=>{if(/^[wasd]$/i.test(e.key))RM.keys[e.key.toLowerCase()]=false});
 /* the click that focuses the window shouldn't burn a beat */
 let focusT=-1e9;
 window.addEventListener('focus',()=>focusT=performance.now());
 document.addEventListener('click',()=>{if(!PRELOAD.done||performance.now()-focusT<400)return;advance()});
-function honk(){if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
+function honk(){if(RM.on)sndHorn();if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
 
 /* fonts and the asset preload first, so canvas type is the real type and
    nothing pops in after the show starts */
@@ -1272,7 +1303,7 @@ Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
   const begin=e=>{if(e&&(e.key==='f'||e.key==='F'))return;
     document.removeEventListener('keydown',begin);document.removeEventListener('pointerdown',begin);
     PRELOAD.done=true;ld.classList.add('off');setTimeout(()=>ld.remove(),1100);
-    go(0,0);requestAnimationFrame(frame)};
+    sndInit();go(0,0);requestAnimationFrame(frame)};
   document.addEventListener('keydown',begin);document.addEventListener('pointerdown',begin)});
 
 
@@ -1284,17 +1315,18 @@ Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
 const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(8).fill(false),live:false,phase:'idle',
   taps:Array(8).fill(0),rate:Array(8).fill(0),prog:Array(8).fill(0),spd:Array(8).fill(0),
   lat:Array(8).fill(0),st:Array(8).fill(0),slip:Array(8).fill(0),slipDir:Array(8).fill(0),hitCd:Array(8).fill(0),
-  haz:[],hazMeshes:[],trac:null,done:[],greenT0:0,camProg:0,lastLap:0,lastPlaceT:0};
+  haz:[],hazMeshes:[],trac:null,done:[],greenT0:0,camProg:0,lastLap:0,lastPlaceT:0,
+  prevLat:Array(8).fill(0),wl:Array(8).fill(null),wr:Array(8).fill(null),dustT:Array(8).fill(0)};
 const lobbyEl=document.getElementById('lobby'),chipsEl=document.getElementById('chips'),qrBox=document.getElementById('qr'),towerEl=document.getElementById('tower');
 
 function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='undefined')return;
   const id='r08-'+Math.random().toString(36).slice(2,7);
   try{NET.peer=new Peer(id)}catch(e){return}
-  NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='hotlap'))showLobby(true)});
+  NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='roam'))showLobby(true)});
   NET.peer.on('connection',c=>{NET.all.add(c);
-    c.on('open',()=>{if(TT.on)try{c.send({type:'tt',on:true})}catch(e){}});
+    c.on('open',()=>{try{if(RM.on)c.send({type:'roam',on:true})}catch(e){}});
     c.on('data',d=>onMsg(c,d));
-    c.on('close',()=>{NET.all.delete(c);dropConn(c);ttDrop(c)})});
+    c.on('close',()=>{NET.all.delete(c);dropConn(c)})});
   NET.peer.on('error',()=>{})}
 function drawLobby(id){const url=location.origin+location.pathname.replace(/[^/]*$/,'')+'play/#'+id;
   const q=qrcode(0,'M');q.addData(url);q.make();const n=q.getModuleCount();
@@ -1314,14 +1346,16 @@ function onMsg(c,d){
   if(d.type==='join'){const i=d.i,cur=NET.conns[i];
     if(i>=0&&i<8&&(!NET.claimed[i]||!cur||!cur.open)){ /* fresh claim, or reclaiming a dead slot */
       NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
-      c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby()}
+      c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby();
+      if(RM.on&&RM.c[i]&&RM.c[i].ai)rmStage(RM.c[i],i)}
     else c.send({type:'roster',claimed:NET.claimed})}
   else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n;
-    if(TT.phase==='run'&&TT.driver&&TT.driver.conn===c)TT.taps+=d.n}
+    if(RM.on&&i!==undefined)RM.taps[i]+=d.n}
   else if(d.type==='steer'){const v=Math.max(-1,Math.min(1,+d.v||0));c._st=v;
     const i=c._idx;if(i!==undefined)NET.st[i]=v}
-  else if(d.type==='tt-join')ttJoin(c,d.name,d.car)}
-function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;
+  else if(d.type==='rev'){const i=c._idx;if(i!==undefined)RM.rev[i]=d.v?1:0}
+  else if(d.type==='gas'){const i=c._idx;if(i!==undefined)RM.gas[i]=d.v?1:0}}
+function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;RM.rev[i]=0;RM.gas[i]=0;
   if(!NET.live){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
 
 /* the race is always real: humans drive claimed cars by tapping, AI drives the
@@ -1353,6 +1387,8 @@ function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;
     NET.lat[i]=i%2?1.9:-1.9;NET.st[i]=0;NET.slip[i]=0;NET.hitCd[i]=0;
     setCarO(cars[i],1);carAt(cars[i],i,NET.prog[i],NET.lat[i])}
   buildHazards();
+  if(!RM.skid)rmBuildSkid();if(!RM.dust.length)rmBuildDust();rmClearSkid();
+  NET.prevLat=NET.lat.slice();NET.wl.fill(null);NET.wr.fill(null);
   /* the tractor waits in the infield until the final lap */
   NET.trac={on:false,done:false,lat:-7.2,prog:TRACK.S+Math.PI*TRACK.R+TRACK.S*.55};
   trackTractor.visible=false;
@@ -1360,8 +1396,9 @@ function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;
   cap.textContent='Drivers, ready…';
   broadcast({type:'state',phase:'set'});
   townTimers.push(setTimeout(()=>{NET.phase='green';NET.greenT0=performance.now();
-    broadcast({type:'state',phase:'green'});cap.textContent='GREEN. GREEN. GREEN.'},2600))}
+    broadcast({type:'state',phase:'green'});cap.textContent='GREEN. GREEN. GREEN.';sndFanfare()},2600))}
 function netEndRace(){NET.live=false;NET.phase='idle';clearHazards();trackTractor.visible=false;
+  cars.forEach(c=>c.rotation.z=0);RM.dust.forEach(d=>d.s.visible=false);
   broadcast({type:'state',phase:'idle'})}
 
 /* AI steering: hunt the inside line through the turns, weave around the
@@ -1409,7 +1446,7 @@ function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finish
     if(now-NET.hitCd[i]>2500){
       for(const h of NET.haz){const d=Math.abs(u-h.p),dd=Math.min(d,L-d);
         if(dd<1.7&&Math.abs(NET.lat[i]-h.lat)<1.15){NET.hitCd[i]=now;
-          if(h.type==='cone')NET.spd[i]*=.4;
+          if(h.type==='cone'){NET.spd[i]*=.4;sndThud();const c=cars[i];for(let k=0;k<3;k++)rmPuff({x:c.position.x,z:c.position.z,h:c.rotation.y},30)}
           else{NET.slip[i]=.9;NET.slipDir[i]=NET.lat[i]>=h.lat?1:-1}
           break}}
       if(NET.trac&&NET.trac.on&&now-NET.hitCd[i]>2500){const d=Math.abs(u-NET.trac.prog),dd=Math.min(d,L-d);
@@ -1425,7 +1462,27 @@ function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finish
   if(NET.phase==='green'&&now-NET.greenT0>120000){[...Array(8).keys()].filter(i=>!NET.done.includes(i))
     .sort((a,c)=>NET.prog[c]-NET.prog[a]).forEach(i=>{NET.done.push(i);
       if(NET.conns[i])NET.conns[i].send({type:'state',phase:'done',place:NET.done.length})})}
+  /* bumping: two cars can't share a piece of road. the one behind loses a touch */
+  for(let a=0;a<8;a++)for(let c2=a+1;c2<8;c2++){const dp=NET.prog[a]-NET.prog[c2];if(Math.abs(dp)>3.2)continue;
+    const dl=NET.lat[a]-NET.lat[c2];if(Math.abs(dl)>=1.9)continue;
+    const sg=dl>0?1:dl<0?-1:(a%2?1:-1),ov=(1.9-Math.abs(dl))/2;
+    NET.lat[a]=Math.max(-3.4,Math.min(3.4,NET.lat[a]+sg*ov));NET.lat[c2]=Math.max(-3.4,Math.min(3.4,NET.lat[c2]-sg*ov));
+    if(dp<0)NET.spd[a]*=.985;else NET.spd[c2]*=.985}
   cars.forEach((c,i)=>carAt(c,i,NET.prog[i],NET.lat[i]+Math.sin(now/300+i*2.3)*.12));
+  /* the look of speed: lean into the turns, rubber on the corners, sand off the edge */
+  for(let i=0;i<8;i++){const c=cars[i],u=((NET.prog[i]%L)+L)%L,sp=Math.min(1,NET.spd[i]/38);
+    const inTurn=(u>S&&u<S+Math.PI*R)||(u>2*S+Math.PI*R);
+    const dl=dt>0?(NET.lat[i]-NET.prevLat[i])/dt:0;NET.prevLat[i]=NET.lat[i];
+    c.rotation.z=(inTurn?.045*sp:0)+Math.max(-.05,Math.min(.05,dl*.006));
+    const ry=c.rotation.y,fx=-Math.sin(ry),fz=-Math.cos(ry),rx=Math.cos(ry),rz=-Math.sin(ry);
+    if((inTurn&&NET.spd[i]>22)||NET.slip[i]>0){const bx=c.position.x-fx*1.05,bz=c.position.z-fz*1.05,
+        lx=bx-rx*.86,lz=bz-rz*.86,rxw=bx+rx*.86,rzw=bz+rz*.86;
+      if(NET.wl[i]){rmMark(NET.wl[i][0],NET.wl[i][1],lx,lz);rmMark(NET.wr[i][0],NET.wr[i][1],rxw,rzw)}
+      NET.wl[i]=[lx,lz];NET.wr[i]=[rxw,rzw]}
+    else NET.wl[i]=NET.wr[i]=null;
+    if(NET.slip[i]>0||(Math.abs(NET.lat[i])>3.1&&NET.spd[i]>15)){NET.dustT[i]+=dt*NET.spd[i];
+      if(NET.dustT[i]>3){NET.dustT[i]=0;rmPuff({x:c.position.x,z:c.position.z,h:ry},NET.spd[i])}}}
+  rmDustTick(dt);
   /* lap board on the caption */
   if(NET.phase==='green'){const lap=Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1);
     if(lap>NET.lastLap){NET.lastLap=lap;cap.textContent=lap===TRACK.LAPS?'FINAL LAP':`LAP ${lap} OF ${TRACK.LAPS}`}}
@@ -1440,159 +1497,424 @@ function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finish
   const trail=Math.min(...NET.prog);
   NET.camProg+=(Math.min(trail-8,F+16)-NET.camProg)*Math.min(1,dt*1.4);
   if(NET.phase==='green'&&NET.done.length>=8){NET.phase='finished';
-    const w=people[NET.done[0]];cap.textContent=`${w[1]} takes the August 500!`;
+    const w=people[NET.done[0]];cap.textContent=`${w[1]} takes the August 500!`;sndFanfare();
     broadcast({type:'state',phase:'over',order:NET.done});updateFin(NET.done)}}
 
 function updateFin(order){document.getElementById('fin').innerHTML=order.map((idx,pl)=>{const p=people[idx];
   return `<div class="p"><span class="n" style="background:${p[3]}">${p[0]}</span><span class="who">${pl+1}. ${p[1]}<small>${p[2]}</small></span></div>`}).join('')}
 
 
-/* ======================= midnight time trial =======================
-   the post-credits playground: one driver at a time takes the big
-   circuit, the host times the lap, and the leaderboard remembers the
-   night's legends. phones queue with a typed name — nobody claims a
-   roster car, they just borrow a paint job for one lap. */
-const TT={on:false,phase:'idle',queue:[],driver:null,timers:[],
-  prog:0,spd:0,rate:0,taps:0,lat:0,slip:0,slipDir:0,stun:0,hitCd:0,t0:0,camProg:0,
-  cones:[],coneMeshes:[],board:[]};
-const ttPanel=document.getElementById('ttpanel'),ttRows=document.getElementById('ttrows'),
-  ttClock=document.getElementById('ttclock'),ttDriver=document.getElementById('ttdriver');
-try{TT.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
-const ttEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ttFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
-function ttSave(){try{localStorage.setItem('r08-laps',JSON.stringify(TT.board.slice(0,50)))}catch(e){}}
-function ttCast(m){if(NET.all)NET.all.forEach(c=>{if(c.open)try{c.send(m)}catch(e){}})}
-function ttSetCap(t){cap.textContent=t||'';cap.classList.toggle('on',!!t)}
-const TT_INVITE='scan the code · one lap · fastest tonight wins';
+/* ======================= the open desert: free roam =======================
+   the second after-party. every phone gets a roster car at once and the
+   speedway infield becomes a playground: no rails, no laps. an arcade car
+   model (a heading, a forward speed, a little sideways slip that the tyres
+   bleed off) on the flat desert floor; circle collisions against cars,
+   cones, shopfronts and rocks; dust off the tarmac and skid marks in a
+   slide; seven glowing checkpoints scattered from the town to the far turn;
+   a director cam that hops between drivers; and a minimap so nobody loses
+   their car in the dark. cars nobody has claimed cruise the midnight
+   circuit as moving furniture. */
+const RM={on:false,c:[],taps:Array(8).fill(0),gas:Array(8).fill(0),rev:Array(8).fill(0),knocks:Array(8).fill(0),
+  checks:people.map(()=>new Set()),feat:-1,featT:0,cutT:0,snap:false,cones:[],cps:[],timers:[],walls:null,road:null,keys:{},hostT:0,
+  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null};
+try{RM.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
+const rmLapsEl=document.getElementById('rmlaps'),rmClock=document.getElementById('rmclock');
+const rmFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
+const rmEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rmPanel=document.getElementById('rmpanel'),rmRows=document.getElementById('rmrows'),rmMap=document.getElementById('rmmap');
+/* the playground: from the town's first shopfront to the speedway's far turn */
+const RM_B={x0:-100,x1:112,z0:-1062,z1:-412},CAR_R=1.45;
+const RM_INVITE='the open desert · scan to join · hold to go · laps start under the arch';
+const rmFirst=i=>people[i][1].split(' ')[0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 
-function ttRenderBoard(hl){ttRows.innerHTML=TT.board.slice(0,8).map((e,i)=>
-  `<div class="row${e===hl?' me':''}"><b>${i+1}</b><i style="background:${people[e.car][3]}"></i>${ttEsc(e.n)}<span>${ttFmt(e.ms)}</span></div>`).join('')
-  ||'<div class="row">no laps yet — be the first</div>'}
-function ttStatus(){
-  if(TT.driver)ttDriver.textContent='at the wheel — '+TT.driver.name;
-  else if(TT.queue.length)ttDriver.textContent='next up: '+TT.queue[0].name+(TT.queue.length>1?' · '+(TT.queue.length-1)+' more in line':'');
-  else ttDriver.textContent='the track is open';
-  if(TT.phase!=='run')ttClock.textContent=TT.board[0]?'★ '+ttFmt(TT.board[0].ms):'--:--.--'}
+function rmOpen(){if(RM.on)return;RM.on=true;
+  netInit();showLobby(true);lobbyEl.classList.add('roam');
+  rmPanel.classList.add('on');
+  RM.knocks.fill(0);RM.checks.forEach(s=>s.clear());RM.feat=-1;RM.featT=0;RM.cutT=0;RM.boardT=0;RM.snap=true;
+  RM.evT=performance.now()+55000;
+  if(!RM.walls)rmBuildWalls();
+  if(!RM.road)rmBuildRoad();
+  if(!RM.skid)rmBuildSkid();
+  if(!RM.dust.length)rmBuildDust();
+  rmClearSkid();rmBuildCones();rmBuildCheckpoints();
+  /* claimed cars line up on the infield grid; the rest cruise the circuit */
+  RM.c=people.map((p,i)=>{const s={x:0,z:0,h:0,vx:0,vz:0,sa:0,rate:0,slip:0,ai:true,prog:i*CIRCUIT.L/8,hit:0,wl:null,wr:null,dustT:0,lean:0,lapT0:null,gates:0,pz:null};
+    if(NET.conns[i])rmStage(s,i);
+    setCarO(cars[i],1);return s});
+  rmDrawMapBg();rmRenderBoard();rmRenderLaps(null);
+  cap.textContent=RM_INVITE;cap.classList.add('on');
+  RM.camP.set(40,16,-810);RM.camL.set(40,0,-885);
+  rmCast({type:'roam',on:true})}
+function rmClose(){if(!RM.on)return;RM.on=false;
+  RM.timers.forEach(clearTimeout);RM.timers=[];
+  RM.cones.forEach(h=>scene.remove(h.mesh));RM.cones=[];
+  RM.cps.forEach(c=>scene.remove(c.g));RM.cps=[];
+  RM.skid.mesh.visible=false;RM.dust.forEach(d=>d.s.visible=false);
+  kill('rmtr');trackTractor.visible=false;kill('rmtrain');if(RM.train)RM.train.visible=false;
+  cars.forEach(c=>c.rotation.z=0); /* no lean carried into the next act */
+  rmPanel.classList.remove('on');lobbyEl.classList.remove('roam');
+  rmCast({type:'roam',on:false})}
+function rmCast(m){if(NET.all)NET.all.forEach(c=>{if(c.open)try{c.send(m)}catch(e){}})}
+/* a fresh driver starts on the infield grid, facing down the front straight */
+function rmStage(s,i){s.ai=false;s.x=22+(i%2)*4.2;s.z=-790-Math.floor(i/2)*6;s.h=0;s.vx=s.vz=0;s.sa=0;s.rate=0;s.wl=s.wr=null;s.lapT0=null;s.gates=0;s.pz=null;
+  cars[i].position.set(s.x,0,s.z);cars[i].rotation.set(0,0,0)}
 
-function ttOpen(){if(TT.on)return;TT.on=true;TT.phase='idle';TT.camProg=0;
-  netInit();showLobby(true);lobbyEl.classList.add('tt');
-  ttPanel.classList.add('on');ttBuildCones();ttRenderBoard(null);ttStatus();
-  ttSetCap(TT_INVITE);
-  ttCast({type:'tt',on:true})}
-function ttClose(){if(!TT.on)return;TT.on=false;
-  TT.timers.forEach(clearTimeout);TT.timers=[];
-  if(TT.driver&&TT.driver.conn.open)try{TT.driver.conn.send({type:'tt-dnf'})}catch(e){}
-  if(TT.driver)setCarO(cars[TT.driver.car],0);
-  TT.driver=null;TT.queue=[];TT.phase='idle';
-  TT.coneMeshes.forEach(m=>scene.remove(m));TT.coneMeshes=[];TT.cones=[];
-  ttPanel.classList.remove('on');lobbyEl.classList.remove('tt');
-  ttCast({type:'tt',on:false})}
+/* ---- the furniture: what a car can't drive through ---- */
+function rmBuildWalls(){const W=RM.walls=[];
+  const C=(x,z,r)=>W.push({t:'c',x,z,r}),R=(x0,x1,z0,z1)=>W.push({t:'r',x0,x1,z0,z1});
+  LOTS.forEach(([z,w,side])=>{const cx=side*(9.5+w/2);R(cx-w/2,cx+w/2,z-4,z+4)});
+  /* scenery models: a prop planted on the road is dressing, not a wall */
+  const p={};
+  (SHOW.props||[]).forEach(q=>{let near=Math.abs(q.x)<9;
+    for(let s=0;s<CIRCUIT.L&&!near;s+=6){circuitPos(s,p);if(Math.hypot(p.x-q.x,p.z-q.z)<10)near=true}
+    if(!near)C(q.x,q.z,(q.size||10)*.28)});
+  desertRocks.forEach(r=>C(r.x,r.z,r.r));
+  R(-32,-22,-1005,-765);R(102,112,-1005,-765);  /* speedway stands */
+  R(5.85,6.35,-925,-785);                        /* pit wall */
+  [[-7.4,-700],[7.4,-700],[-7.6,-560],[7.6,-560],[-6.6,-855],[6.6,-855],
+   [-13,-780],[-13,-985],[93,-780],[93,-985]].forEach(([x,z])=>C(x,z,.4));
+  [290,905].forEach(s=>{circuitPos(s,p);C(p.x-p.hz*9,p.z+p.hx*9,.4)});
+  tractors.forEach(t=>C(t.position.x,t.position.z,1.6))}
+/* pavement samples, for the off-road feel: sand drags, tarmac flies */
+function rmBuildRoad(){const pts=RM.road=[],p={};
+  for(let s=0;s<CIRCUIT.L;s+=3){circuitPos(s,p);pts.push(p.x,p.z)}
+  for(let s=0;s<TRACK.L;s+=3){trackPos(s,p);pts.push(p.x,p.z)}}
+function rmOnRoad(x,z){if(Math.abs(x)<5.4&&z<10&&z>-1540)return true;
+  const r=RM.road;for(let i=0;i<r.length;i+=2){const dx=x-r[i],dz=z-r[i+1];if(dx*dx+dz*dz<30)return true}
+  return false}
 
-/* track furniture: one fixed layout per session, so every lap is the same test */
-function ttBuildCones(){TT.coneMeshes.forEach(m=>scene.remove(m));TT.coneMeshes=[];TT.cones=[];
-  const used=[],p={};
-  for(let k=0;k<11;k++){let s=null;
-    for(let t=0;t<40;t++){const q=130+Math.random()*(CIRCUIT.L-190);
-      if(used.every(u=>Math.abs(u-q)>26)){s=q;used.push(q);break}}
-    if(s===null)break;
-    TT.cones.push({p:s,lat:Math.random()*5.4-2.7,type:k<8?'cone':'oil'})}
-  TT.cones.forEach(h=>{circuitPos(h.p,p);const nx=-p.hz,nz=p.hx;let m;
-    if(h.type==='cone')m=new THREE.Mesh(new THREE.ConeGeometry(.4,.8,10),new THREE.MeshLambertMaterial({color:0xF5B335}));
-    else{m=new THREE.Mesh(new THREE.CircleGeometry(.95,16),new THREE.MeshBasicMaterial({color:0x0a0c18,transparent:true,opacity:.8}));m.rotation.x=-Math.PI/2}
-    m.position.set(p.x+nx*h.lat,h.type==='cone'?.4:.05,p.z+nz*h.lat);
-    h.mesh=m;h.x0=m.position.x;h.z0=m.position.z;h.nx=nx;h.nz=nz;h.gone=false;
-    scene.add(m);TT.coneMeshes.push(m)})}
-/* a struck cone gets punted off the racing line, then walks back for the
-   next driver — the layout stays identical for everyone */
-function ttThump(h,side){if(h.gone)return;h.gone=true;const m=h.mesh;
-  tween(v=>{m.position.y=.4+Math.sin(v*Math.PI)*1.8;
-    m.position.x=h.x0+h.nx*side*2.4*v;m.position.z=h.z0+h.nz*side*2.4*v;
-    m.rotation.z=v*6.5},0,1,650,ease.out,null,'cone'+h.p);
-  TT.timers.push(setTimeout(()=>{h.gone=false;m.position.set(h.x0,.4,h.z0);m.rotation.z=0},3200))}
-function ttFlash(t){if(TT.phase!=='run')return;ttSetCap(t);
-  TT.timers.push(setTimeout(()=>{if(TT.phase==='run')ttSetCap('')},1400))}
+/* cones and oil on the infield: a slalom, a ring, a bowling triangle */
+function rmBuildCones(){RM.cones.forEach(h=>scene.remove(h.mesh));RM.cones=[];
+  const spots=[];
+  for(let k=0;k<8;k++)spots.push([40,-808-k*18,'cone']);
+  for(let k=0;k<12;k++){const a=k/12*Math.PI*2;spots.push([22+Math.cos(a)*11,-880+Math.sin(a)*11,'cone'])}
+  for(let r=0;r<4;r++)for(let k=0;k<=r;k++)spots.push([60-r*1.5+k*3,-955-r*1.6,'cone']);
+  [[56,-815],[28,-940],[66,-880],[40,-985]].forEach(([x,z])=>spots.push([x,z,'oil']));
+  spots.forEach(([x,z,type])=>{let m;
+    if(type==='cone')m=new THREE.Mesh(new THREE.ConeGeometry(.4,.8,10),new THREE.MeshLambertMaterial({color:0xF5B335}));
+    else{m=new THREE.Mesh(new THREE.CircleGeometry(1.3,16),new THREE.MeshBasicMaterial({color:0x0a0c18,transparent:true,opacity:.8}));m.rotation.x=-Math.PI/2}
+    m.position.set(x,type==='cone'?.4:.05,z);scene.add(m);
+    RM.cones.push({x,z,type,mesh:m,gone:false})})}
+/* a struck cone flies the way the car was going, tumbles, and walks back
+   home a while later so the playground never runs out of things to hit */
+function rmKnock(h,s,i){if(h.gone)return;h.gone=true;const m=h.mesh,spd=Math.hypot(s.vx,s.vz);
+  const dx=spd>.1?s.vx/spd:1,dz=spd>.1?s.vz/spd:0,fl=3+Math.min(9,spd*.3),lift=1+Math.min(3,spd*.08);
+  const rx=(Math.random()-.5)*7,rz=(Math.random()-.5)*7;
+  tween(v=>{m.position.set(h.x+dx*fl*v,.4+Math.sin(v*Math.PI)*lift,h.z+dz*fl*v);m.rotation.set(rx*v,0,rz*v)},0,1,700,ease.out,null,'rmc'+h.x+h.z);
+  RM.timers.push(setTimeout(()=>{if(!RM.on)return;
+    tween(v=>{m.position.y=.4+Math.sin(v*Math.PI)*.6;m.rotation.set(rx*(1-v),0,rz*(1-v));
+      m.position.x=h.x+dx*fl*(1-v);m.position.z=h.z+dz*fl*(1-v)},0,1,900,ease.inout,null,'rmc'+h.x+h.z);
+    h.gone=false},9000));
+  RM.knocks[i]++;rmFeature(i,performance.now());sndThud();
+  const n=RM.knocks[i];rmFlash(rmFirst(i)+(n%10===0?' — '+n+' cones and counting':n===1?' flattens a cone':' · cone '+n))}
+function rmFlash(t){cap.textContent=t;cap.classList.add('on');
+  RM.timers.push(setTimeout(()=>{if(RM.on&&cap.textContent===t)cap.textContent=RM_INVITE},2200))}
+function rmFeature(i,now){if(RM.feat===i||now-RM.cutT<4000)return;RM.feat=i;RM.featT=now;RM.cutT=now;RM.snap=true}
 
-/* the queue: phones ask in with a name, the host stages them one by one */
-function ttJoin(c,name,car){if(!TT.on)return;
-  name=String(name||'').replace(/\s+/g,' ').trim().slice(0,14)||'mystery driver';
-  car=Math.abs(car|0)%8;
-  if(TT.driver&&TT.driver.conn===c)return;
-  const q=TT.queue.find(e=>e.conn===c);
-  if(q){q.name=name;q.car=car}else TT.queue.push({conn:c,name,car});
-  ttQPos();ttStatus();
-  if(!TT.driver)ttNext()}
-function ttQPos(){TT.queue.forEach((e,i)=>{if(e.conn.open)try{e.conn.send({type:'tt-q',pos:i+1})}catch(x){}})}
-function ttDrop(c){if(!TT.on)return;
-  const n=TT.queue.length;TT.queue=TT.queue.filter(e=>e.conn!==c);
-  if(TT.queue.length!==n){ttQPos();ttStatus()}
-  if(TT.driver&&TT.driver.conn===c){ttSetCap(TT.driver.name+' lost the pits — next driver');ttAbort(1800)}}
-function ttAbort(delay){TT.timers.forEach(clearTimeout);TT.timers=[];TT.phase='idle';
-  if(TT.driver)setCarO(cars[TT.driver.car],0);TT.driver=null;ttStatus();
-  TT.timers.push(setTimeout(ttNext,delay||0))}
+/* ---- checkpoints: one per person, the reason to leave the infield.
+   each ring carries a guest's number and colour; finding them all is
+   visiting everyone at the party ---- */
+const RM_PLACES=['the diner','the gas station','the town hairpin','the back road','the far hairpin','turn two','the infield','the pits'];
+function rmBuildCheckpoints(){RM.cps.forEach(c=>scene.remove(c.g));RM.cps=[];
+  const p={},at=s=>{circuitPos(s,p);return[p.x,p.z]};
+  const spots=[[0,-463],[0,-570],at(290),at(560),at(905),[TRACK.R,-760-TRACK.S-TRACK.R],[70,-880],[12,-855]];
+  spots.forEach(([x,z],k)=>{const g=new THREE.Group(),who=people[k],col=new THREE.Color(who[3]);
+    const glow=glowTexture(col.getStyle());
+    const ring=new THREE.Mesh(new THREE.RingGeometry(2.7,3.4,40),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.75,depthWrite:false,side:THREE.DoubleSide}));
+    ring.rotation.x=-Math.PI/2;ring.position.y=.06;g.add(ring);
+    const beam=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,transparent:true,opacity:.55,depthWrite:false}));
+    beam.scale.set(2.2,26,1);beam.position.y=12;g.add(beam);
+    const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,transparent:true,opacity:.5,depthWrite:false}));
+    halo.scale.set(9,9,1);halo.position.y=.6;g.add(halo);
+    const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:tagTexture(who),transparent:true,depthWrite:false}));
+    tag.scale.set(2.6,2.6,1);tag.position.y=4.6;g.add(tag);
+    g.position.set(x,0,z);scene.add(g);RM.cps.push({x,z,name:RM_PLACES[k],g,ring,beam,tag,k})})}
+function rmCheck(c,s,i,now){const set=RM.checks[i];if(set.has(c.k))return;set.add(c.k);
+  tween(v=>{c.ring.scale.setScalar(1+v*1.6);c.ring.material.opacity=.75*(1-v);c.tag.position.y=4.6+Math.sin(v*Math.PI)*2},0,1,900,ease.out,null,'rmcp'+c.k);
+  RM.timers.push(setTimeout(()=>{c.ring.scale.setScalar(1);c.ring.material.opacity=.75},950));
+  rmFeature(i,now);sndChime(false);
+  const n=set.size,me=rmFirst(i),owner=rmFirst(c.k);
+  rmFlash(n===RM.cps.length?me+' has seen everyone!':c.k===i?me+' is home · '+n+' of '+RM.cps.length:me+' finds '+owner+"'s "+c.name+' · '+n+' of '+RM.cps.length)}
 
-function ttNext(){if(!TT.on||TT.driver)return;
-  let d=null;while(TT.queue.length&&!d){const e=TT.queue.shift();if(e.conn.open)d=e}
-  ttQPos();
-  if(!d){TT.phase='idle';ttStatus();ttSetCap(TT_INVITE);return}
-  TT.driver=d;TT.phase='staged';
-  TT.prog=0;TT.spd=0;TT.rate=0;TT.taps=0;TT.lat=0;TT.slip=0;TT.stun=0;TT.hitCd=0;TT.camProg=-16;
-  cars.forEach(c=>setCarO(c,0));setCarO(cars[d.car],1);carAtC(cars[d.car],0,0);
-  try{d.conn.send({type:'tt-stage'})}catch(e){}
-  ttStatus();ttSetCap(d.name+' to the line…');
-  [['READY…',1600],['3',2600],['2',3400],['1',4200]].forEach(([t,ms])=>TT.timers.push(setTimeout(()=>ttSetCap(t),ms)));
-  TT.timers.push(setTimeout(()=>{if(TT.driver!==d)return;
-    TT.phase='run';TT.t0=performance.now();
-    ttSetCap('GO!');try{d.conn.send({type:'tt-go'})}catch(e){}
-    TT.timers.push(setTimeout(()=>{if(TT.phase==='run')ttSetCap('')},2200))},5000))}
+/* ---- things that happen to the world, for the room that is watching ---- */
+function rmEventsTick(now){if(now<RM.evT)return;RM.evT=now+90000;
+  const ev=['tractor','flicker','train'][RM.evN++%3];
+  if(ev==='tractor')rmTractor();else if(ev==='flicker')rmFlicker();else rmTrain()}
+/* a tractor ambles across the infield: it is solid, mind it */
+function rmTractor(){const t=trackTractor;t.visible=true;t.rotation.y=-Math.PI/2;
+  tween(v=>{t.position.set(4+74*v,0,-905+Math.sin(v*9)*3)},0,1,26000,ease.lin,null,'rmtr');
+  RM.timers.push(setTimeout(()=>{t.visible=false},26100));
+  rmFlash('tractor on the infield · it happens every august')}
+/* the town's power stutters: the neon goes out and reignites sign by sign */
+function rmFlicker(){signs.forEach((s,k)=>RM.timers.push(setTimeout(()=>{s.on.material.opacity=0;s.light.intensity=0;s.lit=false;
+    RM.timers.push(setTimeout(()=>lightSign(s),900+Math.random()*1100))},k*140)));
+  tween(v=>setBoard(v),1,0,260,ease.out,null,'board');
+  RM.timers.push(setTimeout(()=>tween(v=>setBoard(v),0,1,1600,ease.inout,ignite,'board'),1300));
+  rmFlash('the power flickers…')}
+/* a string of birthday lights crosses under the arch */
+function rmTrain(){if(!RM.train){const g=RM.train=new THREE.Group();
+    for(let i=0;i<12;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:festTex[i%4],transparent:true,depthWrite:false}));
+      s.scale.set(1.1,1.1,1);s.position.x=i*3.2;g.add(s)}
+    scene.add(g)}
+  const g=RM.train;g.visible=true;
+  tween(v=>{g.position.set(-90+150*v,2.2,-706);g.children.forEach((s,i)=>s.position.y=Math.sin(v*40+i)*.5)},0,1,14000,ease.lin,null,'rmtrain');
+  RM.timers.push(setTimeout(()=>{g.visible=false},14100));
+  rmFlash('the birthday train rolls through · happy birthday, august')}
 
-function ttFinish(ms){const d=TT.driver;TT.phase='cool';
-  const entry={n:d.name,car:d.car,ms:Math.round(ms)};
-  TT.board.push(entry);TT.board.sort((a,b)=>a.ms-b.ms);ttSave();
-  const rank=TT.board.indexOf(entry);
-  ttRenderBoard(entry);ttClock.textContent=ttFmt(ms);
-  ttSetCap(rank===0?d.name+' — '+ttFmt(ms)+' — TRACK RECORD!':d.name+' — '+ttFmt(ms));
-  try{d.conn.send({type:'tt-done',ms:entry.ms,rank:rank+1,of:TT.board.length})}catch(e){}
-  TT.timers.push(setTimeout(()=>{if(TT.driver!==d)return;
-    setCarO(cars[d.car],0);TT.driver=null;TT.phase='idle';ttStatus();
-    if(TT.queue.length)ttNext();else ttSetCap(TT_INVITE)},4500))}
+/* ---- last call: the cars come home ---- */
+function rmGoodnight(){rmCast({type:'bye'});sndHorn();
+  ['cityL','cityR'].forEach(k=>{if(_propReg[k])_propReg[k].visible=false}); /* the skyline blocks would crowd the lens this close */
+  const order=[...Array(8).keys()].sort((a,b)=>((RM.c[b]&&!RM.c[b].ai)?1:0)-((RM.c[a]&&!RM.c[a].ai)?1:0));
+  cars.forEach((c,i)=>{setCarO(c,1);c.rotation.z=0;
+    const k=order.indexOf(i),tx=k%2?3.3:-3.3,tz=-664-Math.floor(k/2)*4.6,yaw=Math.atan2(tx,tz+650); /* between the cockpit and the arch banner, facing home */
+    const x0=c.position.x,z0=c.position.z,y0=c.rotation.y,dist=Math.hypot(tx-x0,tz-z0);
+    let dy=yaw-y0;while(dy>Math.PI)dy-=Math.PI*2;while(dy<-Math.PI)dy+=Math.PI*2;
+    tween(v=>{c.position.set(x0+(tx-x0)*v,0,z0+(tz-z0)*v);c.rotation.y=y0+dy*v},0,1,2400+Math.min(4200,dist*9)+k*200,ease.inout,null,'gn'+i)});
+  boardTexture(1,'GOODNIGHT, AUGUST','THANKS FOR DRIVING · SEE YOU NEXT YEAR');archM.material.map=archTexture('GOODNIGHT, AUGUST');
+  order.forEach((i,k)=>townTimers.push(setTimeout(()=>{cars[i].userData.lamps.visible=false},7000+k*450)));
+  townTimers.push(setTimeout(()=>{creditsEl.classList.add('on');startRoll()},11500))}
 
-const _tt_p={};
-function ttTick(dt,now){if(!TT.on)return;
-  if(TT.phase==='idle'){TT.camProg+=dt*16;return} /* empty track: a slow flying tour */
-  if(TT.phase==='staged'){TT.camProg+=(-16-TT.camProg)*Math.min(1,dt*3);return}
-  const d=TT.driver;if(!d)return;
-  const L=CIRCUIT.L,u=((TT.prog%L)+L)%L;
-  if(TT.phase==='run'){
-    TT.rate=Math.min(14,TT.rate*(1-Math.min(1,dt*1.5))+TT.taps*1.5);TT.taps=0;
-    if(TT.stun>0)TT.stun-=dt; /* a hit kills the throttle until the car recovers */
-    const target=TT.stun>0?0:(12+TT.rate*1.9)*(TT.slip>0?.72:1);
-    TT.spd+=(target-TT.spd)*Math.min(1,dt*(TT.stun>0?4:1.8));
-    ttClock.textContent=ttFmt(now-TT.t0)}
-  else TT.spd+=(0-TT.spd)*Math.min(1,dt*1.2); /* cool: roll it out past the line */
-  const st=(d.conn&&d.conn._st)||0;
-  if(TT.slip>0){TT.slip-=dt;TT.lat+=TT.slipDir*2.6*dt}
-  else{TT.lat+=st*4.6*dt;if(!st)TT.lat+=(0-TT.lat)*Math.min(1,dt*.3)}
-  TT.lat=Math.max(-3.4,Math.min(3.4,TT.lat));
-  if(TT.phase==='run'&&now-TT.hitCd>2000){
-    for(const h of TT.cones){if(h.gone)continue;
-      const d0=Math.abs(u-h.p),dd=Math.min(d0,L-d0);
-      if(dd<1.7&&Math.abs(TT.lat-h.lat)<1.15){TT.hitCd=now;
-        if(h.type==='cone'){TT.spd*=.1;TT.stun=.6;ttThump(h,TT.lat>=h.lat?-1:1);ttFlash('CONE!')}
-        else{TT.slip=.9;TT.slipDir=TT.lat>=h.lat?1:-1;ttFlash('OIL SLICK!')}
-        break}}}
-  /* real corner geometry, same as the race: the inside line is shorter */
-  circuitPos(u,_tt_p);
-  const cf=_tt_p.R?_tt_p.R/(_tt_p.R-_tt_p.dir*TT.lat):1;
-  TT.prog+=TT.spd*dt*cf;
-  if(TT.phase==='run'&&TT.prog>=L)ttFinish(now-TT.t0);
-  else if(TT.phase==='run'&&now-TT.t0>150000){ /* a dead phone can't hold the track */
-    ttSetCap(d.name+' ran out of night');
-    if(d.conn.open)try{d.conn.send({type:'tt-dnf'})}catch(e){}
-    ttAbort(1800);return}
-  carAtC(cars[d.car],TT.prog,TT.lat+Math.sin(now/300)*.1);
-  /* tight chase: a slow lerp lags by spd/rate, so keep the rate high and the
-     gap reads as a steady car-and-a-half even at full song */
-  TT.camProg+=(TT.prog-8-TT.camProg)*Math.min(1,dt*7)}
+/* ---- dust and skid marks ---- */
+const RM_DUST_TEX=glowTexture('rgb(214,178,126)');
+function rmBuildDust(){for(let k=0;k<48;k++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:RM_DUST_TEX,transparent:true,opacity:0,depthWrite:false}));
+  s.visible=false;scene.add(s);RM.dust.push({s,t:1,life:1,vx:0,vz:0,grow:1})}}
+function rmPuff(s,spd){const d=RM.dust[RM.dustN++%RM.dust.length];
+  const fx=-Math.sin(s.h),fz=-Math.cos(s.h),rx=Math.cos(s.h),rz=-Math.sin(s.h),o=(Math.random()-.5)*1.6;
+  d.s.position.set(s.x-fx*1.4+rx*o,.5,s.z-fz*1.4+rz*o);d.s.visible=true;
+  d.t=0;d.life=.7+Math.random()*.5;d.vx=-fx*2+(Math.random()-.5)*2;d.vz=-fz*2+(Math.random()-.5)*2;d.grow=1.4+Math.min(2.6,spd*.06)}
+function rmDustTick(dt){RM.dust.forEach(d=>{if(!d.s.visible)return;d.t+=dt;const u=d.t/d.life;
+  if(u>=1){d.s.visible=false;return}
+  d.s.position.x+=d.vx*dt;d.s.position.z+=d.vz*dt;d.s.position.y+=dt*1.1;
+  const sc=.8+u*d.grow*2.2;d.s.scale.set(sc,sc,1);
+  const near=Math.min(1,Math.max(0,(d.s.position.distanceTo(camera.position)-3)/6));
+  d.s.material.opacity=.42*(1-u)*(1-u)*near})}
+/* skid marks: one ring-buffered mesh, a quad per wheel per frame of sliding */
+const RM_SK_N=6000;
+function rmBuildSkid(){const geo=new THREE.BufferGeometry(),pos=new Float32Array(RM_SK_N*12),idx=[];
+  for(let q=0;q<RM_SK_N;q++){const a=q*4;idx.push(a,a+1,a+2,a+1,a+3,a+2)}
+  for(let i=1;i<pos.length;i+=3)pos[i]=-5; /* unused quads live under the floor */
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setIndex(idx);
+  const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x0a0a12,transparent:true,opacity:.55,depthWrite:false}));
+  mesh.frustumCulled=false;mesh.visible=false;scene.add(mesh);RM.skid={mesh,pos,n:0}}
+function rmClearSkid(){const S=RM.skid;S.n=0;for(let i=1;i<S.pos.length;i+=3)S.pos[i]=-5;
+  S.mesh.geometry.attributes.position.needsUpdate=true;S.mesh.visible=false}
+function rmMark(x0,z0,x1,z1){const S=RM.skid,dx=x1-x0,dz=z1-z0,l=Math.hypot(dx,dz);if(l<.05)return;
+  const nx=-dz/l*.17,nz=dx/l*.17,o=(S.n++%RM_SK_N)*12,p=S.pos;
+  p[o]=x0+nx;p[o+1]=.055;p[o+2]=z0+nz;p[o+3]=x0-nx;p[o+4]=.055;p[o+5]=z0-nz;
+  p[o+6]=x1+nx;p[o+7]=.055;p[o+8]=z1+nz;p[o+9]=x1-nx;p[o+10]=.055;p[o+11]=z1-nz;
+  S.mesh.geometry.attributes.position.needsUpdate=true;S.mesh.visible=true}
+
+/* ---- the car model ---- */
+function rmDrive(s,i,thr,st,rev,dt){
+  const fx=-Math.sin(s.h),fz=-Math.cos(s.h),rx=Math.cos(s.h),rz=-Math.sin(s.h);
+  let vf=s.vx*fx+s.vz*fz,vr=s.vx*rx+s.vz*rz;
+  const road=rmOnRoad(s.x,s.z),spd=Math.abs(vf);
+  /* the wheel eases toward the button, so a tap is a nudge and a hold is a corner */
+  s.sa+=(st-s.sa)*Math.min(1,dt*7);
+  /* throttle: a held button or a flurry of taps becomes push; reverse is a gentle hold */
+  if(rev)vf+=(-7-vf)*Math.min(1,dt*3);
+  else vf+=thr*(road?22:19)*dt;
+  vf-=vf*(road?.55:.85)*dt;                       /* air and sand */
+  if(!thr&&!rev)vf-=Math.sign(vf)*Math.min(spd,2.5*dt); /* rolling to a stop */
+  /* the tyres bleed off sideways speed; less so at pace, so a hard corner drifts */
+  const grip=(s.slip>0?.8:(road?6.5:4))-2.8*Math.min(1,spd/32);
+  vr*=Math.exp(-grip*dt);
+  if(s.slip>0)s.slip-=dt;
+  s.vx=fx*vf+rx*vr;s.vz=fz*vf+rz*vr;
+  /* steering needs rolling wheels; reversing swings the tail the other way */
+  s.h-=s.sa*2.5*Math.min(1,spd/8)*(vf<0?-1:1)*dt;
+  s.x+=s.vx*dt;s.z+=s.vz*dt;
+  /* sand off the tyres when quick on the loose stuff; rubber on the road in a slide */
+  const total=Math.hypot(s.vx,s.vz);
+  if(!road&&total>7){s.dustT+=dt*total;if(s.dustT>2.2){s.dustT=0;rmPuff(s,total)}}
+  const sliding=(Math.abs(vr)>3.2||s.slip>0)&&total>5;
+  if(sliding&&road){const bx=s.x-fx*1.05,bz=s.z-fz*1.05,lx=bx-rx*.86,lz=bz-rz*.86,rxw=bx+rx*.86,rzw=bz+rz*.86;
+    if(s.wl){rmMark(s.wl[0],s.wl[1],lx,lz);rmMark(s.wr[0],s.wr[1],rxw,rzw)}
+    s.wl=[lx,lz];s.wr=[rxw,rzw]}
+  else s.wl=s.wr=null;
+  s.lean=vr}
+function rmPushCircle(s,cx,cz,r){const dx=s.x-cx,dz=s.z-cz,d=Math.hypot(dx,dz),m=r+CAR_R;
+  if(d>=m)return false;const nx=d>1e-4?dx/d:1,nz=d>1e-4?dz/d:0;
+  s.x=cx+nx*m;s.z=cz+nz*m;const vn=s.vx*nx+s.vz*nz;if(vn<0){s.vx-=vn*nx*1.35;s.vz-=vn*nz*1.35}return true}
+function rmPushRect(s,w){const px=clamp(s.x,w.x0,w.x1),pz=clamp(s.z,w.z0,w.z1);
+  let dx=s.x-px,dz=s.z-pz,d=Math.hypot(dx,dz);
+  if(d>=CAR_R)return false;
+  let nx,nz;
+  if(d>1e-4){nx=dx/d;nz=dz/d}
+  else{ /* inside the box: leave by the nearest face */
+    const l=s.x-w.x0,r=w.x1-s.x,b=s.z-w.z0,t=w.z1-s.z,m=Math.min(l,r,b,t);
+    nx=m===l?-1:m===r?1:0;nz=m===b?-1:m===t?1:0;d=-m}
+  s.x+=nx*(CAR_R-d);s.z+=nz*(CAR_R-d);
+  const vn=s.vx*nx+s.vz*nz;if(vn<0){s.vx-=vn*nx*1.35;s.vz-=vn*nz*1.35}return true}
+function rmCollide(s,i,now){
+  if(s.x<RM_B.x0){s.x=RM_B.x0;s.vx=Math.abs(s.vx)*.3}else if(s.x>RM_B.x1){s.x=RM_B.x1;s.vx=-Math.abs(s.vx)*.3}
+  if(s.z<RM_B.z0){s.z=RM_B.z0;s.vz=Math.abs(s.vz)*.3}else if(s.z>RM_B.z1){s.z=RM_B.z1;s.vz=-Math.abs(s.vz)*.3}
+  if(trackTractor.visible)rmPushCircle(s,trackTractor.position.x,trackTractor.position.z,1.7);
+  for(const w of RM.walls){if(w.t==='c'){if(Math.abs(w.x-s.x)>w.r+3||Math.abs(w.z-s.z)>w.r+3)continue;rmPushCircle(s,w.x,w.z,w.r)}
+    else{if(s.x<w.x0-3||s.x>w.x1+3||s.z<w.z0-3||s.z>w.z1+3)continue;rmPushRect(s,w)}}
+  for(const h of RM.cones){if(h.gone)continue;const dx=s.x-h.x,dz=s.z-h.z;
+    if(dx*dx+dz*dz<(h.type==='cone'?2.6:2.4)){
+      if(h.type==='cone'){rmKnock(h,s,i);s.vx*=.94;s.vz*=.94}
+      else if(now-s.hit>1500){s.hit=now;s.slip=.9;const rx=Math.cos(s.h),rz=-Math.sin(s.h),k=(i%2?1:-1)*7;
+        s.vx+=rx*k;s.vz+=rz*k;rmFlash(rmFirst(i)+' finds the oil')}}}
+  for(const c of RM.cps){const dx=s.x-c.x,dz=s.z-c.z;if(dx*dx+dz*dz<11){rmCheck(c,s,i,now);
+    if(c.k===2)s.gates|=1;else if(c.k===4)s.gates|=2}}} /* both hairpins make a lap honest */
+
+/* ---- the lap clock: the circuit is still a lap. cross the line under the
+   arch heading north to start the clock, touch both hairpins, cross it again ---- */
+function rmLine(s,i,now){
+  if(s.lapT0!==null&&s.gates===3)rmLapDone(i,Math.round(now-s.lapT0),now);
+  s.lapT0=now;s.gates=0}
+function rmLapDone(i,ms,now){const e={n:people[i][1],car:i,ms};
+  RM.board.push(e);RM.board.sort((a,b)=>a.ms-b.ms);RM.board=RM.board.slice(0,50);
+  try{localStorage.setItem('r08-laps',JSON.stringify(RM.board))}catch(x){}
+  const rank=RM.board.indexOf(e);
+  rmRenderLaps(e);rmFeature(i,now);if(rank===0)sndFanfare();else sndChime(true);
+  rmFlash(rank===0?rmFirst(i)+' — '+rmFmt(ms)+' — TRACK RECORD!':rmFirst(i)+' — '+rmFmt(ms));
+  const c=NET.conns[i];if(c&&c.open)try{c.send({type:'lap',ms,rank:rank+1,of:RM.board.length})}catch(x){}}
+function rmRenderLaps(hl){rmLapsEl.innerHTML='<div class="label">fastest laps tonight</div>'+(RM.board.slice(0,5).map((e,k)=>
+  `<div class="row${e===hl?' me':''}"><b>${k+1}</b><i style="background:${people[e.car][3]}"></i>${rmEsc(e.n.split(' ')[0])}<span>${rmFmt(e.ms)}</span></div>`).join('')
+  ||'<div class="row">no laps yet — be the first</div>')}
+function rmClockTick(now){const f=RM.feat>=0?RM.c[RM.feat]:null;
+  rmClock.textContent=f&&f.lapT0!==null?rmFmt(now-f.lapT0)+(f.gates===3?' ·':f.gates?' · far hairpin':' · town hairpin'):(f?'lap: cross the arch':'')}
+
+function rmTick(dt,now){if(!RM.on)return;
+  const K=RM.keys,keyed=K.w||K.a||K.s||K.d;
+  let host=-1;for(let i=0;i<8;i++)if(!NET.conns[i]){host=i;break}
+  if(keyed)RM.hostT=now;
+  for(let i=0;i<8;i++){const s=RM.c[i],c=cars[i],phone=NET.conns[i];
+    const human=phone||(i===host&&keyed);
+    if(human&&s.ai){ /* a cruiser gets claimed: it becomes a real car where it is */
+      s.ai=false;s.x=c.position.x;s.z=c.position.z;s.h=c.rotation.y;
+      s.vx=-Math.sin(s.h)*15;s.vz=-Math.cos(s.h)*15}
+    if(s.ai){s.prog+=15*dt;carAtC(c,s.prog,((i%3)-1)*1.6);s.x=c.position.x;s.z=c.position.z;continue}
+    let thr=0,st=0,rev=0;
+    if(phone){s.rate=Math.min(14,s.rate*(1-Math.min(1,dt*1.5))+RM.taps[i]*1.5);RM.taps[i]=0;
+      thr=Math.max(s.rate/14,RM.gas[i]);st=NET.st[i];rev=RM.rev[i]}
+    else if(i===host){thr=K.w?1:0;rev=K.s?1:0;st=(K.d?1:0)-(K.a?1:0);s.rate=0}
+    else s.rate=0; /* a lost phone: the car rolls to a stop where it is */
+    rmDrive(s,i,thr,st,rev,dt);
+    rmCollide(s,i,now);
+    if(s.pz!==null&&s.pz<-700&&s.z>=-700&&Math.abs(s.x)<5.2)rmLine(s,i,now);
+    s.pz=s.z}
+  /* car on car: equal weights, a bit of bounce; cruisers are immovable */
+  for(let a=0;a<8;a++){const p=RM.c[a];if(p.ai)continue;
+    for(let b=0;b<8;b++){if(b===a)continue;const q=RM.c[b];if(q.ai){rmPushCircle(p,q.x,q.z,CAR_R);continue}
+      if(b<a)continue;
+      const dx=p.x-q.x,dz=p.z-q.z,d=Math.hypot(dx,dz);if(d>=CAR_R*2||d<1e-4)continue;
+      const nx=dx/d,nz=dz/d,ov=(CAR_R*2-d)/2;p.x+=nx*ov;p.z+=nz*ov;q.x-=nx*ov;q.z-=nz*ov;
+      const vn=(p.vx-q.vx)*nx+(p.vz-q.vz)*nz;
+      if(vn<0){const j=-(1+.45)*vn/2;p.vx+=j*nx;p.vz+=j*nz;q.vx-=j*nx;q.vz-=j*nz;
+        if(-vn>10&&now-RM.cutT>2500){rmFeature(a,now);sndCrunch();rmFlash(rmFirst(a)+' and '+rmFirst(b)+' — PILE-UP!')}}}}
+  RM.c.forEach((s,i)=>{if(s.ai)return;const c=cars[i];c.position.set(s.x,0,s.z);c.rotation.y=s.h;
+    c.rotation.z=s.lean*.004}); /* lean into the slide */
+  rmDustTick(dt);rmClockTick(now);rmEventsTick(now);
+  RM.cps.forEach((c,k)=>{c.beam.material.opacity=.45+Math.sin(now/500+k)*.12});
+  if(now-RM.boardT>500){RM.boardT=now;rmRenderBoard()}
+  rmDrawMap()}
+
+/* the director: follow one driver at a time, hop to the next every few
+   seconds or straight to whoever just made a mess. a long hop is a hard
+   cut, a short one glides. nobody driving yet: a slow circle over the infield */
+const _rm_hum=[];
+function rmHumans(){_rm_hum.length=0;for(let i=0;i<8;i++){const s=RM.c[i];if(!s||s.ai)continue;
+  if(NET.conns[i]||(performance.now()-RM.hostT<30000))_rm_hum.push(i)}return _rm_hum}
+function rmCam(t,dt,now){const hum=rmHumans();
+  let tx,ty,tz,lx,ly,lz;
+  if(!hum.length){RM.feat=-1;const a=t*.07;tx=40+Math.cos(a)*78;ty=15;tz=-885+Math.sin(a)*78;lx=40;ly=0;lz=-885}
+  else{if(!hum.includes(RM.feat)||now-RM.featT>11000){RM.feat=hum[(hum.indexOf(RM.feat)+1)%hum.length];RM.featT=now;RM.snap=true}
+    const s=RM.c[RM.feat],spd=Math.hypot(s.vx,s.vz);
+    /* look where the car is going, not only where it points, so a slide reads */
+    let fx=-Math.sin(s.h),fz=-Math.cos(s.h);
+    if(spd>4){const k=Math.min(.6,spd/40),vf=s.vx*fx+s.vz*fz;if(vf>0){fx=fx*(1-k)+s.vx/spd*k;fz=fz*(1-k)+s.vz/spd*k;const n=Math.hypot(fx,fz);fx/=n;fz/=n}}
+    const back=7+spd*.06;
+    tx=s.x-fx*back;ty=2.9+spd*.02;tz=s.z-fz*back;lx=s.x+fx*7;ly=.8;lz=s.z+fz*7}
+  if(RM.snap){RM.snap=false;
+    if(Math.hypot(tx-RM.camP.x,tz-RM.camP.z)>60){RM.camP.set(tx,ty,tz);RM.camL.set(lx,ly,lz)}}
+  const k=Math.min(1,dt*(hum.length?5:1.2)),kl=Math.min(1,dt*(hum.length?8:1.5));
+  RM.camP.x+=(tx-RM.camP.x)*k;RM.camP.y+=(ty-RM.camP.y)*k;RM.camP.z+=(tz-RM.camP.z)*k;
+  RM.camL.x+=(lx-RM.camL.x)*kl;RM.camL.y+=(ly-RM.camL.y)*kl;RM.camL.z+=(lz-RM.camL.z)*kl;
+  camera.position.copy(RM.camP);camera.position.x+=Math.sin(t*1.7)*.03;camera.position.y+=Math.sin(t*9.3)*.02;
+  camera.lookAt(RM.camL);
+  /* the real headlight rides with the featured car */
+  const f=RM.feat>=0?RM.c[RM.feat]:null;
+  if(f){head.position.set(f.x,.75,f.z);head.target.position.set(f.x-Math.sin(f.h)*38,-.2,f.z-Math.cos(f.h)*38)}
+  else{head.position.copy(RM.camP);head.target.position.copy(RM.camL)}
+  return RM.camP.z}
+function rmSpeed(){const f=RM.feat>=0?RM.c[RM.feat]:null;return f?Math.hypot(f.vx,f.vz):18}
+
+/* ---- on screen: the board and the map ---- */
+function rmRenderBoard(){const hum=rmHumans().slice().sort((a,b)=>(RM.knocks[b]+RM.checks[b].size*3)-(RM.knocks[a]+RM.checks[a].size*3));
+  rmRows.innerHTML=hum.map((i,k)=>`<div class="row${i===RM.feat?' me':''}"><b>${k+1}</b><i style="background:${people[i][3]}"></i>${rmFirst(i)}<span>${RM.knocks[i]} · ${RM.checks[i].size}/${RM.cps.length}</span></div>`).join('')
+    ||'<div class="row">nobody on the sand yet — scan the code</div>'}
+const RM_MW=360,RM_MH=124;
+const rmMX=z=>(RM_B.z1-z)/(RM_B.z1-RM_B.z0)*RM_MW,rmMY=x=>(x-RM_B.x0)/(RM_B.x1-RM_B.x0)*RM_MH;
+function rmDrawMapBg(){const c=document.createElement('canvas');c.width=RM_MW;c.height=RM_MH;const x=c.getContext('2d');
+  x.fillStyle='rgba(4,5,16,.78)';x.fillRect(0,0,RM_MW,RM_MH);
+  x.strokeStyle='rgba(243,231,207,.55)';x.lineWidth=2.2;x.lineCap='round';x.lineJoin='round';
+  const path=(fn,L)=>{x.beginPath();const p={};for(let s=0;s<=L;s+=4){fn(s,p);const px=rmMX(p.z),py=rmMY(p.x);s?x.lineTo(px,py):x.moveTo(px,py)}x.stroke()};
+  x.beginPath();x.moveTo(rmMX(RM_B.z1),rmMY(0));x.lineTo(rmMX(RM_B.z0),rmMY(0));x.stroke();
+  path(circuitPos,CIRCUIT.L);path(trackPos,TRACK.L);
+  x.fillStyle='rgba(243,231,207,.22)';
+  LOTS.forEach(([z,w,side])=>{const cx=side*(9.5+w/2);x.fillRect(rmMX(z+4),rmMY(cx-w/2),Math.max(1.5,rmMX(z-4)-rmMX(z+4)),Math.max(1.5,rmMY(cx+w/2)-rmMY(cx-w/2)))});
+  x.fillStyle='rgba(245,179,53,.7)';
+  RM.cones.forEach(h=>{if(h.type==='cone'){x.fillRect(rmMX(h.z)-1,rmMY(h.x)-1,2,2)}});
+  x.lineWidth=1.8;
+  RM.cps.forEach(c=>{x.strokeStyle=people[c.k][3];x.beginPath();x.arc(rmMX(c.z),rmMY(c.x),4,0,7);x.stroke()});
+  RM.mapBg=c;rmMap.width=RM_MW;rmMap.height=RM_MH}
+function rmDrawMap(){const x=rmMap.getContext('2d');x.clearRect(0,0,RM_MW,RM_MH);x.drawImage(RM.mapBg,0,0);
+  RM.c.forEach((s,i)=>{const px=rmMX(s.z),py=rmMY(s.x);
+    x.fillStyle=people[i][3];x.globalAlpha=s.ai?.45:1;
+    x.beginPath();x.arc(px,py,s.ai?2.6:4,0,7);x.fill();
+    if(i===RM.feat){x.strokeStyle='#F3E7CF';x.lineWidth=1.6;x.beginPath();x.arc(px,py,6.5,0,7);x.stroke()}});
+  x.globalAlpha=1}
+
+
+/* ======================= sound: synthesized, no files =======================
+   an engine that follows the speed, a thud for a cone, a crunch for a
+   pile-up, a chime for a checkpoint or a lap, a horn for last call. all
+   WebAudio, built at the first key press (the same gesture that starts the
+   show), so nothing is loaded and nothing can fail to arrive. M mutes. */
+const SND={ctx:null,master:null,eng:null,muted:false};
+function sndInit(){if(SND.ctx)return;
+  try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=SND.ctx=new C();
+    const m=SND.master=ctx.createGain();m.gain.value=.7;m.connect(ctx.destination);
+    /* the engine: a saw and a square a hair apart, through a lowpass, behind a gate */
+    const g=ctx.createGain();g.gain.value=0;
+    const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=380;f.Q.value=2;
+    const o1=ctx.createOscillator(),o2=ctx.createOscillator();o1.type='sawtooth';o2.type='square';
+    o1.frequency.value=50;o2.frequency.value=50.7;
+    const o2g=ctx.createGain();o2g.gain.value=.35;
+    o1.connect(f);o2.connect(o2g);o2g.connect(f);f.connect(g);g.connect(m);o1.start();o2.start();
+    SND.eng={g,f,o1,o2};
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ctx.state==='suspended')ctx.resume().catch(()=>{})});
+  }catch(e){SND.ctx=null}}
+function sndEngine(spd,on){const e=SND.eng;if(!e)return;const t=SND.ctx.currentTime,k=Math.min(1,spd/40);
+  e.g.gain.setTargetAtTime(on?.05+.09*k:0,t,.12);
+  const f=42+k*95;e.o1.frequency.setTargetAtTime(f,t,.15);e.o2.frequency.setTargetAtTime(f*1.01+.6,t,.15);
+  e.f.frequency.setTargetAtTime(300+k*900,t,.15)}
+function sndNoise(dur,fc,vol,q){const ctx=SND.ctx;if(!ctx)return;
+  const n=Math.floor(ctx.sampleRate*dur),b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++){const e=1-i/n;d[i]=(Math.random()*2-1)*e*e}
+  const s=ctx.createBufferSource();s.buffer=b;
+  const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=fc;f.Q.value=q||.7;
+  const g=ctx.createGain();g.gain.value=vol;s.connect(f);f.connect(g);g.connect(SND.master);s.start()}
+function sndThud(){sndNoise(.16,420,.9,1.2)}
+function sndCrunch(){sndNoise(.45,900,1,.6)}
+function sndTone(fr,t0,dur,vol,type){const ctx=SND.ctx;if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();o.type=type||'sine';o.frequency.value=fr;
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.02);g.gain.exponentialRampToValueAtTime(.001,t0+dur);
+  o.connect(g);g.connect(SND.master);o.start(t0);o.stop(t0+dur+.05)}
+function sndChime(high){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime,b=high?660:523;
+  [b,b*1.25,b*1.5].forEach((f,i)=>sndTone(f,t+i*.09,.5,.25,'triangle'))}
+function sndFanfare(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;
+  [523,659,784,1047].forEach((f,i)=>sndTone(f,t+i*.12,.7,.3,'triangle'))}
+function sndHorn(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;
+  sndTone(392,t,.55,.35,'square');sndTone(494,t,.55,.25,'square')}
+function sndMute(){SND.muted=!SND.muted;
+  if(SND.master)SND.master.gain.setTargetAtTime(SND.muted?0:.7,SND.ctx.currentTime,.05);return SND.muted}
 
 </script>
 </body>

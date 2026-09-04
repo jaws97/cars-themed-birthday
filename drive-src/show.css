@@ -49,19 +49,23 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #tower .row.fin{opacity:.55}
 
 /* multiplayer lobby, lives on the grid beat */
-/* midnight time trial: the leaderboard column and the live clock */
-#ttpanel{position:absolute;left:3.2cqw;top:10cqh;width:26cqw;display:none;flex-direction:column;gap:.9cqh;pointer-events:none}
-#ttpanel.on{display:flex}
-#ttpanel .tthead{font:400 2.7cqh var(--race);color:var(--gold);letter-spacing:.14em;text-shadow:0 .3cqh 1.6cqh rgba(0,0,0,.8)}
-#ttdriver{font:700 1.9cqh var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cream);opacity:.85;min-height:2.3cqh}
-#ttclock{font:400 6.4cqh var(--race);color:var(--cream);text-shadow:0 .4cqh 2cqh rgba(0,0,0,.75);font-variant-numeric:tabular-nums}
-#ttrows{display:flex;flex-direction:column;gap:.45cqh}
-#ttrows .row{display:flex;align-items:center;gap:.8cqh;background:rgba(4,5,16,.72);border-radius:.4cqh;padding:.4cqh 1.1cqh .4cqh .6cqh;font:700 2.1cqh var(--body);color:var(--cream)}
-#ttrows .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
-#ttrows .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
-#ttrows .row span{margin-left:auto;font:400 2.1cqh var(--race);font-variant-numeric:tabular-nums}
-#ttrows .row.me{outline:.25cqh solid var(--gold)}
-#lobby.tt .chips{display:none}
+/* the open desert: the board, the map and the lap clock */
+#rmpanel{position:absolute;left:3.2cqw;top:10cqh;width:26cqw;display:none;flex-direction:column;gap:.9cqh;pointer-events:none}
+#rmpanel.on{display:flex}
+#rmsub{font:700 1.9cqh var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cream);opacity:.85}
+#rmclock{font:400 4.2cqh var(--race);color:var(--cream);text-shadow:0 .4cqh 2cqh rgba(0,0,0,.75);font-variant-numeric:tabular-nums;min-height:4.6cqh}
+#rmmap{width:100%;height:auto;border-radius:.6cqh;border:1px solid rgba(243,231,207,.25)}
+#rmpanel .tthead{font:400 2.7cqh var(--race);color:var(--gold);letter-spacing:.14em;text-shadow:0 .3cqh 1.6cqh rgba(0,0,0,.8)}
+#rmrows,#rmlaps{display:flex;flex-direction:column;gap:.45cqh}
+#rmlaps{display:none;width:100%}
+#lobby.roam #rmlaps{display:flex}
+#lobby.roam .chips{display:none}
+#rmlaps .label{font-size:1.7cqh;opacity:.7;text-align:center;margin-top:.4cqh}
+#rmrows .row,#rmlaps .row{display:flex;align-items:center;gap:.8cqh;background:rgba(4,5,16,.72);border-radius:.4cqh;padding:.4cqh 1.1cqh .4cqh .6cqh;font:700 2.1cqh var(--body);color:var(--cream)}
+#rmrows .row b,#rmlaps .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
+#rmrows .row i,#rmlaps .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
+#rmrows .row span,#rmlaps .row span{margin-left:auto;font:400 2.1cqh var(--race);font-variant-numeric:tabular-nums}
+#rmrows .row.me,#rmlaps .row.me{outline:.25cqh solid var(--gold)}
 
 #lobby{position:absolute;right:13cqw;top:9cqh;opacity:0;transform:translateY(1.2cqh);transition:opacity 700ms var(--out),transform 700ms var(--out);pointer-events:none}
 #lobby.on{opacity:1;transform:none}
@@ -118,7 +122,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .dust{position:absolute;inset:0;pointer-events:none;opacity:.5;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='d'><feTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23d)'/></svg>")}
 
-.wiper{position:absolute;left:60%;bottom:calc(var(--dashH) - 9cqh);width:2.2cqw;height:118cqh;transform-origin:50% 100%;
+.wiper{transition:opacity 1400ms var(--inout);position:absolute;left:60%;bottom:calc(var(--dashH) - 9cqh);width:2.2cqw;height:118cqh;transform-origin:50% 100%;
   transform:translateX(-50%) rotate(-108deg);transition:transform 1150ms var(--inout);pointer-events:none}
 .wiper.right{transform:translateX(-50%) rotate(108deg)}
 .wiper .arm{position:absolute;left:40%;right:40%;top:0;bottom:0;background:#04050c}
@@ -126,7 +130,13 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .wiper .smear{position:absolute;left:100%;top:0;height:72%;width:1.6cqw;background:linear-gradient(90deg,rgba(243,231,207,.06),transparent)}
 
 /* cockpit */
-.cockpit{position:absolute;inset:0;pointer-events:none}
+.cockpit{position:absolute;inset:0;pointer-events:none;transition:opacity 1400ms var(--inout)}
+/* the after-party is watched on the speedway's big screen: the cockpit fades, a chrome frame takes over */
+.stage.roam .cockpit,.stage.roam .wiper{opacity:0}
+.stage.roam #cap{bottom:7cqh}
+#screenframe{position:absolute;inset:2.4cqh 2.4cqw;border:.45cqh solid rgba(201,207,221,.32);border-radius:1.4cqh;opacity:0;transition:opacity 1400ms var(--inout);pointer-events:none;box-shadow:inset 0 0 4cqh rgba(0,0,0,.55)}
+#screenframe span{position:absolute;top:0;left:50%;transform:translate(-50%,-55%);background:#0E1230;padding:.35cqh 1.8cqw;border:.3cqh solid rgba(201,207,221,.32);border-radius:2cqh;font:700 1.6cqh var(--body);letter-spacing:.3em;text-transform:uppercase;color:var(--cream)}
+.stage.roam #screenframe{opacity:1}
 .pillar{position:absolute;top:0;bottom:0;width:11cqw;background:#03040b}
 .pillar.l{left:0;clip-path:polygon(0 0,58% 0,22% 100%,0 100%)}
 .pillar.r{right:0;clip-path:polygon(42% 0,100% 0,100% 100%,78% 100%)}

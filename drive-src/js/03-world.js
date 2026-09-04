@@ -95,6 +95,19 @@ function tagTexture(p){const[c,x]=cv(128,128);x.fillStyle=p[3];x.beginPath();x.a
   x.fillStyle='#0E1230';x.textAlign='center';x.textBaseline='middle';x.font='54px "Racing Sans One"';x.fillText(p[0],64,68);return tex(c)}
 cars.forEach((g,i)=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tagTexture(people[i]),transparent:true,depthWrite:false}));
   s.scale.set(.85,.85,1);s.position.y=2.7;s.visible=false;s.userData.isTag=true;g.add(s);g.userData.tag=s});
+/* lamps for the open desert: two headlamp glows, a pool of light on the sand
+   ahead, two tail glows. no real lights — eight cars of point lights would
+   sink the laptop — so they only ever show after dark */
+const lampTex=glowTexture('rgb(255,228,184)'),tailTex=glowTexture('rgb(255,70,50)'),lampGlows=[];
+const lampAt=(o,base)=>{o.userData.base=base;lampGlows.push(o);return o};
+cars.forEach(g=>{const L=new THREE.Group();L.visible=false;L.userData.keep=true;
+  [-.58,.58].forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:lampTex,transparent:true,opacity:.95,depthWrite:false}));
+    s.scale.set(.75,.75,1);s.position.set(x,.6,-1.5);L.add(lampAt(s,.95))});
+  [-.55,.55].forEach(x=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tailTex,transparent:true,opacity:.8,depthWrite:false}));
+    s.scale.set(.4,.4,1);s.position.set(x,.72,1.62);L.add(lampAt(s,.8))});
+  const pool=new THREE.Mesh(new THREE.PlaneGeometry(8,12),new THREE.MeshBasicMaterial({map:lampTex,transparent:true,opacity:.55,depthWrite:false}));
+  pool.rotation.x=-Math.PI/2;pool.position.set(0,.045,-6.2);L.add(lampAt(pool,.55));
+  g.add(L);g.userData.lamps=L});
 
 /* real 3D car models: any .glb named in the roster replaces the box car once
    it loads — normalized to the same footprint, box car kept on any failure */
@@ -113,7 +126,7 @@ function loadCarModel(g,file,yaw){
     m.position.set(-c.x,-b2.min.y,-c.z);
     const mats=[];m.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(mm=>{mm.transparent=true;mats.push(mm)})});
     const keep=carO(g);
-    [...g.children].forEach(ch=>{if(!ch.userData.isTag)g.remove(ch)});
+    [...g.children].forEach(ch=>{if(!ch.userData.isTag&&!ch.userData.keep)g.remove(ch)});
     g.add(m);g.userData.mats=mats;delete g.userData.redraw;setCarO(g,keep);
   })}
 if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
@@ -123,14 +136,15 @@ if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
 for(let z=-75;z>-440;z-=24){const p=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,7.5,6),dark);p.position.set(6.6,3.75,z);scene.add(p);
   const b=new THREE.Mesh(new THREE.BoxGeometry(1.6,.12,.12),dark);b.position.set(6.6,7,z);scene.add(b)}
 const rockG=new THREE.DodecahedronGeometry(1,0),rockM=new THREE.MeshLambertMaterial({color:0x1c1720});
+const desertRocks=[]; /* footprints for the free-roam collisions */
 for(let i=0;i<90;i++){const r=new THREE.Mesh(rockG,rockM);const side=Math.random()<.5?-1:1;r.position.set(side*(7+Math.random()*40),0,-50-Math.random()*400);const s=.4+Math.random()*1.6;r.scale.set(s*1.4,s*.7,s);r.rotation.y=Math.random()*3;
   if(r.position.x<0&&r.position.z<-405)r.position.x=-58-Math.random()*18; /* keep the circuit hairpin clear */
-  scene.add(r)}
+  desertRocks.push({x:r.position.x,z:r.position.z,r:s*1.1});scene.add(r)}
 for(let i=0;i<22;i++){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.22,.28,4,7),rockM);t.position.y=2;g.add(t);
   const a=new THREE.Mesh(new THREE.CylinderGeometry(.16,.18,1.8,6),rockM);a.position.set(.6,2.6,0);g.add(a);const a2=a.clone();a2.position.set(-.55,2.2,0);a2.scale.y=.8;g.add(a2);
   const side=Math.random()<.5?-1:1;g.position.set(side*(9+Math.random()*30),0,-80-Math.random()*360);g.rotation.y=Math.random()*3;const s=.7+Math.random()*.8;g.scale.set(s,s,s);
   if(side<0&&g.position.z<-405)g.position.x=-55-Math.random()*15; /* keep the circuit hairpin clear */
-  scene.add(g)}
+  desertRocks.push({x:g.position.x,z:g.position.z,r:.5*s});scene.add(g)}
 
 /* exit sign */
 {const post=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,3,6),dark);post.position.set(6.2,1.5,-150);scene.add(post);
@@ -364,5 +378,6 @@ function setNight(t){nightT=t;
   dayClouds.forEach(c=>c.material.opacity=Math.max(0,1-t*1.15)*.92);
   sunSprite.material.opacity=Math.max(0,1-t*1.25)*.95;sunL.intensity=1.05*(1-t);
   nightGlows.forEach(g=>g.material.opacity=g.userData.base*t);
-  nightLights.forEach(l=>l.intensity=l.userData.base*t)}
+  nightLights.forEach(l=>l.intensity=l.userData.base*t);
+  lampGlows.forEach(g=>g.material.opacity=g.userData.base*(.35+.65*t))}
 setNight(.08);

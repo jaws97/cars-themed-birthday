@@ -7,12 +7,15 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='b'||e.key==='B'||e.key==='.'){document.getElementById('blk').classList.toggle('on')}
   else if(e.key==='r'||e.key==='R'){kill('z');carZ=0;lastZ=0;go(0,0)}
   else if(e.key==='h'||e.key==='H'){honk()}
-  else if(/^[0-6]$/.test(e.key)){jumpMile(+e.key)}});
+  else if(e.key==='m'||e.key==='M'){sndMute()}
+  else if(/^[0-6]$/.test(e.key)){jumpMile(+e.key)}
+  else if(/^[wasd]$/i.test(e.key)){RM.keys[e.key.toLowerCase()]=true}}); /* the projector drives a spare car on the sand */
+document.addEventListener('keyup',e=>{if(/^[wasd]$/i.test(e.key))RM.keys[e.key.toLowerCase()]=false});
 /* the click that focuses the window shouldn't burn a beat */
 let focusT=-1e9;
 window.addEventListener('focus',()=>focusT=performance.now());
 document.addEventListener('click',()=>{if(!PRELOAD.done||performance.now()-focusT<400)return;advance()});
-function honk(){if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
+function honk(){if(RM.on)sndHorn();if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
 
 /* fonts and the asset preload first, so canvas type is the real type and
    nothing pops in after the show starts */
@@ -32,5 +35,5 @@ Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
   const begin=e=>{if(e&&(e.key==='f'||e.key==='F'))return;
     document.removeEventListener('keydown',begin);document.removeEventListener('pointerdown',begin);
     PRELOAD.done=true;ld.classList.add('off');setTimeout(()=>ld.remove(),1100);
-    go(0,0);requestAnimationFrame(frame)};
+    sndInit();go(0,0);requestAnimationFrame(frame)};
   document.addEventListener('keydown',begin);document.addEventListener('pointerdown',begin)});

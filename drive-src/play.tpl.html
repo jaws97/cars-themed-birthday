@@ -32,22 +32,15 @@ h1{font-family:'Alfa Slab One',serif;font-weight:400;font-size:7vw;letter-spacin
 #mash[disabled]{filter:grayscale(.7) brightness(.6)}
 #msg{font-family:'Alfa Slab One',serif;font-size:8vw;line-height:1.25}
 #msg small{display:block;font-family:Nunito;font-weight:700;font-size:3.4vw;letter-spacing:.28em;text-transform:uppercase;opacity:.6;margin-top:1.5vh}
+#msg .bigtime{font-family:'Racing Sans One',sans-serif;font-weight:400;color:var(--gold)}
 #steer{display:flex;gap:3vw;width:100%;max-width:480px}
 #steer button{flex:1;height:14vh;border:0;border-radius:3vw;background:#141838;color:var(--cream);
   font-size:9vw;box-shadow:inset 0 -1vh 2.5vh rgba(0,0,0,.4);touch-action:none}
 #steer button.held{background:#232b66;transform:scale(.97)}
 #steer button[disabled]{opacity:.28}
-#tt{display:none;flex-direction:column;align-items:center;gap:3vh;width:100%;max-width:480px}
-#ttname{border:1px solid rgba(243,231,207,.3);border-radius:3vw;background:#141838;color:var(--cream);
-  font:700 5.5vw Nunito,sans-serif;text-align:center;padding:3.5vw 2vw;width:100%;outline:none}
-#ttname:focus{border-color:var(--teal)}
-#ttcars{display:flex;gap:2.5vw;justify-content:center;flex-wrap:wrap}
-#ttcars button{width:10vw;height:10vw;max-width:52px;max-height:52px;border-radius:50%;border:1vw solid transparent;background:var(--c)}
-#ttcars button.sel{border-color:var(--cream);transform:scale(1.12)}
-#ttgo{border:0;border-radius:3vw;padding:4.5vw 2vw;background:var(--gold);color:#0E1230;font:700 5vw Nunito,sans-serif;width:100%;letter-spacing:.06em}
-#ttgo:active{transform:scale(.97)}
-#ttstat{font-weight:700;font-size:4.2vw;line-height:1.5;min-height:6vw}
-#ttstat .bigtime{font-family:'Racing Sans One',sans-serif;font-weight:400;font-size:13vw;color:var(--gold);display:block}
+#rev{display:none;width:100%;max-width:480px;height:8vh;border:0;border-radius:3vw;background:#141838;color:var(--cream);font:700 4vw Nunito,sans-serif;letter-spacing:.2em;text-transform:uppercase;box-shadow:inset 0 -1vh 2.5vh rgba(0,0,0,.4);touch-action:none}
+#rev.show{display:block}
+#rev.held{background:#232b66;transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -60,39 +53,27 @@ h1{font-family:'Alfa Slab One',serif;font-weight:400;font-size:7vw;letter-spacin
 <div id="pit">
   <button id="mash" disabled>GO</button>
   <div id="steer"><button id="sl" disabled>&#9664;</button><button id="sr" disabled>&#9654;</button></div>
+  <button id="rev">&#8630; reverse · hold</button>
   <div id="msg">Hold tight.<small>wait for the green</small></div>
-</div>
-
-<div id="tt">
-  <input id="ttname" maxlength="14" placeholder="your name" autocomplete="off">
-  <div id="ttcars"></div>
-  <button id="ttgo">TAKE THE WHEEL</button>
-  <div id="ttstat"></div>
 </div>
 
 <script>
 //{{PEOPLE}}
 const statusEl=document.getElementById('status'),pickEl=document.getElementById('pick'),pitEl=document.getElementById('pit'),
   carsEl=document.getElementById('cars'),mash=document.getElementById('mash'),msg=document.getElementById('msg'),
-  sl=document.getElementById('sl'),sr=document.getElementById('sr'),
-  ttEl=document.getElementById('tt'),ttName=document.getElementById('ttname'),ttCars=document.getElementById('ttcars'),
-  ttGo=document.getElementById('ttgo'),ttStat=document.getElementById('ttstat');
-let conn=null,me=-1,taps=0,green=false,steer=0,ttOn=false,myCar=Math.floor(Math.random()*8);
-const ttFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
-try{ttName.value=localStorage.getItem('r08-name')||'';
-  const c=+localStorage.getItem('r08-car');if(c>=0&&c<8)myCar=Math.floor(c)}catch(e){}
-ttCars.innerHTML=people.map((p,i)=>`<button style="--c:${p[3]}" data-i="${i}"></button>`).join('');
-function ttPickCar(i){myCar=i;[...ttCars.children].forEach((el,k)=>el.classList.toggle('sel',k===i))}
-ttCars.addEventListener('click',e=>{const el=e.target.closest('button');if(el)ttPickCar(+el.dataset.i)});
-ttPickCar(myCar);
-function ttShow(){pickEl.classList.remove('on');pitEl.classList.remove('on');ttEl.classList.add('on')}
-ttGo.addEventListener('click',()=>{const n=ttName.value.trim();
-  if(!n){ttName.focus();return}
-  try{localStorage.setItem('r08-name',n);localStorage.setItem('r08-car',myCar)}catch(e){}
-  if(conn&&conn.open){conn.send({type:'tt-join',name:n,car:myCar});ttStat.textContent='joining the queue…'}});
+  sl=document.getElementById('sl'),sr=document.getElementById('sr'),rev=document.getElementById('rev');
+let conn=null,me=-1,taps=0,green=false,steer=0,roamOn=false,revOn=0,gasOn=0,lapT=null;
+const fmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
 function racing(on){mash.disabled=sl.disabled=sr.disabled=!on;
-  if(!on){sl.classList.remove('held');sr.classList.remove('held');sendSteer(0)}}
+  if(!on){sl.classList.remove('held');sr.classList.remove('held');rev.classList.remove('held');sendSteer(0);sendRev(0);sendGas(0)}}
 function sendSteer(v){if(steer===v)return;steer=v;if(conn&&conn.open)conn.send({type:'steer',v})}
+function sendRev(v){if(revOn===v)return;revOn=v;if(conn&&conn.open)conn.send({type:'rev',v})}
+function sendGas(v){if(gasOn===v)return;gasOn=v;if(conn&&conn.open)conn.send({type:'gas',v})}
+/* the open desert: everyone drives at once, so the pit page becomes the wheel */
+function roamMsg(){setMsg('FREE ROAM','hold to go · hold &#9664; &#9654; to steer · laps start under the arch')}
+function roamPit(){pickEl.classList.remove('on');pitEl.classList.add('on');rev.classList.add('show');
+  const p=people[me];mash.style.setProperty('--c',p[3]);mash.textContent=p[0];
+  green=true;racing(true);roamMsg()}
 const hostId=location.hash.slice(1);
 
 function setMsg(big,small){msg.innerHTML=big+(small?`<small>${small}</small>`:'')}
@@ -112,24 +93,21 @@ else{
       if(d.type==='roster')renderPick(d.claimed);
       else if(d.type==='assigned'){me=d.i;const p=people[me];
         mash.style.setProperty('--c',p[3]);mash.textContent=p[0];
-        if(!ttOn){statusEl.textContent=`${p[1]} · car ${p[0]}`;
-          pickEl.classList.remove('on');pitEl.classList.add('on');
+        statusEl.textContent=`${p[1]} · car ${p[0]}`;
+        if(roamOn)roamPit();
+        else{pickEl.classList.remove('on');pitEl.classList.add('on');
           setMsg('You&#39;re in.','wait for the green')}}
-      else if(d.type==='tt'){ttOn=!!d.on;green=false;racing(false);
-        if(ttOn){ttShow();statusEl.textContent='MIDNIGHT TIME TRIAL';
-          ttStat.textContent='one driver at a time · fastest lap owns the night'}
-        else{ttEl.classList.remove('on');
-          if(me>=0){pitEl.classList.add('on');setMsg('Hold tight.','wait for the green')}
-          else{statusEl.textContent='Pick your car';pickEl.classList.add('on');renderPick()}}}
-      else if(d.type==='tt-q'){ttShow();ttStat.innerHTML=`P${d.pos} in line<br><small>keep the phone awake — you&#39;re on soon</small>`}
-      else if(d.type==='tt-stage'){pickEl.classList.remove('on');ttEl.classList.remove('on');pitEl.classList.add('on');
-        green=false;racing(false);const p=people[myCar];mash.style.setProperty('--c',p[3]);mash.textContent='GO';
-        setMsg('You&#39;re up.','watch the big screen · 3 · 2 · 1')}
-      else if(d.type==='tt-go'){green=true;racing(true);setMsg('DRIVE','tap fast · hold &#9664; &#9654; to steer')}
-      else if(d.type==='tt-done'){green=false;racing(false);pitEl.classList.remove('on');ttShow();
-        ttStat.innerHTML=`<b class="bigtime">${ttFmt(d.ms)}</b>${d.rank===1?'TRACK RECORD — ':''}#${d.rank} of ${d.of} tonight<br><small>tap TAKE THE WHEEL to run again</small>`}
-      else if(d.type==='tt-dnf'){green=false;racing(false);pitEl.classList.remove('on');
-        if(ttOn){ttShow();ttStat.innerHTML='lap over<br><small>tap TAKE THE WHEEL to try again</small>'}}
+      else if(d.type==='roam'){roamOn=!!d.on;green=false;racing(false);rev.classList.toggle('show',roamOn);
+        if(roamOn){statusEl.textContent='THE OPEN DESERT';
+          if(me>=0)roamPit();else{pickEl.classList.add('on');pitEl.classList.remove('on');renderPick()}}
+        else if(me>=0){pitEl.classList.add('on');setMsg('Hold tight.','wait for the green')}}
+      else if(d.type==='bye'){green=false;racing(false);roamOn=false;rev.classList.remove('show');clearTimeout(lapT);
+        pickEl.classList.remove('on');statusEl.textContent='Goodnight, August.';
+        if(me>=0){pitEl.classList.add('on');setMsg('Goodnight.','thank you for driving')}}
+      else if(d.type==='lap'){ /* a lap on the circuit: your time, your place tonight */
+        clearTimeout(lapT);
+        setMsg(`<span class="bigtime">${fmt(d.ms)}</span>`,(d.rank===1?'TRACK RECORD · ':'')+'#'+d.rank+' of '+d.of+' tonight');
+        lapT=setTimeout(()=>{if(roamOn)roamMsg()},5000)}
       else if(d.type==='state'){
         if(d.phase==='set'){green=false;racing(false);setMsg('Drivers, ready…','fingers on the button')}
         else if(d.phase==='green'){green=true;racing(true);
@@ -145,8 +123,10 @@ else{
   peer.on('open',connect);
   peer.on('error',e=>{if(e.type==='peer-unavailable')retry();else statusEl.textContent='Couldn’t connect — enjoy the show!'});
   peer.on('disconnected',()=>peer.reconnect());
-  /* count taps locally, ship them in small batches; heartbeat keeps the pipe warm */
-  mash.addEventListener('pointerdown',e=>{e.preventDefault();if(green)taps++});
+  /* count taps locally, ship them in small batches; heartbeat keeps the pipe warm.
+     in the open desert the same button is held instead */
+  mash.addEventListener('pointerdown',e=>{e.preventDefault();if(!green)return;taps++;if(roamOn)sendGas(1)});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>mash.addEventListener(ev,()=>sendGas(0)));
   setInterval(()=>{if(conn&&conn.open&&taps>0){conn.send({type:'taps',n:taps});taps=0}},150);
   setInterval(()=>{if(conn&&conn.open)conn.send({type:'hi'})},4000);
   /* steering: hold ◀ or ▶ — state-based, so lag can't eat a tap */
@@ -155,6 +135,8 @@ else{
     const up=()=>{el.classList.remove('held');if(steer===v)sendSteer(0)};
     el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('pointerleave',up)};
   hold(sl,-1);hold(sr,1);
+  rev.addEventListener('pointerdown',e=>{e.preventDefault();if(!green)return;rev.classList.add('held');sendRev(1)});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>rev.addEventListener(ev,()=>{rev.classList.remove('held');sendRev(0)}));
 }
 </script>
 </body>

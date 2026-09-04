@@ -1,13 +1,13 @@
 /* ======================= loop ======================= */
 let last=performance.now(),lastZ=0,lastProg=0;
 let lastYaw=0,wheelDeg=0,tempDeg=-38; /* cockpit life: steering lock and the temp needle warming up */
-const _camP={},_camL={};
-function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRaw);last=now;
-  runTweens(now);netTick(dtRaw,now);ttTick(dtRaw,now); /* the race integrates true elapsed time, so lag can't slow it */
+const _camP={};
+function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.min(.05,dtRaw);last=now;
+  runTweens(now);netTick(dtRaw,now);rmTick(dt,now); /* the race integrates true elapsed time, so lag can't slow it */
   const racing=NET.live&&NET.phase!=='idle';
   let v;
   if(racing){v=dt>0?Math.max(0,NET.camProg-lastProg)/dt:0;lastProg=NET.camProg}
-  else if(TT.on){v=dt>0?Math.max(0,TT.camProg-lastProg)/dt:0;lastProg=TT.camProg}
+  else if(RM.on)v=rmSpeed();
   else{v=dt>0?Math.abs(carZ-lastZ)/dt:0;lastZ=carZ;lastProg=NET.camProg}
   vel+=(v-vel)*Math.min(1,dt*6);
   const t=now/1000,sp=Math.min(1,vel/40);
@@ -17,18 +17,7 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
     camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp);
     head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
-  else if(TT.on){ /* the time trial rides the midnight circuit */
-    circuitPos(TT.camProg,_camP);camZ=_camP.z;
-    if(TT.driver){ /* chase cam: raised behind the car, aimed through it at the
-         road ahead, drifting with the car's line so it stays centred */
-      const nx=-_camP.hz,nz=_camP.hx,lat=TT.lat*.55;
-      camera.position.set(_camP.x+nx*lat+Math.sin(t*1.7)*.03,3.4+Math.sin(t*9.3)*.02,_camP.z+nz*lat);
-      circuitPos(TT.prog+7,_camL);
-      camera.lookAt(_camL.x+(-_camL.hz)*TT.lat*.4,.9,_camL.z+_camL.hx*TT.lat*.4)}
-    else{ /* empty track: the low cruising flyover */
-      camera.position.set(_camP.x+Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,_camP.z);
-      camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,Math.atan2(-_camP.hx,-_camP.hz),Math.sin(t*2.3)*.004*sp)}
-    head.position.set(_camP.x,.75,_camP.z);head.target.position.set(_camP.x+_camP.hx*38,-.2,_camP.z+_camP.hz*38)}
+  else if(RM.on)camZ=rmCam(t,dt,now); /* the open desert: the director cam */
   else{
     camera.position.set(Math.sin(t*1.7)*.02*sp,1.25+Math.sin(t*9.3)*.014*sp,carZ);
     camera.rotation.set(-.055+Math.sin(t*7.1)*.002*sp,camYaw,Math.sin(t*2.3)*.004*sp);
@@ -52,4 +41,5 @@ function frame(now){const dtRaw=Math.min(1,(now-last)/1000),dt=Math.min(.05,dtRa
   fneedle.style.transform=`rotate(${(40-62*Math.min(1,Math.max(0,-carZ/730))).toFixed(1)}deg)`;
   tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
   tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
+  sndEngine(vel,RM.on||racing);
   renderer.render(scene,camera);requestAnimationFrame(frame)}
