@@ -10,7 +10,7 @@
    circuit as moving furniture. */
 const RM={on:false,c:[],taps:Array(8).fill(0),gas:Array(8).fill(0),rev:Array(8).fill(0),knocks:Array(8).fill(0),
   checks:people.map(()=>new Set()),feat:-1,featT:0,cutT:0,snap:false,cones:[],cps:[],timers:[],walls:null,road:null,keys:{},hostT:0,
-  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null};
+  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null,base:null};
 try{RM.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
 const rmLapsEl=document.getElementById('rmlaps'),rmClock=document.getElementById('rmclock');
 const rmFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
@@ -41,7 +41,7 @@ function rmOpen(){if(RM.on)return;RM.on=true;
   cap.textContent=RM_INVITE;cap.classList.add('on');
   RM.camP.set(40,16,-810);RM.camL.set(40,0,-885);
   rmCast({type:'roam',on:true});rmCast(rmWorld())}
-function rmClose(){if(!RM.on)return;RM.on=false;
+function rmClose(){if(!RM.on)return;RM.on=false;RM.world=null; /* cones are laid out fresh each time */
   RM.timers.forEach(clearTimeout);RM.timers=[];
   RM.cones.forEach(h=>scene.remove(h.mesh));RM.cones=[];
   RM.cps.forEach(c=>scene.remove(c.g));RM.cps=[];
@@ -204,16 +204,20 @@ function rmMark(x0,z0,x1,z1){const S=RM.skid,dx=x1-x0,dz=z1-z0,l=Math.hypot(dx,d
    ten times a second. the phone builds a light copy of the desert from this
    (road ribbons, cones, rings, box cars) and chases its own car ---- */
 const r1=v=>Math.round(v*10)/10,r2=v=>Math.round(v*100)/100;
-function rmWorld(){if(RM.world)return RM.world;
+function worldBase(){if(RM.base)return RM.base;
   const p={},circ=[],oval=[];
   for(let s=0;s<=CIRCUIT.L;s+=4){circuitPos(s,p);circ.push(r1(p.x),r1(p.z))}
   for(let s=0;s<=TRACK.L;s+=4){trackPos(s,p);oval.push(r1(p.x),r1(p.z))}
-  return RM.world={type:'rm-world',circ,oval,
-    cones:RM.cones.map(h=>[h.x,h.z,h.type==='cone'?0:1]),
-    cps:RM.cps.map(c=>[r1(c.x),r1(c.z),c.k]),
-    lots:LOTS,
+  return RM.base={circ,oval,lots:LOTS,
     boxes:[[-32,-22,-1005,-765,5.5],[102,112,-1005,-765,5.5],[5.85,6.35,-925,-785,.9]],
     poles:[[-7.4,-700],[7.4,-700],[-7.6,-560],[7.6,-560],[-6.6,-855],[6.6,-855]]}}
+function rmWorld(){if(RM.world)return RM.world;
+  return RM.world={type:'rm-world',...worldBase(),
+    cones:RM.cones.map(h=>[h.x,h.z,h.type==='cone'?0:1]),
+    cps:RM.cps.map(c=>[r1(c.x),r1(c.z),c.k])}}
+/* the race on the phone: the same desert, the race's own cones and oil, no rings */
+function raceWorld(){return{type:'rm-world',...worldBase(),
+  cones:NET.hazMeshes.map((m,k)=>[r1(m.position.x),r1(m.position.z),NET.haz[k].type==='cone'?0:1]),cps:[]}}
 function rmFeed(now){if(now-RM.netT<100)return;RM.netT=now;
   const gone=[];RM.cones.forEach((h,k)=>{if(h.gone)gone.push(k)});
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;

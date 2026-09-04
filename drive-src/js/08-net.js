@@ -15,7 +15,7 @@ function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='unde
   try{NET.peer=new Peer(id)}catch(e){return}
   NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='roam'))showLobby(true)});
   NET.peer.on('connection',c=>{NET.all.add(c);
-    c.on('open',()=>{try{if(RM.on){c.send({type:'roam',on:true});c.send(rmWorld())}}catch(e){}});
+    c.on('open',()=>{try{if(RM.on){c.send({type:'roam',on:true});c.send(rmWorld())}else if(NET.live)c.send(raceWorld())}catch(e){}});
     c.on('data',d=>onMsg(c,d));
     c.on('close',()=>{NET.all.delete(c);dropConn(c)})});
   NET.peer.on('error',()=>{})}
@@ -89,7 +89,7 @@ function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;
   trackTractor.visible=false;
   NET.camProg=-12; /* trackPos(-12) is the grid-beat camera spot, so the cut to the race is seamless */
   cap.textContent='Drivers, ready…';
-  broadcast({type:'state',phase:'set'});
+  broadcast({type:'state',phase:'set'});broadcast(raceWorld());
   townTimers.push(setTimeout(()=>{NET.phase='green';NET.greenT0=performance.now();
     broadcast({type:'state',phase:'green'});cap.textContent='GREEN. GREEN. GREEN.';sndFanfare()},2600))}
 function netEndRace(){NET.live=false;NET.phase='idle';clearHazards();trackTractor.visible=false;
@@ -109,8 +109,20 @@ function aiLat(i,u){const S=TRACK.S,R=TRACK.R,L=TRACK.L;
     if(d>0&&d<look+6&&Math.abs(t-NET.trac.lat)<2.2)t=NET.trac.lat>0?NET.trac.lat-2.8:NET.trac.lat+2.8}
   return Math.max(-3.2,Math.min(3.2,t))}
 
+/* each phone watches its own car from the grid to the flag: pose, the
+   pack around it, the tractor, place and lap, ten times a second */
+let netFeedT=0;
+function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
+  const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
+  const lead=Math.max(...NET.prog),lap=Math.max(1,Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1));
+  const order=[...NET.done,...[...Array(8).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
+  for(let i=0;i<8;i++){const c=NET.conns[i];if(!c||!c.open)continue;const m=cars[i];
+    const others=[];cars.forEach((q,j)=>{if(j!==i)others.push([j,r1(q.position.x),r1(q.position.z),r2(q.rotation.y)])});
+    try{c.send({type:'rm',me:[r1(m.position.x),r1(m.position.z),r2(m.rotation.y)],cars:others,gone:[],tr,
+      st:{place:order.indexOf(i)+1,lap,laps:TRACK.LAPS,done:NET.done.includes(i)}})}catch(e){}}}
 const _tr_p={};
-function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finished'))return;
+function netTick(dt,now){if(NET.live)netFeed(now);
+  if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finished'))return;
   const F=finishProg(),L=TRACK.L,S=TRACK.S,R=TRACK.R,lead=Math.max(...NET.prog);
   /* the tractor ambles across the back straight on the final lap, timed so
      it's mid-crossing when the leaders arrive */

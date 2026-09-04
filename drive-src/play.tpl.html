@@ -91,11 +91,13 @@ function sendGas(v){if(gasOn===v)return;gasOn=v;if(conn&&conn.open)conn.send({ty
 /* the open desert: everyone drives at once, so the pit page becomes the wheel,
    with your own car on your own screen above it */
 function roamMsg(){setMsg('FREE ROAM',stats||'hold to go · hold &#9664; &#9654; to steer · laps start under the arch')}
+function showDrive(){if(!V)return;document.body.classList.add('roam');viewEl.classList.add('show')}
+function hideDrive(){document.body.classList.remove('roam');viewEl.classList.remove('show')}
 function roamPit(){pickEl.classList.remove('on');pitEl.classList.add('on');rev.classList.add('show');nm.classList.add('show');
-  document.body.classList.add('roam');if(V)viewEl.classList.add('show');
+  showDrive();
   const p=people[me];mash.style.setProperty('--c',p[3]);mash.textContent=p[0];
   green=true;racing(true);roamMsg()}
-function roamOff(){document.body.classList.remove('roam');viewEl.classList.remove('show');nm.classList.remove('show');rev.classList.remove('show');stats=''}
+function roamOff(){hideDrive();nm.classList.remove('show');rev.classList.remove('show');stats=''}
 const hostId=location.hash.slice(1);
 
 function setMsg(big,small){msg.innerHTML=big+(small?`<small>${small}</small>`:'')}
@@ -126,7 +128,8 @@ function ribbon(scene,pts,W,y,mat){const n=pts.length/2,pos=[],idx=[];
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();
   const m=new THREE.Mesh(g,mat);m.frustumCulled=false;scene.add(m)}
 function buildView(w){
-  viewEl.classList.add('show');
+  if(V){try{V.renderer.dispose()}catch(e){}V=null} /* a fresh layout: the race's cones, or the desert's rings */
+  viewEl.classList.add('show');document.body.classList.add('roam');
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
   const Wd=viewEl.clientWidth||320,Ht=viewEl.clientHeight||240;renderer.setSize(Wd,Ht);viewEl.innerHTML='';viewEl.appendChild(renderer.domElement);
   const scene=new THREE.Scene();scene.background=new THREE.Color(0x2a2c44);scene.fog=new THREE.Fog(0x2a2c44,20,260);
@@ -190,7 +193,8 @@ function onFeed(d){if(!V)return;
   for(const j in V.poses)if(!seen[j]){V.carsM[j].visible=false;delete V.poses[j]}
   V.cones.forEach((m,k)=>m.visible=!d.gone.includes(k));
   if(d.tr){V.tractor.visible=true;V.tractor.position.set(d.tr[0],0,d.tr[1])}else V.tractor.visible=false;
-  const st=d.st;stats=`${st.k} cone${st.k===1?'':'s'} · ${st.c.length}/8 found`+(st.lap!==null?` · lap ${fmt(st.lap)}`:'');
+  const st=d.st;if(st.k===undefined)return; /* the race keeps its own messages */
+  stats=`${st.k} cone${st.k===1?'':'s'} · ${st.c.length}/8 found`+(st.lap!==null?` · lap ${fmt(st.lap)}`:'');
   if(roamOn&&green&&!lapT)setMsg('FREE ROAM',stats)}
 
 if(!hostId){statusEl.textContent='Open this page from the QR code on the big screen.'}
@@ -213,7 +217,7 @@ else{
         if(roamOn){statusEl.textContent='THE OPEN DESERT';
           if(me>=0)roamPit();else{pickEl.classList.add('on');pitEl.classList.remove('on');renderPick()}}
         else{roamOff();if(me>=0){pitEl.classList.add('on');setMsg('Hold tight.','wait for the green')}}}
-      else if(d.type==='rm-world'){ensureThree(()=>{if(!V)buildView(d);else viewEl.classList.add('show')})}
+      else if(d.type==='rm-world'){ensureThree(()=>buildView(d))}
       else if(d.type==='rm')onFeed(d);
       else if(d.type==='bye'){green=false;racing(false);roamOn=false;roamOff();clearTimeout(lapT);lapT=null;
         pickEl.classList.remove('on');statusEl.textContent='Goodnight, August.';
@@ -229,7 +233,7 @@ else{
         else if(d.phase==='done'){green=false;racing(false);
           setMsg(d.place===1?'P1. Winner!':'P'+d.place,d.place===1?'the august 500 is yours':'across the line')}
         else if(d.phase==='over'){green=false;racing(false)}
-        else if(d.phase==='idle'){green=false;racing(false);setMsg('Hold tight.','wait for the green')}}});
+        else if(d.phase==='idle'){green=false;racing(false);hideDrive();setMsg('Hold tight.','wait for the green')}}});
     c.on('close',retry);c.on('error',retry)}
   function retry(){if(conn&&conn.open)return;
     if(retries++<10){statusEl.textContent='Reconnecting…';retryTimer=setTimeout(connect,500*Math.min(retries,4))}

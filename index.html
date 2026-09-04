@@ -1324,7 +1324,7 @@ function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='unde
   try{NET.peer=new Peer(id)}catch(e){return}
   NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='roam'))showLobby(true)});
   NET.peer.on('connection',c=>{NET.all.add(c);
-    c.on('open',()=>{try{if(RM.on){c.send({type:'roam',on:true});c.send(rmWorld())}}catch(e){}});
+    c.on('open',()=>{try{if(RM.on){c.send({type:'roam',on:true});c.send(rmWorld())}else if(NET.live)c.send(raceWorld())}catch(e){}});
     c.on('data',d=>onMsg(c,d));
     c.on('close',()=>{NET.all.delete(c);dropConn(c)})});
   NET.peer.on('error',()=>{})}
@@ -1398,7 +1398,7 @@ function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;
   trackTractor.visible=false;
   NET.camProg=-12; /* trackPos(-12) is the grid-beat camera spot, so the cut to the race is seamless */
   cap.textContent='Drivers, ready…';
-  broadcast({type:'state',phase:'set'});
+  broadcast({type:'state',phase:'set'});broadcast(raceWorld());
   townTimers.push(setTimeout(()=>{NET.phase='green';NET.greenT0=performance.now();
     broadcast({type:'state',phase:'green'});cap.textContent='GREEN. GREEN. GREEN.';sndFanfare()},2600))}
 function netEndRace(){NET.live=false;NET.phase='idle';clearHazards();trackTractor.visible=false;
@@ -1418,8 +1418,20 @@ function aiLat(i,u){const S=TRACK.S,R=TRACK.R,L=TRACK.L;
     if(d>0&&d<look+6&&Math.abs(t-NET.trac.lat)<2.2)t=NET.trac.lat>0?NET.trac.lat-2.8:NET.trac.lat+2.8}
   return Math.max(-3.2,Math.min(3.2,t))}
 
+/* each phone watches its own car from the grid to the flag: pose, the
+   pack around it, the tractor, place and lap, ten times a second */
+let netFeedT=0;
+function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
+  const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
+  const lead=Math.max(...NET.prog),lap=Math.max(1,Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1));
+  const order=[...NET.done,...[...Array(8).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
+  for(let i=0;i<8;i++){const c=NET.conns[i];if(!c||!c.open)continue;const m=cars[i];
+    const others=[];cars.forEach((q,j)=>{if(j!==i)others.push([j,r1(q.position.x),r1(q.position.z),r2(q.rotation.y)])});
+    try{c.send({type:'rm',me:[r1(m.position.x),r1(m.position.z),r2(m.rotation.y)],cars:others,gone:[],tr,
+      st:{place:order.indexOf(i)+1,lap,laps:TRACK.LAPS,done:NET.done.includes(i)}})}catch(e){}}}
 const _tr_p={};
-function netTick(dt,now){if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finished'))return;
+function netTick(dt,now){if(NET.live)netFeed(now);
+  if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finished'))return;
   const F=finishProg(),L=TRACK.L,S=TRACK.S,R=TRACK.R,lead=Math.max(...NET.prog);
   /* the tractor ambles across the back straight on the final lap, timed so
      it's mid-crossing when the leaders arrive */
@@ -1520,7 +1532,7 @@ function updateFin(order){document.getElementById('fin').innerHTML=order.map((id
    circuit as moving furniture. */
 const RM={on:false,c:[],taps:Array(8).fill(0),gas:Array(8).fill(0),rev:Array(8).fill(0),knocks:Array(8).fill(0),
   checks:people.map(()=>new Set()),feat:-1,featT:0,cutT:0,snap:false,cones:[],cps:[],timers:[],walls:null,road:null,keys:{},hostT:0,
-  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null};
+  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null,base:null};
 try{RM.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
 const rmLapsEl=document.getElementById('rmlaps'),rmClock=document.getElementById('rmclock');
 const rmFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
@@ -1551,7 +1563,7 @@ function rmOpen(){if(RM.on)return;RM.on=true;
   cap.textContent=RM_INVITE;cap.classList.add('on');
   RM.camP.set(40,16,-810);RM.camL.set(40,0,-885);
   rmCast({type:'roam',on:true});rmCast(rmWorld())}
-function rmClose(){if(!RM.on)return;RM.on=false;
+function rmClose(){if(!RM.on)return;RM.on=false;RM.world=null; /* cones are laid out fresh each time */
   RM.timers.forEach(clearTimeout);RM.timers=[];
   RM.cones.forEach(h=>scene.remove(h.mesh));RM.cones=[];
   RM.cps.forEach(c=>scene.remove(c.g));RM.cps=[];
@@ -1714,16 +1726,20 @@ function rmMark(x0,z0,x1,z1){const S=RM.skid,dx=x1-x0,dz=z1-z0,l=Math.hypot(dx,d
    ten times a second. the phone builds a light copy of the desert from this
    (road ribbons, cones, rings, box cars) and chases its own car ---- */
 const r1=v=>Math.round(v*10)/10,r2=v=>Math.round(v*100)/100;
-function rmWorld(){if(RM.world)return RM.world;
+function worldBase(){if(RM.base)return RM.base;
   const p={},circ=[],oval=[];
   for(let s=0;s<=CIRCUIT.L;s+=4){circuitPos(s,p);circ.push(r1(p.x),r1(p.z))}
   for(let s=0;s<=TRACK.L;s+=4){trackPos(s,p);oval.push(r1(p.x),r1(p.z))}
-  return RM.world={type:'rm-world',circ,oval,
-    cones:RM.cones.map(h=>[h.x,h.z,h.type==='cone'?0:1]),
-    cps:RM.cps.map(c=>[r1(c.x),r1(c.z),c.k]),
-    lots:LOTS,
+  return RM.base={circ,oval,lots:LOTS,
     boxes:[[-32,-22,-1005,-765,5.5],[102,112,-1005,-765,5.5],[5.85,6.35,-925,-785,.9]],
     poles:[[-7.4,-700],[7.4,-700],[-7.6,-560],[7.6,-560],[-6.6,-855],[6.6,-855]]}}
+function rmWorld(){if(RM.world)return RM.world;
+  return RM.world={type:'rm-world',...worldBase(),
+    cones:RM.cones.map(h=>[h.x,h.z,h.type==='cone'?0:1]),
+    cps:RM.cps.map(c=>[r1(c.x),r1(c.z),c.k])}}
+/* the race on the phone: the same desert, the race's own cones and oil, no rings */
+function raceWorld(){return{type:'rm-world',...worldBase(),
+  cones:NET.hazMeshes.map((m,k)=>[r1(m.position.x),r1(m.position.z),NET.haz[k].type==='cone'?0:1]),cps:[]}}
 function rmFeed(now){if(now-RM.netT<100)return;RM.netT=now;
   const gone=[];RM.cones.forEach((h,k)=>{if(h.gone)gone.push(k)});
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
