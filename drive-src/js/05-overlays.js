@@ -17,23 +17,14 @@ rollEl.innerHTML=
   +`<div class="gap"></div>`
   +people.map(p=>`<div><div class="role">car №${p[0]} · ${p[2]}</div><div class="who">${p[1]}</div></div>`).join('')
   +`<div class="gap"></div>
-  <div><div class="role">directed by</div><div class="who">Whoever was holding the clicker</div></div>
   <div><div class="role">wrong turn</div><div class="who">Recalculating…</div></div>
   <div><div class="role">neon</div><div class="who">The town, showing off</div></div>
-  <div><div class="role">tractors</div><div class="who">Themselves. No notes were taken.</div></div>
-  <div><div class="role">stunt driving</div><div class="who">Everyone who found the oil slick</div></div>
-  <div><div class="role">cones</div><div class="who">Flattened. Repeatedly. On purpose.</div></div>
-  <div><div class="role">speed limit</div><div class="who">More of a suggestion</div></div>
-  <div><div class="role">lap records</div><div class="who">Disputed by everyone who lost</div></div>
-  <div><div class="role">soundtrack</div><div class="who">One synthesized engine, doing its best</div></div>
-  <div><div class="role">special effects</div><div class="who">Dust. Just dust.</div></div>
+  <div><div class="role">tractors</div><div class="who">Themselves</div></div>
   <div><div class="role">pit crew</div><div class="who">Everyone who brought cake</div></div>
-  <div><div class="role">no cars were harmed</div><div class="who">Several cones would like a word</div></div>
-  <div><div class="role">continuity</div><div class="who">Everyone finished first. Again.</div></div>
   <div class="gap"></div>
   <div class="hero" style="font-size:5.4cqh;white-space:normal;max-width:70cqw;margin:0 auto;line-height:1.3">Happy birthday, August people.</div>
   <div class="gap"></div>
   <div class="label" style="opacity:.55">same road next year · press space — the track is yours</div>`;
 function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
   const H=stageEl.clientHeight,fin=rollEl.lastElementChild,end=-(H*.5+fin.offsetTop+fin.offsetHeight*.5);
-  tween(v=>rollEl.style.transform=`translateY(${v}px)`,0,end,56000,ease.lin,null,'roll')}
+  tween(v=>rollEl.style.transform=`translateY(${v}px)`,0,end,40000,ease.lin,null,'roll')}
