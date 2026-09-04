@@ -18,7 +18,7 @@ const SHOW={
   boardSub:'POPULATION: EIGHT MORE THAN YESTERDAY',
   race:'THE AUGUST 500',
   scrawl:'everyone finished first · august 2026',
-  credits:[['website and show created by','Arokia Lijas'],['made with love and questionable life choices by','Kavya']],
+  credits:[['made with code, coffee and zero sleep by','Arokia Lijas'],['made with love and questionable life choices by','Kavya']],
   video:'Landing Video.mp4',
   attractTitle:'20 YEARS OF CARS',
   attractSub:'route 08 · the august detour',
