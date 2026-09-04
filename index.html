@@ -1594,6 +1594,10 @@ const RM={on:false,c:[],taps:Array(8).fill(0),gas:Array(8).fill(0),rev:Array(8).
   checks:people.map(()=>new Set()),feat:-1,featT:0,cutT:0,snap:false,cones:[],cps:[],timers:[],walls:null,road:null,keys:{},hostT:0,
   camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null,base:null};
 try{RM.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
+/* cones and checkpoints last the night too, per car, like the lap board */
+try{const d=JSON.parse(localStorage.getItem('r08-desert')||'null');
+  if(d){(d.knocks||[]).forEach((n,i)=>{if(i<8)RM.knocks[i]=n|0});(d.checks||[]).forEach((a,i)=>{if(i<8)a.forEach(k=>RM.checks[i].add(k))})}}catch(e){}
+function rmSaveDesert(){try{localStorage.setItem('r08-desert',JSON.stringify({knocks:RM.knocks,checks:RM.checks.map(s=>[...s])}))}catch(e){}}
 const rmLapsEl=document.getElementById('rmlaps'),rmClock=document.getElementById('rmclock');
 const rmFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
 const rmEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1608,7 +1612,7 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 function rmOpen(){if(RM.on)return;RM.on=true;
   netInit();showLobby(true);lobbyEl.classList.add('roam');
   rmPanel.classList.add('on');
-  RM.knocks.fill(0);RM.checks.forEach(s=>s.clear());RM.feat=-1;RM.featT=0;RM.cutT=0;RM.boardT=0;RM.snap=true;
+  RM.feat=-1;RM.featT=0;RM.cutT=0;RM.boardT=0;RM.snap=true;
   RM.evT=performance.now()+55000;
   if(!RM.walls)rmBuildWalls();
   if(!RM.road)rmBuildRoad();
@@ -1683,7 +1687,7 @@ function rmKnock(h,s,i){if(h.gone)return;h.gone=true;const m=h.mesh,spd=Math.hyp
     tween(v=>{m.position.y=.4+Math.sin(v*Math.PI)*.6;m.rotation.set(rx*(1-v),0,rz*(1-v));
       m.position.x=h.x+dx*fl*(1-v);m.position.z=h.z+dz*fl*(1-v)},0,1,900,ease.inout,null,'rmc'+h.x+h.z);
     h.gone=false},9000));
-  RM.knocks[i]++;rmFeature(i,performance.now());sndThud();
+  RM.knocks[i]++;rmSaveDesert();rmFeature(i,performance.now());sndThud();
   const n=RM.knocks[i];rmFlash(rmName(i)+(n%10===0?' — '+n+' cones and counting':n===1?' flattens a cone':' · cone '+n))}
 function rmFlash(t){cap.textContent=t;cap.classList.add('on');
   RM.timers.push(setTimeout(()=>{if(RM.on&&cap.textContent===t)cap.textContent=RM_INVITE},2200))}
@@ -1707,7 +1711,7 @@ function rmBuildCheckpoints(){RM.cps.forEach(c=>scene.remove(c.g));RM.cps=[];
     const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:tagTexture(who),transparent:true,depthWrite:false}));
     tag.scale.set(2.6,2.6,1);tag.position.y=4.6;g.add(tag);
     g.position.set(x,0,z);scene.add(g);RM.cps.push({x,z,name:RM_PLACES[k],g,ring,beam,tag,k})})}
-function rmCheck(c,s,i,now){const set=RM.checks[i];if(set.has(c.k))return;set.add(c.k);
+function rmCheck(c,s,i,now){const set=RM.checks[i];if(set.has(c.k))return;set.add(c.k);rmSaveDesert();
   tween(v=>{c.ring.scale.setScalar(1+v*1.6);c.ring.material.opacity=.75*(1-v);c.tag.position.y=4.6+Math.sin(v*Math.PI)*2},0,1,900,ease.out,null,'rmcp'+c.k);
   RM.timers.push(setTimeout(()=>{c.ring.scale.setScalar(1);c.ring.material.opacity=.75},950));
   rmFeature(i,now);sndChime(false);
