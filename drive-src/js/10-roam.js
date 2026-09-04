@@ -10,7 +10,7 @@
    circuit as moving furniture. */
 const RM={on:false,c:[],taps:Array(8).fill(0),gas:Array(8).fill(0),rev:Array(8).fill(0),knocks:Array(8).fill(0),
   checks:people.map(()=>new Set()),feat:-1,featT:0,cutT:0,snap:false,cones:[],cps:[],timers:[],walls:null,road:null,keys:{},hostT:0,
-  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null};
+  camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null};
 try{RM.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
 const rmLapsEl=document.getElementById('rmlaps'),rmClock=document.getElementById('rmclock');
 const rmFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
@@ -20,6 +20,7 @@ const rmPanel=document.getElementById('rmpanel'),rmRows=document.getElementById(
 const RM_B={x0:-100,x1:112,z0:-1062,z1:-412},CAR_R=1.45;
 const RM_INVITE='the open desert · scan to join · hold to go · laps start under the arch';
 const rmFirst=i=>people[i][1].split(' ')[0];
+const rmName=i=>NET.names[i]||rmFirst(i); /* the driver's own name if they typed one */
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 
 function rmOpen(){if(RM.on)return;RM.on=true;
@@ -39,7 +40,7 @@ function rmOpen(){if(RM.on)return;RM.on=true;
   rmDrawMapBg();rmRenderBoard();rmRenderLaps(null);
   cap.textContent=RM_INVITE;cap.classList.add('on');
   RM.camP.set(40,16,-810);RM.camL.set(40,0,-885);
-  rmCast({type:'roam',on:true})}
+  rmCast({type:'roam',on:true});rmCast(rmWorld())}
 function rmClose(){if(!RM.on)return;RM.on=false;
   RM.timers.forEach(clearTimeout);RM.timers=[];
   RM.cones.forEach(h=>scene.remove(h.mesh));RM.cones=[];
@@ -101,7 +102,7 @@ function rmKnock(h,s,i){if(h.gone)return;h.gone=true;const m=h.mesh,spd=Math.hyp
       m.position.x=h.x+dx*fl*(1-v);m.position.z=h.z+dz*fl*(1-v)},0,1,900,ease.inout,null,'rmc'+h.x+h.z);
     h.gone=false},9000));
   RM.knocks[i]++;rmFeature(i,performance.now());sndThud();
-  const n=RM.knocks[i];rmFlash(rmFirst(i)+(n%10===0?' — '+n+' cones and counting':n===1?' flattens a cone':' · cone '+n))}
+  const n=RM.knocks[i];rmFlash(rmName(i)+(n%10===0?' — '+n+' cones and counting':n===1?' flattens a cone':' · cone '+n))}
 function rmFlash(t){cap.textContent=t;cap.classList.add('on');
   RM.timers.push(setTimeout(()=>{if(RM.on&&cap.textContent===t)cap.textContent=RM_INVITE},2200))}
 function rmFeature(i,now){if(RM.feat===i||now-RM.cutT<4000)return;RM.feat=i;RM.featT=now;RM.cutT=now;RM.snap=true}
@@ -128,7 +129,7 @@ function rmCheck(c,s,i,now){const set=RM.checks[i];if(set.has(c.k))return;set.ad
   tween(v=>{c.ring.scale.setScalar(1+v*1.6);c.ring.material.opacity=.75*(1-v);c.tag.position.y=4.6+Math.sin(v*Math.PI)*2},0,1,900,ease.out,null,'rmcp'+c.k);
   RM.timers.push(setTimeout(()=>{c.ring.scale.setScalar(1);c.ring.material.opacity=.75},950));
   rmFeature(i,now);sndChime(false);
-  const n=set.size,me=rmFirst(i),owner=rmFirst(c.k);
+  const n=set.size,me=rmName(i),owner=rmFirst(c.k);
   rmFlash(n===RM.cps.length?me+' has seen everyone!':c.k===i?me+' is home · '+n+' of '+RM.cps.length:me+' finds '+owner+"'s "+c.name+' · '+n+' of '+RM.cps.length)}
 
 /* ---- things that happen to the world, for the room that is watching ---- */
@@ -199,6 +200,28 @@ function rmMark(x0,z0,x1,z1){const S=RM.skid,dx=x1-x0,dz=z1-z0,l=Math.hypot(dx,d
   p[o+6]=x1+nx;p[o+7]=.055;p[o+8]=z1+nz;p[o+9]=x1-nx;p[o+10]=.055;p[o+11]=z1-nz;
   S.mesh.geometry.attributes.position.needsUpdate=true;S.mesh.visible=true}
 
+/* ---- the phones' own view: the world once, then each driver's surroundings
+   ten times a second. the phone builds a light copy of the desert from this
+   (road ribbons, cones, rings, box cars) and chases its own car ---- */
+const r1=v=>Math.round(v*10)/10,r2=v=>Math.round(v*100)/100;
+function rmWorld(){if(RM.world)return RM.world;
+  const p={},circ=[],oval=[];
+  for(let s=0;s<=CIRCUIT.L;s+=4){circuitPos(s,p);circ.push(r1(p.x),r1(p.z))}
+  for(let s=0;s<=TRACK.L;s+=4){trackPos(s,p);oval.push(r1(p.x),r1(p.z))}
+  return RM.world={type:'rm-world',circ,oval,
+    cones:RM.cones.map(h=>[h.x,h.z,h.type==='cone'?0:1]),
+    cps:RM.cps.map(c=>[r1(c.x),r1(c.z),c.k]),
+    lots:LOTS,
+    boxes:[[-32,-22,-1005,-765,5.5],[102,112,-1005,-765,5.5],[5.85,6.35,-925,-785,.9]],
+    poles:[[-7.4,-700],[7.4,-700],[-7.6,-560],[7.6,-560],[-6.6,-855],[6.6,-855]]}}
+function rmFeed(now){if(now-RM.netT<100)return;RM.netT=now;
+  const gone=[];RM.cones.forEach((h,k)=>{if(h.gone)gone.push(k)});
+  const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
+  for(let i=0;i<8;i++){const c=NET.conns[i],s=RM.c[i];if(!c||!c.open||!s||s.ai)continue;
+    const others=[];RM.c.forEach((q,j)=>{if(j===i)return;const d=Math.hypot(q.x-s.x,q.z-s.z);if(d<160)others.push([j,r1(q.x),r1(q.z),r2(q.ai?cars[j].rotation.y:q.h)])});
+    try{c.send({type:'rm',me:[r1(s.x),r1(s.z),r2(s.h)],cars:others,gone,tr,
+      st:{k:RM.knocks[i],c:[...RM.checks[i]],lap:s.lapT0!==null?Math.round(now-s.lapT0):null,g:s.gates}})}catch(e){}}}
+
 /* ---- the car model ---- */
 function rmDrive(s,i,thr,st,rev,dt){
   const fx=-Math.sin(s.h),fz=-Math.cos(s.h),rx=Math.cos(s.h),rz=-Math.sin(s.h);
@@ -251,7 +274,7 @@ function rmCollide(s,i,now){
     if(dx*dx+dz*dz<(h.type==='cone'?2.6:2.4)){
       if(h.type==='cone'){rmKnock(h,s,i);s.vx*=.94;s.vz*=.94}
       else if(now-s.hit>1500){s.hit=now;s.slip=.9;const rx=Math.cos(s.h),rz=-Math.sin(s.h),k=(i%2?1:-1)*7;
-        s.vx+=rx*k;s.vz+=rz*k;rmFlash(rmFirst(i)+' finds the oil')}}}
+        s.vx+=rx*k;s.vz+=rz*k;rmFlash(rmName(i)+' finds the oil')}}}
   for(const c of RM.cps){const dx=s.x-c.x,dz=s.z-c.z;if(dx*dx+dz*dz<11){rmCheck(c,s,i,now);
     if(c.k===2)s.gates|=1;else if(c.k===4)s.gates|=2}}} /* both hairpins make a lap honest */
 
@@ -260,12 +283,12 @@ function rmCollide(s,i,now){
 function rmLine(s,i,now){
   if(s.lapT0!==null&&s.gates===3)rmLapDone(i,Math.round(now-s.lapT0),now);
   s.lapT0=now;s.gates=0}
-function rmLapDone(i,ms,now){const e={n:people[i][1],car:i,ms};
+function rmLapDone(i,ms,now){const e={n:NET.names[i]||people[i][1],car:i,ms};
   RM.board.push(e);RM.board.sort((a,b)=>a.ms-b.ms);RM.board=RM.board.slice(0,50);
   try{localStorage.setItem('r08-laps',JSON.stringify(RM.board))}catch(x){}
   const rank=RM.board.indexOf(e);
   rmRenderLaps(e);rmFeature(i,now);if(rank===0)sndFanfare();else sndChime(true);
-  rmFlash(rank===0?rmFirst(i)+' — '+rmFmt(ms)+' — TRACK RECORD!':rmFirst(i)+' — '+rmFmt(ms));
+  rmFlash(rank===0?rmName(i)+' — '+rmFmt(ms)+' — TRACK RECORD!':rmName(i)+' — '+rmFmt(ms));
   const c=NET.conns[i];if(c&&c.open)try{c.send({type:'lap',ms,rank:rank+1,of:RM.board.length})}catch(x){}}
 function rmRenderLaps(hl){rmLapsEl.innerHTML='<div class="label">fastest laps tonight</div>'+(RM.board.slice(0,5).map((e,k)=>
   `<div class="row${e===hl?' me':''}"><b>${k+1}</b><i style="background:${people[e.car][3]}"></i>${rmEsc(e.n.split(' ')[0])}<span>${rmFmt(e.ms)}</span></div>`).join('')
@@ -300,10 +323,10 @@ function rmTick(dt,now){if(!RM.on)return;
       const nx=dx/d,nz=dz/d,ov=(CAR_R*2-d)/2;p.x+=nx*ov;p.z+=nz*ov;q.x-=nx*ov;q.z-=nz*ov;
       const vn=(p.vx-q.vx)*nx+(p.vz-q.vz)*nz;
       if(vn<0){const j=-(1+.45)*vn/2;p.vx+=j*nx;p.vz+=j*nz;q.vx-=j*nx;q.vz-=j*nz;
-        if(-vn>10&&now-RM.cutT>2500){rmFeature(a,now);sndCrunch();rmFlash(rmFirst(a)+' and '+rmFirst(b)+' — PILE-UP!')}}}}
+        if(-vn>10&&now-RM.cutT>2500){rmFeature(a,now);sndCrunch();rmFlash(rmName(a)+' and '+rmName(b)+' — PILE-UP!')}}}}
   RM.c.forEach((s,i)=>{if(s.ai)return;const c=cars[i];c.position.set(s.x,0,s.z);c.rotation.y=s.h;
     c.rotation.z=s.lean*.004}); /* lean into the slide */
-  rmDustTick(dt);rmClockTick(now);rmEventsTick(now);
+  rmDustTick(dt);rmClockTick(now);rmEventsTick(now);rmFeed(now);
   RM.cps.forEach((c,k)=>{c.beam.material.opacity=.45+Math.sin(now/500+k)*.12});
   if(now-RM.boardT>500){RM.boardT=now;rmRenderBoard()}
   rmDrawMap()}
@@ -340,7 +363,7 @@ function rmSpeed(){const f=RM.feat>=0?RM.c[RM.feat]:null;return f?Math.hypot(f.v
 
 /* ---- on screen: the board and the map ---- */
 function rmRenderBoard(){const hum=rmHumans().slice().sort((a,b)=>(RM.knocks[b]+RM.checks[b].size*3)-(RM.knocks[a]+RM.checks[a].size*3));
-  rmRows.innerHTML=hum.map((i,k)=>`<div class="row${i===RM.feat?' me':''}"><b>${k+1}</b><i style="background:${people[i][3]}"></i>${rmFirst(i)}<span>${RM.knocks[i]} · ${RM.checks[i].size}/${RM.cps.length}</span></div>`).join('')
+  rmRows.innerHTML=hum.map((i,k)=>`<div class="row${i===RM.feat?' me':''}"><b>${k+1}</b><i style="background:${people[i][3]}"></i>${rmEsc(rmName(i))}<span>${RM.knocks[i]} · ${RM.checks[i].size}/${RM.cps.length}</span></div>`).join('')
     ||'<div class="row">nobody on the sand yet — scan the code</div>'}
 const RM_MW=360,RM_MH=124;
 const rmMX=z=>(RM_B.z1-z)/(RM_B.z1-RM_B.z0)*RM_MW,rmMY=x=>(x-RM_B.x0)/(RM_B.x1-RM_B.x0)*RM_MH;

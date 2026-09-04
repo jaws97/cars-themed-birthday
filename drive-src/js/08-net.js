@@ -3,7 +3,7 @@
    PeerJS (free public broker, no account) and send tap counts; the host runs the
    race. If there's no internet, no PeerJS, or nobody joins, the scripted race
    runs untouched — multiplayer is additive, never load-bearing. */
-const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(8).fill(false),live:false,phase:'idle',
+const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(8).fill(false),names:Array(8).fill(''),live:false,phase:'idle',
   taps:Array(8).fill(0),rate:Array(8).fill(0),prog:Array(8).fill(0),spd:Array(8).fill(0),
   lat:Array(8).fill(0),st:Array(8).fill(0),slip:Array(8).fill(0),slipDir:Array(8).fill(0),hitCd:Array(8).fill(0),
   haz:[],hazMeshes:[],trac:null,done:[],greenT0:0,camProg:0,lastLap:0,lastPlaceT:0,
@@ -15,7 +15,7 @@ function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='unde
   try{NET.peer=new Peer(id)}catch(e){return}
   NET.peer.on('open',()=>{NET.ready=true;drawLobby(id);updateLobby();if(beats[b]&&(beats[b].name==='grid500'||beats[b].name==='roam'))showLobby(true)});
   NET.peer.on('connection',c=>{NET.all.add(c);
-    c.on('open',()=>{try{if(RM.on)c.send({type:'roam',on:true})}catch(e){}});
+    c.on('open',()=>{try{if(RM.on){c.send({type:'roam',on:true});c.send(rmWorld())}}catch(e){}});
     c.on('data',d=>onMsg(c,d));
     c.on('close',()=>{NET.all.delete(c);dropConn(c)})});
   NET.peer.on('error',()=>{})}
@@ -37,6 +37,7 @@ function onMsg(c,d){
   if(d.type==='join'){const i=d.i,cur=NET.conns[i];
     if(i>=0&&i<8&&(!NET.claimed[i]||!cur||!cur.open)){ /* fresh claim, or reclaiming a dead slot */
       NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
+      NET.names[i]=cleanName(d.name);
       c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby();
       if(RM.on&&RM.c[i]&&RM.c[i].ai)rmStage(RM.c[i],i)}
     else c.send({type:'roster',claimed:NET.claimed})}
@@ -45,7 +46,10 @@ function onMsg(c,d){
   else if(d.type==='steer'){const v=Math.max(-1,Math.min(1,+d.v||0));c._st=v;
     const i=c._idx;if(i!==undefined)NET.st[i]=v}
   else if(d.type==='rev'){const i=c._idx;if(i!==undefined)RM.rev[i]=d.v?1:0}
-  else if(d.type==='gas'){const i=c._idx;if(i!==undefined)RM.gas[i]=d.v?1:0}}
+  else if(d.type==='gas'){const i=c._idx;if(i!==undefined)RM.gas[i]=d.v?1:0}
+  else if(d.type==='name'){const i=c._idx;if(i!==undefined){NET.names[i]=cleanName(d.n);if(RM.on)rmRenderBoard()}}}
+/* a guest's own name for the open desert: short, plain text, optional */
+const cleanName=n=>String(n||'').replace(/\s+/g,' ').trim().slice(0,14);
 function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;RM.rev[i]=0;RM.gas[i]=0;
   if(!NET.live){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
 

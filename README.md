@@ -20,7 +20,7 @@ August birthdays on a projector.
 | 3 | The August 500 — two laps of a real stadium oval at sunrise, raced live from phones, with bumping, skid marks and dust |
 | 4 | Finish photo, then the trophy and confetti |
 | 5 | Credits |
-| 6 | The open desert — everyone drives at once from their phones, no rails, watched on the speedway's big screen: an arcade car with headlights, dust and skid marks, cones to flatten, one checkpoint per guest to find across the town and the circuit, a lap clock under the arch with a leaderboard that lasts all night, a director cam that hops between drivers, a minimap, and things that happen to the world every ninety seconds. One more press is last call: the cars come home to the arch, the lamps go out, the board says goodnight |
+| 6 | The open desert — everyone drives at once from their phones, no rails, each phone showing its own car from behind while the speedway's big screen cuts between drivers; guests can type their own name for the board: an arcade car with headlights, dust and skid marks, cones to flatten, one checkpoint per guest to find across the town and the circuit, a lap clock under the arch with a leaderboard that lasts all night, a director cam that hops between drivers, a minimap, and things that happen to the world every ninety seconds. One more press is last call: the cars come home to the arch, the lamps go out, the board says goodnight |
 
 ## Keys
 
