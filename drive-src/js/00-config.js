@@ -49,6 +49,8 @@ const N=people.length; /* the field: every loop, grid and slot follows the roste
 const CREAM='#F3E7CF';
 const SHOW={
   portrait:'mickey.png',
+  /* models painted so dark they vanish at night get a little self-light */
+  darkCars:['cars_2_the_videogame_-_zil.glb'],
   board:'HAPPY BIRTHDAY, AUGUST',
   boardSub:'POPULATION: THIRTY-SIX MORE THAN YESTERDAY',
   race:'THE AUGUST 500',

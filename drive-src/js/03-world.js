@@ -111,6 +111,12 @@ cars.forEach(g=>{const L=new THREE.Group();L.visible=false;L.userData.keep=true;
 
 /* real 3D car models: any .glb named in the roster replaces the box car once
    it loads — normalized to the same footprint, box car kept on any failure */
+/* average brightness of a texture, 0..1, sampled once per image */
+const _lum=new Map();
+function texLum(t){const im=t.image;if(!im)return 1;if(_lum.has(im))return _lum.get(im);let l=1;
+  try{const[c,x]=cv(8,8);x.drawImage(im,0,0,8,8);const d=x.getImageData(0,0,8,8).data;let s=0;
+    for(let i=0;i<d.length;i+=4)s+=(.2126*d[i]+.7152*d[i+1]+.0722*d[i+2])/255;l=s/(d.length/4)}catch(e){}
+  _lum.set(im,l);return l}
 const _carGltf={};
 function loadCarModel(g,file,yaw){
   if(!_carGltf[file])_carGltf[file]=new Promise(res=>loadGLB(file,res));
@@ -119,6 +125,11 @@ function loadCarModel(g,file,yaw){
        per car so opacity fades don't bleed across the field */
     const m=gltf.scene.clone(true);
     m.traverse(o=>{if(o.isMesh)o.material=Array.isArray(o.material)?o.material.map(x=>x.clone()):o.material.clone()});
+    /* night-proofing: a car painted near-black (Zil) vanishes against the
+       town at night. models listed in SHOW.darkCars get a touch of self-light
+       on their dark textures so they read as charcoal rather than a hole */
+    if((SHOW.darkCars||[]).includes(file))m.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(mm=>{if(!mm.map||!mm.emissive||mm.emissiveMap)return;
+      const l=texLum(mm.map);if(l<.25){mm.emissive.set(0xffffff);mm.emissiveMap=mm.map;mm.emissiveIntensity=.55;mm.needsUpdate=true}})});
     m.updateMatrixWorld(true);
     const s0=new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3());
     if(s0.x>s0.z)m.rotation.y=Math.PI/2;         /* long axis becomes length */

@@ -42,8 +42,8 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #credits .roll{position:absolute;left:0;right:0;top:100%;text-align:center;display:flex;flex-direction:column;gap:3cqh;will-change:transform}
 #credits .role{font:700 1.8cqh var(--body);letter-spacing:.32em;text-transform:uppercase;color:var(--cream);opacity:.5}
 #credits .who{font:400 4.2cqh var(--race);color:var(--cream);margin-top:.2cqh}
-#credits .pic{width:7.5cqh;height:7.5cqh;border-radius:50%;margin:0 auto .8cqh;background:var(--cream);border:.4cqh solid var(--pc);overflow:hidden}
-#credits .cast{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3cqh 2cqh;width:130cqh;max-width:92cqw;margin:0 auto}
+#credits .pic{width:16cqh;height:16cqh;border-radius:50%;margin:0 auto 1.2cqh;background:var(--cream);border:.6cqh solid var(--pc);overflow:hidden;box-shadow:0 .6cqh 2cqh rgba(0,0,0,.5)}
+#credits .cast{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4.5cqh 2cqh;width:130cqh;max-width:92cqw;margin:0 auto}
 #credits .cast .who{font-size:3.1cqh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #credits .cast .role{font-size:1.5cqh}
 #credits .pic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
