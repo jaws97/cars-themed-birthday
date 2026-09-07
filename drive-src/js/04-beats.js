@@ -44,9 +44,11 @@ let attractOK=false;
 function playAttract(){avid.muted=false;
   const p=avid.play();
   if(p)p.catch(()=>{avid.muted=true;avid.play().catch(()=>{});
-    const unmute=()=>{if(beats[b]&&beats[b].name==='walkin')avid.muted=false;
-      document.removeEventListener('pointerdown',unmute);document.removeEventListener('keydown',unmute)};
-    document.addEventListener('pointerdown',unmute);document.addEventListener('keydown',unmute)})}
+    /* capture phase: runs before the beat controls, so the press that unmutes
+       still counts even if it also moves the show on */
+    const unmute=()=>{avid.muted=false;
+      document.removeEventListener('pointerdown',unmute,true);document.removeEventListener('keydown',unmute,true)};
+    document.addEventListener('pointerdown',unmute,true);document.addEventListener('keydown',unmute,true)})}
 if(SHOW.video){PRELOAD.ready.then(()=>{avid.src=PRELOAD.videoURL||encodeURI('assets/'+SHOW.video)});
   avid.addEventListener('canplay',()=>{if(!attractOK){attractOK=true;
     if(beats[b]&&beats[b].name==='walkin'){stopWalk();attractEl.classList.add('on');playAttract()}}});

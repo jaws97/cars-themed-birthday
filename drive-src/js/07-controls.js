@@ -12,9 +12,10 @@ document.addEventListener('keydown',e=>{
   else if(/^[wasd]$/i.test(e.key)){RM.keys[e.key.toLowerCase()]=true}}); /* the projector drives a spare car on the sand */
 document.addEventListener('keyup',e=>{if(/^[wasd]$/i.test(e.key))RM.keys[e.key.toLowerCase()]=false});
 /* the click that focuses the window shouldn't burn a beat */
-let focusT=-1e9;
+let focusT=-1e9,startClick=false;
 window.addEventListener('focus',()=>focusT=performance.now());
-document.addEventListener('click',()=>{if(!PRELOAD.done||performance.now()-focusT<400)return;advance()});
+/* the click that starts the show (pointerdown begins it, click follows) is not a press either */
+document.addEventListener('click',()=>{if(startClick){startClick=false;return}if(!PRELOAD.done||performance.now()-focusT<400)return;advance()});
 function honk(){if(RM.on)sndHorn();if(beats[b]&&beats[b].name==='tractors')sndMoo();if(beats[b]&&beats[b].name==='tractors')tractors.forEach((tr,i)=>tween(v=>tr.position.y=Math.abs(Math.sin(v*Math.PI*2))*.35,0,1,700+(i?150:0),ease.lin,null,'honk'+i))}
 
 /* fonts and the asset preload first, so canvas type is the real type and
@@ -35,5 +36,6 @@ Promise.all([fontsReady,PRELOAD.ready]).then(()=>{
   const begin=e=>{if(e&&(e.key==='f'||e.key==='F'))return;
     document.removeEventListener('keydown',begin);document.removeEventListener('pointerdown',begin);
     PRELOAD.done=true;ld.classList.add('off');setTimeout(()=>ld.remove(),1100);
+    if(e&&e.type==='pointerdown')startClick=true;
     sndInit();go(0,0);requestAnimationFrame(frame)};
   document.addEventListener('keydown',begin);document.addEventListener('pointerdown',begin)});
