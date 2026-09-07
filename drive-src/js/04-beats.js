@@ -58,6 +58,8 @@ const slot=i=>({x:i%2?3.3:-3.3,z:-565-i*4.2});
    audience during the introductions (a car at yaw 0 faces away, down -z) */
 const faceCam=(s,camZ)=>Math.atan2(s.x,s.z-camZ);
 function showPerson(i){const p=people[i];lname.textContent=p[1];lteam.textContent=p[2];lnum.textContent=p[0];
+  const pic=portraitSrc(p);lport.style.setProperty('--pc',p[3]);lport.classList.toggle('pic',!!pic);lport.classList.toggle('own',ownPortrait(p));
+  if(pic)lpic.src=pic;else lpic.removeAttribute('src');
   /* the card sits on whichever side the car parked: odd slots are +x, the right lane */
   hud.classList.toggle('right',i%2===1);hud.classList.add('on')}
 

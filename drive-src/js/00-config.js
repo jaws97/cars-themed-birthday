@@ -12,8 +12,12 @@ const people=[
   ['22','Ananya Sharma','Marketing','#FF5CA8','tokyo_mater.glb',2],
   ['27','Karthik Menon','Support','#6CC04A','cars_2_the_videogame_-_custom_disney_100_doc.glb',2],
   ['30','Meera Pillai','Data','#C9CFDD','cars_2_the_videogame_-_disney_100_custom_ramone.glb',2]];
+/* portraits: drop driver-<race number>.jpg/.png/.webp in drive-src/assets/ (e.g.
+   driver-03.jpg). Anyone without one shows the `portrait` image below; with no
+   image at all the nameplate keeps the number roundel. Keep photos ~600px. */
 const CREAM='#F3E7CF';
 const SHOW={
+  portrait:'mickey',
   board:'HAPPY BIRTHDAY, AUGUST',
   boardSub:'POPULATION: EIGHT MORE THAN YESTERDAY',
   race:'THE AUGUST 500',

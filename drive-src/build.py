@@ -18,6 +18,8 @@ if assets_dir.exists():
         mime = MIME.get(f.suffix.lower())
         if mime:
             assets[f.stem] = f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode()
+            if f.stem.startswith("driver-") and f.stat().st_size > 400_000:
+                print(f"warning: {f.name} is {f.stat().st_size//1000} KB — portraits are embedded; shrink to ~600px")
 
 # 3D models and video are copied beside the show rather than embedded (binary and big)
 import shutil

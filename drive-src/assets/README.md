@@ -21,6 +21,15 @@ server); opened straight from disk the show keeps its box cars.
 
 ## Images (embedded at build time)
 
+### Portraits
+
+`driver-03.jpg` (any race number from the roster; jpg/png/webp) shows that
+person's face in the introduction nameplate, the finish-line polaroid and the
+credits. `mickey.png` (the `portrait` name in `js/00-config.js`) is the
+picture for anyone without their own. With neither, the nameplate shows a
+number roundel. Faces are cropped to a circle on screen, so any framing works;
+keep files around 600px square (they are embedded in the html).
+
 **Magenta trick:** generate images on a pure magenta background (like a chroma
 key) and the build keys it out automatically — any pixel close to `#FF00FF`
 becomes transparent. Transparent PNGs work too.

@@ -26,6 +26,8 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .finishers{display:grid;grid-template-columns:1fr 1fr;gap:1.3cqh 2.4cqh}
 .finishers .p{display:flex;align-items:center;gap:1.3cqh}
 .finishers .n{width:3.8cqh;height:3.8cqh;border-radius:50%;display:flex;align-items:center;justify-content:center;font:2.1cqh var(--race);color:#0E1230;flex:0 0 auto}
+.finishers .n.pic{width:4.6cqh;height:4.6cqh;background:var(--cream)!important;border:.35cqh solid var(--pc);overflow:hidden}
+.finishers .n img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .finishers .who{font:700 2cqh var(--body);color:var(--cream);line-height:1.15}
 .finishers .who small{display:block;font-weight:700;font-size:1.4cqh;opacity:.55;letter-spacing:.14em;text-transform:uppercase}
 .polaroid .scrawl{position:absolute;left:0;right:0;bottom:1.5cqh;text-align:center;font:3.4cqh Pacifico,cursive;color:#4a4066}
@@ -39,6 +41,8 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #credits .roll{position:absolute;left:0;right:0;top:100%;text-align:center;display:flex;flex-direction:column;gap:3cqh;will-change:transform}
 #credits .role{font:700 1.8cqh var(--body);letter-spacing:.32em;text-transform:uppercase;color:var(--cream);opacity:.5}
 #credits .who{font:400 4.2cqh var(--race);color:var(--cream);margin-top:.2cqh}
+#credits .pic{width:7.5cqh;height:7.5cqh;border-radius:50%;margin:0 auto .8cqh;background:var(--cream);border:.4cqh solid var(--pc);overflow:hidden}
+#credits .pic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 #credits .gap{height:5cqh}
 /* race position tower, broadcast style */
 #tower{position:absolute;left:3.2cqw;top:11cqh;display:flex;flex-direction:column;gap:.45cqh;opacity:0;transition:opacity 600ms var(--out);pointer-events:none}
@@ -283,10 +287,17 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 .hud.right{left:auto;right:14cqw;flex-direction:row-reverse;text-align:right}
 .hud .rule{position:absolute;left:0;top:-2.2cqh;width:22cqw;height:1px;background:linear-gradient(90deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
 .hud.right .rule{left:auto;right:0;background:linear-gradient(270deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
+.hud.right .port.pic .num{inset:auto auto -.6cqh -.9cqh}
 .hud .name{font-size:8.5cqh}.hud .team{margin-top:1.1cqh}
-.hud .ring{width:10.5cqh;height:10.5cqh;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;
+/* driver disc: cream face, rim in the person's colour; a photo fills it and the
+   number shrinks to a badge, otherwise the number is the hero (a roundel) */
+.hud .port{position:relative;width:16cqh;height:16cqh;flex:0 0 auto;border-radius:50%;background:var(--cream);border:.75cqh solid var(--pc,var(--cream));
   box-shadow:inset 0 -.5cqh 0 rgba(14,18,48,.14)}
-.hud .ring .num{color:var(--indigo);font-size:5cqh;padding-top:.3cqh}
+.hud .port img{display:none;position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
+.hud .port.own img,.finishers .n.own img,#credits .pic.own img{filter:sepia(.3) saturate(.85) contrast(1.08)}
+.hud .port.pic img{display:block}
+.hud .port .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--indigo);font-size:7cqh;padding-top:.5cqh}
+.hud .port.pic .num{inset:auto -.9cqh -.6cqh auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--cream);border:.45cqh solid var(--pc);font-size:2.7cqh;padding-top:.3cqh;box-shadow:0 .3cqh .8cqh rgba(0,0,0,.45)}
 
 /* curved windshield corners: an oversized frame whose inner edge is rounded */
 .bezel{position:absolute;inset:-40cqh;pointer-events:none;border:40cqh solid #020308;border-radius:47cqh}

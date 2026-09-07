@@ -8,14 +8,15 @@ function odo(m){d1.style.transform=`translateY(${-Math.floor(m/10)*2.6}cqh)`;d2.
 let needleDeg=-120;
 
 /* ======================= overlay content: photo, confetti, credits ======================= */
-document.getElementById('fin').innerHTML=people.map(p=>`<div class="p"><span class="n" style="background:${p[3]}">${p[0]}</span><span class="who">${p[1]}<small>${p[2]}</small></span></div>`).join('');
+const mini=p=>{const s=portraitSrc(p);return s?`<span class="n pic${ownPortrait(p)?' own':''}" style="--pc:${p[3]}"><img src="${s}" alt=""></span>`:`<span class="n" style="background:${p[3]}">${p[0]}</span>`};
+document.getElementById('fin').innerHTML=people.map(p=>`<div class="p">${mini(p)}<span class="who">${p[1]}<small>${p[2]}</small></span></div>`).join('');
 {const cols=['#3EE6D8','#FF5CA8','#E23A2E','#F5B335','#F3E7CF'];
  document.getElementById('confetti').innerHTML=Array.from({length:90},(_,i)=>`<i style="left:${(i*37)%100}%;background:${cols[i%5]};width:${(.7+(i%5)*.2).toFixed(2)}cqh;height:${(1+(i%4)*.35).toFixed(2)}cqh;animation-duration:${(2.6+(i%7)*.5).toFixed(2)}s;animation-delay:${(-(i%11)*.6).toFixed(2)}s"></i>`).join('')}
 rollEl.innerHTML=
   `<div><div class="hero" style="font-size:7cqh">ROUTE 08</div><div class="label" style="margin-top:1cqh">the august detour</div></div><div class="gap"></div>`
   +(SHOW.credits||[]).map(([r,w])=>`<div><div class="role">${r}</div><div class="who">${w}</div></div>`).join('')
   +`<div class="gap"></div>`
-  +people.map(p=>`<div><div class="role">car №${p[0]} · ${p[2]}</div><div class="who">${p[1]}</div></div>`).join('')
+  +people.map(p=>{const s=portraitSrc(p);return `<div>${s?`<div class="pic${ownPortrait(p)?' own':''}" style="--pc:${p[3]}"><img src="${s}" alt=""></div>`:''}<div class="role">car №${p[0]} · ${p[2]}</div><div class="who">${p[1]}</div></div>`}).join('')
   +`<div class="gap"></div>
   <div><div class="role">wrong turn</div><div class="who">Recalculating…</div></div>
   <div><div class="role">neon</div><div class="who">The town, showing off</div></div>
