@@ -9,7 +9,7 @@ const PRELOAD={glb:{},videoURL:null,done:false};
   const SIZES=typeof ASSET_SIZES==='undefined'?{}:ASSET_SIZES; /* exact bytes, baked by build.py */
   const files=[...new Set([].concat(
     people.map(p=>p[4]).filter(Boolean),
-    (SHOW.props||[]).map(p=>p.file)))];
+    (SHOW.props||[]).map(p=>p.file),['tractors.glb']))];
   const media=SHOW.video?[SHOW.video]:[];
   /* portraits download here too, so the nameplates never wait on a photo */
   const photos=[...new Set(people.map(p=>p[6]).concat([SHOW.portrait]).filter(Boolean))].map(f=>'photos/'+f);

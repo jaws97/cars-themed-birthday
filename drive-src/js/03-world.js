@@ -134,8 +134,15 @@ function loadCarModel(g,file,yaw){
     [...g.children].forEach(ch=>{if(!ch.userData.isTag&&!ch.userData.keep)g.remove(ch)});
     g.add(m);g.userData.mats=mats;delete g.userData.redraw;setCarO(g,keep);
   })}
-if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:')
-  people.forEach((p,i)=>{if(p[4])loadCarModel(cars[i],p[4],p[5])});
+/* the models are a pool, not a pecking order: every model named in the
+   roster goes in a hat (evenly, so each shows up about equally often) and
+   the draw is reshuffled every time the show loads — the car you get is
+   luck, and nobody was handed the old one on purpose */
+if(typeof THREE.GLTFLoader!=='undefined'&&location.protocol!=='file:'){
+  const kinds=[...new Map(people.filter(p=>p[4]).map(p=>[p[4],[p[4],p[5]]])).values()];
+  if(kinds.length){const hat=[];while(hat.length<N)hat.push(...kinds);
+    for(let i=hat.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[hat[i],hat[j]]=[hat[j],hat[i]]}
+    cars.forEach((c,i)=>{const[file,yaw]=hat[i];c.userData.model=file;loadCarModel(c,file,yaw)})}}
 
 /* highway dressing: poles, rocks, cacti */
 for(let z=-75;z>-440;z-=24){const p=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,7.5,6),dark);p.position.set(6.6,3.75,z);scene.add(p);
@@ -280,17 +287,29 @@ function buildTractor(){const g=new THREE.Group(),mats=[];
   [[-.58,-.85],[.58,-.85]].forEach(([wx,wz])=>{const w=new THREE.Mesh(fw,darkM);w.rotation.z=Math.PI/2;w.position.set(wx,.38,wz);g.add(w)});
   g.userData.mats=mats;return g}
 const trAsset=assetTex('tractor');
+/* a real tractor model (assets/tractors.glb) swaps in for the boxes once it
+   loads, normalized like the cars: nose down -z, 2.6 long, on the ground */
+const _trGltf=[];
+function loadTractorModel(g){if(typeof THREE.GLTFLoader==='undefined'||location.protocol==='file:')return;
+  if(!_trGltf[0])_trGltf[0]=new Promise(res=>loadGLB('tractors.glb',res));
+  _trGltf[0].then(gltf=>{const m=gltf.scene.clone(true);m.updateMatrixWorld(true);
+    const s0=new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3());
+    if(s0.x>s0.z)m.rotation.y=Math.PI/2;m.rotation.y+=Math.PI;m.updateMatrixWorld(true);
+    const b1=new THREE.Box3().setFromObject(m);m.scale.setScalar(2.6/Math.max(b1.getSize(new THREE.Vector3()).z,.001));m.updateMatrixWorld(true);
+    const b2=new THREE.Box3().setFromObject(m),c=b2.getCenter(new THREE.Vector3());m.position.set(-c.x,-b2.min.y,-c.z);
+    const mats=[];m.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(mm=>{mm.transparent=true;mats.push(mm)})});
+    [...g.children].forEach(ch=>g.remove(ch));g.add(m);g.userData.mats=mats})}
 const tractors=[0,1].map(i=>{let g;
   if(trAsset){g=new THREE.Group();const s=new THREE.Sprite(new THREE.SpriteMaterial({map:trAsset,transparent:true}));
     s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
-  else{g=buildTractor();g.rotation.y=-Math.PI/2}
+  else{g=buildTractor();g.rotation.y=-Math.PI/2;loadTractorModel(g)}
   g.position.set(-34,0,-578.5-i*2.2);scene.add(g);return g});
 /* a third tractor for the speedway: it wanders across the back straight on
    the final lap (netTick drives it) */
 const trackTractor=(()=>{let g;
   if(trAsset){g=new THREE.Group();const s=new THREE.Sprite(new THREE.SpriteMaterial({map:trAsset,transparent:true}));
     s.scale.set(3.4,2.65,1);s.position.y=1.15;g.add(s);g.userData.mats=[s.material]}
-  else g=buildTractor();
+  else{g=buildTractor();loadTractorModel(g)}
   g.visible=false;scene.add(g);return g})();
 
 /* ======================= the midnight circuit =======================
