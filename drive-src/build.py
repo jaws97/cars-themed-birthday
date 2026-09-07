@@ -18,21 +18,27 @@ if assets_dir.exists():
         mime = MIME.get(f.suffix.lower())
         if mime:
             assets[f.stem] = f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode()
-            if f.stem.startswith("driver-") and f.stat().st_size > 400_000:
-                print(f"warning: {f.name} is {f.stat().st_size//1000} KB — portraits are embedded; shrink to ~600px")
 
 # 3D models and video are copied beside the show rather than embedded (binary and big)
 import shutil
 
 big = [f for f in sorted(assets_dir.iterdir()) if f.suffix.lower() in (".glb", ".mp4", ".webm")] if assets_dir.exists() else []
-if big:
+# portraits live in assets/photos/ at whatever size they came: copied, never embedded
+photos_dir = assets_dir / "photos"
+photos = [f for f in sorted(photos_dir.iterdir()) if MIME.get(f.suffix.lower())] if photos_dir.exists() else []
+if big or photos:
     out_assets = root.parent / "assets"
     out_assets.mkdir(exist_ok=True)
     for f in big:
         shutil.copy2(f, out_assets / f.name)
+    if photos:
+        (out_assets / "photos").mkdir(exist_ok=True)
+        for f in photos:
+            shutil.copy2(f, out_assets / "photos" / f.name)
 
-# exact byte sizes for the preloader's progress bar (models and video)
+# exact byte sizes for the preloader's progress bar (models, video, photos)
 sizes = {f.name: f.stat().st_size for f in big}
+sizes.update({"photos/" + f.name: f.stat().st_size for f in photos})
 
 js = "const ASSETS=" + json.dumps(assets) + ";\nconst ASSET_SIZES=" + json.dumps(sizes) + ";\n\n"
 js += "\n\n".join(f.read_text(encoding="utf-8") for f in sorted((root / "js").glob("*.js")))

@@ -11,7 +11,9 @@ const PRELOAD={glb:{},videoURL:null,done:false};
     people.map(p=>p[4]).filter(Boolean),
     (SHOW.props||[]).map(p=>p.file)))];
   const media=SHOW.video?[SHOW.video]:[];
-  const state=files.concat(media).map(f=>({f,got:0,total:SIZES[f]||0}));
+  /* portraits download here too, so the nameplates never wait on a photo */
+  const photos=[...new Set(people.map(p=>p[6]).concat([SHOW.portrait]).filter(Boolean))].map(f=>'photos/'+f);
+  const state=files.concat(media,photos).map(f=>({f,got:0,total:SIZES[f]||0}));
   const lfill=document.getElementById('lfill'),lcar=document.getElementById('lcar'),ltext=document.getElementById('ltext');
   const MB=b=>(b/1048576).toFixed(1);
   function paint(){const got=state.reduce((a,s)=>a+s.got,0),total=state.reduce((a,s)=>a+s.total,0);
@@ -29,7 +31,8 @@ const PRELOAD={glb:{},videoURL:null,done:false};
   PRELOAD.ready=(location.protocol==='file:'||!window.fetch||!window.ReadableStream)
     ?Promise.resolve()
     :Promise.all(state.map((s,i)=>pull(s)
-        .then(buf=>{if(i>=files.length)PRELOAD.videoURL=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
+        .then(buf=>{if(i>=files.length+media.length)return; /* photos: warmed the cache, the <img> tags take it from here */
+          if(i>=files.length)PRELOAD.videoURL=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
           else PRELOAD.glb[s.f]=buf.buffer})
         .catch(()=>{s.total=s.got;paint()})));
 }

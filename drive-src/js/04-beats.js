@@ -6,12 +6,11 @@ const beats=[
   /* one press, one drive: dusk falls on the highway, the neon ignites as you
      pass each sign, and you roll to a stop under the lit welcome board */
   {name:'arrive',z:-538,mile:1,dur:16000,night:1,nightDur:9000},
-  /* the cockpit rolls one parking slot (4.2) per press, so every newly
+  /* one introduction per press; a pair parks at every stop (one each side)
+     and the cockpit rolls one slot (4.2) every second press, so each newly
      introduced car parks at the same close, readable distance */
-  {name:'town',z:-554.5,mile:2,town:1,intro:1,night:1},{name:'town',z:-558.7,mile:2,town:1,intro:2,night:1},{name:'town',z:-562.9,mile:2,town:1,intro:3,night:1},{name:'town',z:-567.1,mile:2,town:1,intro:4,night:1},
-  {name:'tractors',z:-567.1,mile:2,town:1,night:1,cap:'Tractors. It happens every August.'},
-  {name:'town',z:-571.3,mile:2,town:1,intro:5,night:1},{name:'town',z:-575.5,mile:2,town:1,intro:6,night:1},{name:'town',z:-579.7,mile:2,town:1,intro:7,night:1},{name:'town',z:-583.9,mile:2,town:1,intro:8,night:1},
-  {name:'grid500',z:-748,mile:3,night:.45,cap:'Eight cars. Two laps. One cake.'},
+  ...people.map((p,i)=>({name:'town',z:-554.5-Math.floor(i/2)*4.2,mile:2,town:1,intro:i+1,night:1})),
+  {name:'grid500',z:-748,mile:3,night:.45,cap:`${N} cars. Two laps. One cake.`},
   {name:'race',z:-730,mile:3,night:.12},
   {name:'photo',z:-730,mile:4,dark:true,night:.12},
   {name:'trophy',z:-730,mile:4,dark:true,night:.12},
@@ -23,6 +22,8 @@ const beats=[
   /* last call: the cars come home to the arch, the lamps go out one by one,
      the board says goodnight and the credits roll once more */
   {name:'goodnight',z:-650,mile:6,night:1,cap:'last call · goodnight, august'}];
+{const k=Math.min(12,N),at=beats.findIndex(x=>x.intro===k)+1;
+  beats.splice(at,0,{name:'tractors',z:beats[at-1].z,mile:2,town:1,shown:k,night:1,cap:'Tractors. It happens every August.'})}
 
 let b=-1,carZ=0,vel=0,camYaw=0,wiperRight=false,walkTimer=null,walkIdx=0,walkTos=[],townTimers=[],tractorsOn=false,arriveBoardOn=false;
 const stageEl=document.getElementById('stage'),hud=document.getElementById('hud'),mirror=document.getElementById('mirror'),
@@ -53,7 +54,7 @@ if(SHOW.video){PRELOAD.ready.then(()=>{avid.src=PRELOAD.videoURL||encodeURI('ass
   /* if the browser suspends the video (focus loss, power saving), pick it back up */
   avid.addEventListener('pause',()=>{if(attractOK&&beats[b]&&beats[b].name==='walkin')avid.play().catch(()=>{})})}
 
-const slot=i=>({x:i%2?3.3:-3.3,z:-565-i*4.2});
+const slot=i=>({x:i%2?3.3:-3.3,z:-565-Math.floor(i/2)*4.2});
 /* parked cars turn to face the cockpit, so their windshield eyes meet the
    audience during the introductions (a car at yaw 0 faces away, down -z) */
 const faceCam=(s,camZ)=>Math.atan2(s.x,s.z-camZ);
@@ -68,7 +69,7 @@ function showWalk(n){walkIdx=n;hud.classList.remove('on');mirror.classList.add('
   walkTos.push(setTimeout(()=>mirror.classList.remove('flash'),3200));
   walkTos.push(setTimeout(()=>{cars.forEach((c,i)=>{if(i<n&&carO(c)<1)tween(v=>setCarO(c,v),0,1,900,ease.out);if(i>=n)setCarO(c,0)});
     showPerson(n-1)},3400))}
-function startWalk(){showWalk(1);walkTimer=setInterval(()=>showWalk(walkIdx%8+1),8000)}
+function startWalk(){showWalk(1);walkTimer=setInterval(()=>showWalk(walkIdx%N+1),8000)}
 function stopWalk(){clearInterval(walkTimer);walkTimer=null;walkTos.forEach(clearTimeout);walkTos=[];hud.classList.remove('on');mirror.classList.remove('flash')}
 
 function lightSign(s){if(s.lit)return;s.lit=true;tween(v=>s.on.material.opacity=v,0,1,1500,null,ignite);tween(v=>s.light.intensity=v*2.6,0,1,1500,null,ignite)}
@@ -81,7 +82,7 @@ function layout(nx,dir){
   kill('park');
   if(nx.name==='walkin'){cars.forEach((c,i)=>{c.position.set(i%2?1.9:-1.9,0,-6-i*3.6);c.rotation.y=0;setCarO(c,0)})}
   else if(nx.town){
-    const shown=nx.intro||4;
+    const shown=nx.intro||nx.shown||0;
     const parked=dir>0&&nx.intro?shown-1:shown;
     cars.forEach((c,i)=>{const s=slot(i);
       if(i<parked){c.position.set(s.x,0,s.z);c.rotation.y=faceCam(s,nx.z);setCarO(c,1)}

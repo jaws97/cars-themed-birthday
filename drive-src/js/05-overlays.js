@@ -16,7 +16,7 @@ rollEl.innerHTML=
   `<div><div class="hero" style="font-size:7cqh">ROUTE 08</div><div class="label" style="margin-top:1cqh">the august detour</div></div><div class="gap"></div>`
   +(SHOW.credits||[]).map(([r,w])=>`<div><div class="role">${r}</div><div class="who">${w}</div></div>`).join('')
   +`<div class="gap"></div>`
-  +people.map(p=>{const s=portraitSrc(p);return `<div>${s?`<div class="pic${ownPortrait(p)?' own':''}" style="--pc:${p[3]}"><img src="${s}" alt=""></div>`:''}<div class="role">car №${p[0]} · ${p[2]}</div><div class="who">${p[1]}</div></div>`}).join('')
+  +`<div class="cast">`+people.map(p=>{const s=portraitSrc(p);return `<div>${s?`<div class="pic${ownPortrait(p)?' own':''}" style="--pc:${p[3]}"><img src="${s}" alt=""></div>`:''}<div class="role">car №${p[0]} · ${p[2]}</div><div class="who">${p[1]}</div></div>`}).join('')+`</div>`
   +`<div class="gap"></div>
   <div><div class="role">wrong turn</div><div class="who">Recalculating…</div></div>
   <div><div class="role">neon</div><div class="who">The town, showing off</div></div>
@@ -28,4 +28,4 @@ rollEl.innerHTML=
   <div class="label" style="opacity:.55">same road next year · press space — the track is yours</div>`;
 function startRoll(){kill('roll');rollEl.style.transform='translateY(0)';
   const H=stageEl.clientHeight,fin=rollEl.lastElementChild,end=-(H*.5+fin.offsetTop+fin.offsetHeight*.5);
-  tween(v=>rollEl.style.transform=`translateY(${v}px)`,0,end,40000,ease.lin,null,'roll')}
+  tween(v=>rollEl.style.transform=`translateY(${v}px)`,0,end,Math.max(30000,-end/H*15000),ease.lin,null,'roll')} /* one screen every 15 s */

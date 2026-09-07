@@ -8,13 +8,13 @@
    a director cam that hops between drivers; and a minimap so nobody loses
    their car in the dark. cars nobody has claimed cruise the midnight
    circuit as moving furniture. */
-const RM={on:false,c:[],taps:Array(8).fill(0),gas:Array(8).fill(0),rev:Array(8).fill(0),knocks:Array(8).fill(0),
+const RM={on:false,c:[],taps:Array(N).fill(0),gas:Array(N).fill(0),rev:Array(N).fill(0),knocks:Array(N).fill(0),
   checks:people.map(()=>new Set()),feat:-1,featT:0,cutT:0,snap:false,cones:[],cps:[],timers:[],walls:null,road:null,keys:{},hostT:0,
   camP:new THREE.Vector3(),camL:new THREE.Vector3(),boardT:0,mapBg:null,dust:[],dustN:0,skid:null,board:[],evT:0,evN:0,train:null,netT:0,world:null,base:null};
 try{RM.board=JSON.parse(localStorage.getItem('r08-laps')||'[]')}catch(e){}
 /* cones and checkpoints last the night too, per car, like the lap board */
 try{const d=JSON.parse(localStorage.getItem('r08-desert')||'null');
-  if(d){(d.knocks||[]).forEach((n,i)=>{if(i<8)RM.knocks[i]=n|0});(d.checks||[]).forEach((a,i)=>{if(i<8)a.forEach(k=>RM.checks[i].add(k))})}}catch(e){}
+  if(d){(d.knocks||[]).forEach((n,i)=>{if(i<N)RM.knocks[i]=n|0});(d.checks||[]).forEach((a,i)=>{if(i<N)a.forEach(k=>RM.checks[i].add(k))})}}catch(e){}
 function rmSaveDesert(){try{localStorage.setItem('r08-desert',JSON.stringify({knocks:RM.knocks,checks:RM.checks.map(s=>[...s])}))}catch(e){}}
 const rmLapsEl=document.getElementById('rmlaps'),rmClock=document.getElementById('rmclock');
 const rmFmt=ms=>{const s=ms/1000,m=Math.floor(s/60);return m+':'+(s-m*60).toFixed(2).padStart(5,'0')};
@@ -38,7 +38,7 @@ function rmOpen(){if(RM.on)return;RM.on=true;
   if(!RM.dust.length)rmBuildDust();
   rmClearSkid();rmBuildCones();rmBuildCheckpoints();
   /* claimed cars line up on the infield grid; the rest cruise the circuit */
-  RM.c=people.map((p,i)=>{const s={x:0,z:0,h:0,vx:0,vz:0,sa:0,rate:0,slip:0,ai:true,prog:i*CIRCUIT.L/8,hit:0,wl:null,wr:null,dustT:0,lean:0,lapT0:null,gates:0,pz:null};
+  RM.c=people.map((p,i)=>{const s={x:0,z:0,h:0,vx:0,vz:0,sa:0,rate:0,slip:0,ai:true,prog:i*CIRCUIT.L/N,hit:0,wl:null,wr:null,dustT:0,lean:0,lapT0:null,gates:0,pz:null};
     if(NET.conns[i])rmStage(s,i);
     setCarO(cars[i],1);return s});
   rmDrawMapBg();rmRenderBoard();rmRenderLaps(null);
@@ -164,7 +164,7 @@ function rmTrain(){if(!RM.train){const g=RM.train=new THREE.Group();
 /* ---- last call: the cars come home ---- */
 function rmGoodnight(){rmCast({type:'bye'});sndHorn();
   ['cityL','cityR'].forEach(k=>{if(_propReg[k])_propReg[k].visible=false}); /* the skyline blocks would crowd the lens this close */
-  const order=[...Array(8).keys()].sort((a,b)=>((RM.c[b]&&!RM.c[b].ai)?1:0)-((RM.c[a]&&!RM.c[a].ai)?1:0));
+  const order=[...Array(N).keys()].sort((a,b)=>((RM.c[b]&&!RM.c[b].ai)?1:0)-((RM.c[a]&&!RM.c[a].ai)?1:0));
   cars.forEach((c,i)=>{setCarO(c,1);c.rotation.z=0;
     const k=order.indexOf(i),tx=k%2?3.3:-3.3,tz=-664-Math.floor(k/2)*4.6,yaw=Math.atan2(tx,tz+650); /* between the cockpit and the arch banner, facing home */
     const x0=c.position.x,z0=c.position.z,y0=c.rotation.y,dist=Math.hypot(tx-x0,tz-z0);
@@ -225,7 +225,7 @@ function raceWorld(){return{type:'rm-world',...worldBase(),
 function rmFeed(now){if(now-RM.netT<100)return;RM.netT=now;
   const gone=[];RM.cones.forEach((h,k)=>{if(h.gone)gone.push(k)});
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
-  for(let i=0;i<8;i++){const c=NET.conns[i],s=RM.c[i];if(!c||!c.open||!s||s.ai)continue;
+  for(let i=0;i<N;i++){const c=NET.conns[i],s=RM.c[i];if(!c||!c.open||!s||s.ai)continue;
     const others=[];RM.c.forEach((q,j)=>{if(j===i)return;const d=Math.hypot(q.x-s.x,q.z-s.z);if(d<160)others.push([j,r1(q.x),r1(q.z),r2(q.ai?cars[j].rotation.y:q.h)])});
     try{c.send({type:'rm',me:[r1(s.x),r1(s.z),r2(s.h)],cars:others,gone,tr,
       st:{k:RM.knocks[i],c:[...RM.checks[i]],lap:s.lapT0!==null?Math.round(now-s.lapT0):null,g:s.gates}})}catch(e){}}}
@@ -306,9 +306,9 @@ function rmClockTick(now){const f=RM.feat>=0?RM.c[RM.feat]:null;
 
 function rmTick(dt,now){if(!RM.on)return;
   const K=RM.keys,keyed=K.w||K.a||K.s||K.d;
-  let host=-1;for(let i=0;i<8;i++)if(!NET.conns[i]){host=i;break}
+  let host=-1;for(let i=0;i<N;i++)if(!NET.conns[i]){host=i;break}
   if(keyed)RM.hostT=now;
-  for(let i=0;i<8;i++){const s=RM.c[i],c=cars[i],phone=NET.conns[i];
+  for(let i=0;i<N;i++){const s=RM.c[i],c=cars[i],phone=NET.conns[i];
     const human=phone||(i===host&&keyed);
     if(human&&s.ai){ /* a cruiser gets claimed: it becomes a real car where it is */
       s.ai=false;s.x=c.position.x;s.z=c.position.z;s.h=c.rotation.y;
@@ -324,8 +324,8 @@ function rmTick(dt,now){if(!RM.on)return;
     if(s.pz!==null&&s.pz<-700&&s.z>=-700&&Math.abs(s.x)<5.2)rmLine(s,i,now);
     s.pz=s.z}
   /* car on car: equal weights, a bit of bounce; cruisers are immovable */
-  for(let a=0;a<8;a++){const p=RM.c[a];if(p.ai)continue;
-    for(let b=0;b<8;b++){if(b===a)continue;const q=RM.c[b];if(q.ai){rmPushCircle(p,q.x,q.z,CAR_R);continue}
+  for(let a=0;a<N;a++){const p=RM.c[a];if(p.ai)continue;
+    for(let b=0;b<N;b++){if(b===a)continue;const q=RM.c[b];if(q.ai){rmPushCircle(p,q.x,q.z,CAR_R);continue}
       if(b<a)continue;
       const dx=p.x-q.x,dz=p.z-q.z,d=Math.hypot(dx,dz);if(d>=CAR_R*2||d<1e-4)continue;
       const nx=dx/d,nz=dz/d,ov=(CAR_R*2-d)/2;p.x+=nx*ov;p.z+=nz*ov;q.x-=nx*ov;q.z-=nz*ov;
@@ -343,7 +343,7 @@ function rmTick(dt,now){if(!RM.on)return;
    seconds or straight to whoever just made a mess. a long hop is a hard
    cut, a short one glides. nobody driving yet: a slow circle over the infield */
 const _rm_hum=[];
-function rmHumans(){_rm_hum.length=0;for(let i=0;i<8;i++){const s=RM.c[i];if(!s||s.ai)continue;
+function rmHumans(){_rm_hum.length=0;for(let i=0;i<N;i++){const s=RM.c[i];if(!s||s.ai)continue;
   if(NET.conns[i]||(performance.now()-RM.hostT<30000))_rm_hum.push(i)}return _rm_hum}
 function rmCam(t,dt,now){const hum=rmHumans();
   let tx,ty,tz,lx,ly,lz;

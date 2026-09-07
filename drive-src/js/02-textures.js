@@ -12,10 +12,11 @@ function roadTexture(){const[c,x]=cv(256,512);x.fillStyle='#0d0e18';x.fillRect(0
 function gridTexture(){const[c,x]=cv(256,1024);x.strokeStyle='rgba(243,231,207,.5)';x.lineWidth=5;
   for(let i=0;i<8;i++){const col=i%2,y=40+i*118;x.strokeRect(col?142:28,y,86,92)}
   return tex(c)}
-/* a person's portrait: their own driver-NN image, else the shared default, else null */
-function portraitSrc(p){if(typeof ASSETS==='undefined')return null;return ASSETS['driver-'+p[0]]||ASSETS[SHOW.portrait]||null}
+/* a person's portrait: their own photo, else the shared default, else null.
+   files sit in assets/photos/ beside the show, fetched by the preloader */
+function portraitSrc(p){const f=p[6]||SHOW.portrait;return f?'assets/photos/'+encodeURIComponent(f):null}
 /* only real photos get the warm unifying filter; the shared default art stays as drawn */
-function ownPortrait(p){return typeof ASSETS!=='undefined'&&!!ASSETS['driver-'+p[0]]}
+function ownPortrait(p){return !!p[6]}
 /* optional art from drive-src/assets/, embedded by build.py as data URIs.
    pure-magenta pixels (the meshy/AI cutout convention) become transparent. */
 function assetTex(name){const src=typeof ASSETS!=='undefined'&&ASSETS[name];if(!src)return null;

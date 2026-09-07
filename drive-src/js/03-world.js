@@ -111,9 +111,14 @@ cars.forEach(g=>{const L=new THREE.Group();L.visible=false;L.userData.keep=true;
 
 /* real 3D car models: any .glb named in the roster replaces the box car once
    it loads — normalized to the same footprint, box car kept on any failure */
+const _carGltf={};
 function loadCarModel(g,file,yaw){
-  loadGLB(file,gltf=>{
-    const m=gltf.scene;
+  if(!_carGltf[file])_carGltf[file]=new Promise(res=>loadGLB(file,res));
+  _carGltf[file].then(gltf=>{
+    /* one parse per file, one clone per car: geometry shared, materials
+       per car so opacity fades don't bleed across the field */
+    const m=gltf.scene.clone(true);
+    m.traverse(o=>{if(o.isMesh)o.material=Array.isArray(o.material)?o.material.map(x=>x.clone()):o.material.clone()});
     m.updateMatrixWorld(true);
     const s0=new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3());
     if(s0.x>s0.z)m.rotation.y=Math.PI/2;         /* long axis becomes length */

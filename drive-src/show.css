@@ -19,17 +19,18 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 /* act seven and eight overlays */
 .big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 1200ms var(--inout);background:rgba(2,3,10,.94)}
 .big.on{opacity:1}
-.polaroid{background:var(--cream);padding:2.2cqh 2.2cqh 7.5cqh;border-radius:.7cqh;box-shadow:0 3cqh 9cqh rgba(0,0,0,.65);transform:rotate(-2deg);width:66cqh;position:relative}
+.polaroid{background:var(--cream);padding:2.2cqh 2.2cqh 7.5cqh;border-radius:.7cqh;box-shadow:0 3cqh 9cqh rgba(0,0,0,.65);transform:rotate(-2deg);width:118cqh;max-width:88cqw;position:relative}
 .polaroid .shot{background:linear-gradient(180deg,#141a3f,#0a0d24);border-radius:.4cqh;padding:3.4cqh 2.6cqh 2.6cqh;position:relative;overflow:hidden}
 .polaroid .checker{position:absolute;left:0;right:0;top:0;height:1.7cqh;background:repeating-conic-gradient(#F3E7CF 0% 25%,#0E1230 0% 50%);background-size:3.4cqh 3.4cqh;opacity:.95}
 .polaroid h3{font:400 4.4cqh var(--race);color:var(--cream);text-align:center;letter-spacing:.05em;margin:1.2cqh 0 2.2cqh}
-.finishers{display:grid;grid-template-columns:1fr 1fr;gap:1.3cqh 2.4cqh}
-.finishers .p{display:flex;align-items:center;gap:1.3cqh}
-.finishers .n{width:3.8cqh;height:3.8cqh;border-radius:50%;display:flex;align-items:center;justify-content:center;font:2.1cqh var(--race);color:#0E1230;flex:0 0 auto}
-.finishers .n.pic{width:4.6cqh;height:4.6cqh;background:var(--cream)!important;border:.35cqh solid var(--pc);overflow:hidden}
+.finishers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.9cqh 1.8cqh}
+.finishers .p{display:flex;align-items:center;gap:1cqh;min-width:0}
+.finishers .n{width:3.4cqh;height:3.4cqh;border-radius:50%;display:flex;align-items:center;justify-content:center;font:1.9cqh var(--race);color:#0E1230;flex:0 0 auto}
+.finishers .n.pic{width:4cqh;height:4cqh;background:var(--cream)!important;border:.3cqh solid var(--pc);overflow:hidden}
+.finishers .who{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .finishers .n img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.finishers .who{font:700 2cqh var(--body);color:var(--cream);line-height:1.15}
-.finishers .who small{display:block;font-weight:700;font-size:1.4cqh;opacity:.55;letter-spacing:.14em;text-transform:uppercase}
+.finishers .who{font:700 1.75cqh var(--body);color:var(--cream);line-height:1.15}
+.finishers .who small{display:block;font-weight:700;font-size:1.2cqh;opacity:.55;letter-spacing:.14em;text-transform:uppercase}
 .polaroid .scrawl{position:absolute;left:0;right:0;bottom:1.5cqh;text-align:center;font:3.4cqh Pacifico,cursive;color:#4a4066}
 #trophy .stack{display:flex;flex-direction:column;align-items:center;gap:1.6cqh;text-align:center}
 #trophy svg{width:24cqh;height:26cqh;filter:drop-shadow(0 0 5cqh rgba(245,179,53,.5))}
@@ -42,6 +43,9 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #credits .role{font:700 1.8cqh var(--body);letter-spacing:.32em;text-transform:uppercase;color:var(--cream);opacity:.5}
 #credits .who{font:400 4.2cqh var(--race);color:var(--cream);margin-top:.2cqh}
 #credits .pic{width:7.5cqh;height:7.5cqh;border-radius:50%;margin:0 auto .8cqh;background:var(--cream);border:.4cqh solid var(--pc);overflow:hidden}
+#credits .cast{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3cqh 2cqh;width:130cqh;max-width:92cqw;margin:0 auto}
+#credits .cast .who{font-size:3.1cqh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#credits .cast .role{font-size:1.5cqh}
 #credits .pic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 #credits .gap{height:5cqh}
 /* race position tower, broadcast style */
@@ -51,6 +55,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #tower .row b{font:400 2.3cqh var(--race);width:2.5cqh;text-align:center;color:var(--gold)}
 #tower .row i{width:1.5cqh;height:1.5cqh;border-radius:50%}
 #tower .row.fin{opacity:.55}
+#tower .row.more{opacity:.5;font-size:1.7cqh;justify-content:center}
 
 /* multiplayer lobby, lives on the grid beat */
 /* the open desert: the board, the map and the lap clock */
@@ -76,8 +81,8 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 #lobby .panel{background:rgba(4,5,16,.84);border:1px solid rgba(243,231,207,.25);border-radius:1cqh;padding:2cqh 2.2cqh;display:flex;flex-direction:column;gap:1.2cqh;align-items:center}
 #qr canvas{width:18cqh;height:18cqh;image-rendering:pixelated;border-radius:.5cqh}
 .joinurl{font:700 1.8cqh var(--body);letter-spacing:.06em;color:var(--teal)}
-#lobby .chips{display:grid;grid-template-columns:1fr 1fr;gap:.6cqh;width:100%}
-#lobby .chip{font:700 1.7cqh var(--body);letter-spacing:.05em;color:rgba(243,231,207,.45);border:1px solid rgba(243,231,207,.18);border-radius:.4cqh;padding:.4cqh .6cqh;text-align:center;white-space:nowrap}
+#lobby .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:.45cqh;width:100%}
+#lobby .chip{font:700 1.35cqh var(--body);letter-spacing:.04em;color:rgba(243,231,207,.45);border:1px solid rgba(243,231,207,.18);border-radius:.4cqh;padding:.3cqh .5cqh;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #lobby .chip.in{color:#0E1230;background:var(--c);border-color:transparent}
 
 /* pit-stop loader: the tank fills before the show starts */

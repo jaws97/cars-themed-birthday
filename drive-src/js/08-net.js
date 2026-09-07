@@ -3,11 +3,11 @@
    PeerJS (free public broker, no account) and send tap counts; the host runs the
    race. If there's no internet, no PeerJS, or nobody joins, the scripted race
    runs untouched — multiplayer is additive, never load-bearing. */
-const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(8).fill(false),names:Array(8).fill(''),live:false,phase:'idle',
-  taps:Array(8).fill(0),rate:Array(8).fill(0),prog:Array(8).fill(0),spd:Array(8).fill(0),
-  lat:Array(8).fill(0),st:Array(8).fill(0),slip:Array(8).fill(0),slipDir:Array(8).fill(0),hitCd:Array(8).fill(0),
+const NET={peer:null,ready:false,conns:{},all:new Set(),claimed:Array(N).fill(false),names:Array(N).fill(''),live:false,phase:'idle',
+  taps:Array(N).fill(0),rate:Array(N).fill(0),prog:Array(N).fill(0),spd:Array(N).fill(0),
+  lat:Array(N).fill(0),st:Array(N).fill(0),slip:Array(N).fill(0),slipDir:Array(N).fill(0),hitCd:Array(N).fill(0),
   haz:[],hazMeshes:[],trac:null,done:[],greenT0:0,camProg:0,lastLap:0,lastPlaceT:0,
-  prevLat:Array(8).fill(0),wl:Array(8).fill(null),wr:Array(8).fill(null),dustT:Array(8).fill(0)};
+  prevLat:Array(N).fill(0),wl:Array(N).fill(null),wr:Array(N).fill(null),dustT:Array(N).fill(0)};
 const lobbyEl=document.getElementById('lobby'),chipsEl=document.getElementById('chips'),qrBox=document.getElementById('qr'),towerEl=document.getElementById('tower');
 
 function netInit(){if(NET.peer||location.protocol==='file:'||typeof Peer==='undefined')return;
@@ -35,7 +35,7 @@ function playersCount(){return Object.keys(NET.conns).length}
 function broadcast(m){Object.values(NET.conns).forEach(c=>{try{c.send(m)}catch(e){}})}
 function onMsg(c,d){
   if(d.type==='join'){const i=d.i,cur=NET.conns[i];
-    if(i>=0&&i<8&&(!NET.claimed[i]||!cur||!cur.open)){ /* fresh claim, or reclaiming a dead slot */
+    if(i>=0&&i<N&&(!NET.claimed[i]||!cur||!cur.open)){ /* fresh claim, or reclaiming a dead slot */
       NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
       NET.names[i]=cleanName(d.name);
       c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby();
@@ -78,7 +78,7 @@ function buildHazards(){clearHazards();
     scene.add(m);NET.hazMeshes.push(m)})}
 
 function netStartRace(){NET.live=true;NET.phase='set';NET.done=[];NET.lastLap=1;RD.until=0;RD.n=0;RD.shot='';
-  for(let i=0;i<8;i++){NET.prog[i]=gridProg(i);NET.spd[i]=0;NET.taps[i]=0;NET.rate[i]=0;
+  for(let i=0;i<N;i++){NET.prog[i]=gridProg(i);NET.spd[i]=0;NET.taps[i]=0;NET.rate[i]=0;
     NET.lat[i]=i%2?1.9:-1.9;NET.st[i]=0;NET.slip[i]=0;NET.hitCd[i]=0;
     setCarO(cars[i],1);carAt(cars[i],i,NET.prog[i],NET.lat[i])}
   buildHazards();
@@ -115,8 +115,8 @@ let netFeedT=0;
 function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
   const lead=Math.max(...NET.prog),lap=Math.max(1,Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1));
-  const order=[...NET.done,...[...Array(8).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
-  for(let i=0;i<8;i++){const c=NET.conns[i];if(!c||!c.open)continue;const m=cars[i];
+  const order=[...NET.done,...[...Array(N).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
+  for(let i=0;i<N;i++){const c=NET.conns[i];if(!c||!c.open)continue;const m=cars[i];
     const others=[];cars.forEach((q,j)=>{if(j!==i)others.push([j,r1(q.position.x),r1(q.position.z),r2(q.rotation.y)])});
     try{c.send({type:'rm',me:[r1(m.position.x),r1(m.position.z),r2(m.rotation.y)],cars:others,gone:[],tr,
       st:{place:order.indexOf(i)+1,lap,laps:TRACK.LAPS,done:NET.done.includes(i)}})}catch(e){}}}
@@ -135,7 +135,7 @@ function netTick(dt,now){if(NET.live)netFeed(now);
       trackTractor.visible=true;
       trackTractor.position.set(_tr_p.x+nx*NET.trac.lat,0,_tr_p.z+nz*NET.trac.lat);
       trackTractor.rotation.y=Math.atan2(-nx,-nz)}}
-  for(let i=0;i<8;i++){
+  for(let i=0;i<N;i++){
     const u=((NET.prog[i]%L)+L)%L;
     if(NET.phase==='green'){
       /* impulse-smoothed taps per second: steady mashing at T/s settles rate at T */
@@ -166,18 +166,18 @@ function netTick(dt,now){if(NET.live)netFeed(now);
     if(!crossed&&NET.prog[i]>=F){NET.done.push(i);if(NET.done.length===1)rdEvent('winner',i);
       if(NET.conns[i])NET.conns[i].send({type:'state',phase:'done',place:NET.done.length})}}
   /* 120-second cap so a dead phone can't stall the show */
-  if(NET.phase==='green'&&now-NET.greenT0>120000){[...Array(8).keys()].filter(i=>!NET.done.includes(i))
+  if(NET.phase==='green'&&now-NET.greenT0>120000){[...Array(N).keys()].filter(i=>!NET.done.includes(i))
     .sort((a,c)=>NET.prog[c]-NET.prog[a]).forEach(i=>{NET.done.push(i);
       if(NET.conns[i])NET.conns[i].send({type:'state',phase:'done',place:NET.done.length})})}
   /* bumping: two cars can't share a piece of road. the one behind loses a touch */
-  for(let a=0;a<8;a++)for(let c2=a+1;c2<8;c2++){const dp=NET.prog[a]-NET.prog[c2];if(Math.abs(dp)>3.2)continue;
+  for(let a=0;a<N;a++)for(let c2=a+1;c2<N;c2++){const dp=NET.prog[a]-NET.prog[c2];if(Math.abs(dp)>3.2)continue;
     const dl=NET.lat[a]-NET.lat[c2];if(Math.abs(dl)>=1.9)continue;
     const sg=dl>0?1:dl<0?-1:(a%2?1:-1),ov=(1.9-Math.abs(dl))/2;
     NET.lat[a]=Math.max(-3.4,Math.min(3.4,NET.lat[a]+sg*ov));NET.lat[c2]=Math.max(-3.4,Math.min(3.4,NET.lat[c2]-sg*ov));
     if(dp<0)NET.spd[a]*=.985;else NET.spd[c2]*=.985}
   cars.forEach((c,i)=>carAt(c,i,NET.prog[i],NET.lat[i]+Math.sin(now/300+i*2.3)*.12));
   /* the look of speed: lean into the turns, rubber on the corners, sand off the edge */
-  for(let i=0;i<8;i++){const c=cars[i],u=((NET.prog[i]%L)+L)%L,sp=Math.min(1,NET.spd[i]/38);
+  for(let i=0;i<N;i++){const c=cars[i],u=((NET.prog[i]%L)+L)%L,sp=Math.min(1,NET.spd[i]/38);
     const inTurn=(u>S&&u<S+Math.PI*R)||(u>2*S+Math.PI*R);
     const dl=dt>0?(NET.lat[i]-NET.prevLat[i])/dt:0;NET.prevLat[i]=NET.lat[i];
     c.rotation.z=(inTurn?.045*sp:0)+Math.max(-.05,Math.min(.05,dl*.006));
@@ -195,17 +195,18 @@ function netTick(dt,now){if(NET.live)netFeed(now);
     if(lap>NET.lastLap){NET.lastLap=lap;cap.textContent=lap===TRACK.LAPS?'FINAL LAP':`LAP ${lap} OF ${TRACK.LAPS}`;if(lap===TRACK.LAPS)rdEvent('final')}}
   /* standings: position tower on screen, live place on each phone, once a second */
   if(now-NET.lastPlaceT>1000){NET.lastPlaceT=now;
-    const order=[...NET.done,...[...Array(8).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
-    towerEl.innerHTML=order.map((idx,pl)=>{const p=people[idx];
-      return `<div class="row${NET.done.includes(idx)?' fin':''}"><b>${pl+1}</b><i style="background:${p[3]}"></i>${p[1].split(' ')[0]}</div>`}).join('');
+    const order=[...NET.done,...[...Array(N).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
+    towerEl.innerHTML=order.slice(0,10).map((idx,pl)=>{const p=people[idx];
+      return `<div class="row${NET.done.includes(idx)?' fin':''}"><b>${pl+1}</b><i style="background:${p[3]}"></i>${p[1].split(' ')[0]}</div>`}).join('')
+      +(order.length>10?`<div class="row more">+${order.length-10} more</div>`:'');
     if(NET.phase==='green')order.forEach((idx,pl)=>{const c=NET.conns[idx];
       if(c&&c.open&&!NET.done.includes(idx))try{c.send({type:'state',phase:'green',place:pl+1})}catch(e){}})}
   /* camera rides the track just behind the last car, so every racer stays in view */
   const trail=Math.min(...NET.prog);
   NET.camProg+=(Math.min(trail-8,F+16)-NET.camProg)*Math.min(1,dt*1.4);
-  if(NET.phase==='green'&&NET.done.length>=8){NET.phase='finished';
+  if(NET.phase==='green'&&NET.done.length>=N){NET.phase='finished';
     const w=people[NET.done[0]];cap.textContent=`${w[1]} takes the August 500!`;sndFanfare();
     broadcast({type:'state',phase:'over',order:NET.done});updateFin(NET.done)}}
 
 function updateFin(order){document.getElementById('fin').innerHTML=order.map((idx,pl)=>{const p=people[idx];
-  return `<div class="p"><span class="n" style="background:${p[3]}">${p[0]}</span><span class="who">${pl+1}. ${p[1]}<small>${p[2]}</small></span></div>`}).join('')}
+  return `<div class="p">${mini(p)}<span class="who">${pl+1}. ${p[1]}<small>${p[2]}</small></span></div>`}).join('')}

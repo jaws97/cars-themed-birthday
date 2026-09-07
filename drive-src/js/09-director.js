@@ -11,14 +11,14 @@ function rdCut(shot,tgt,dur,now){
   if(shot===RD.shot&&RD_FIXED.includes(shot)){RD.until=now+dur;return} /* a fixed camera just keeps rolling */
   RD.shot=shot;RD.tgt=tgt|0;RD.until=now+dur;RD.cutT=now;RD.snap=true;RD.n++}
 function rdLeader(){let best=-1,bp=-1e9;
-  for(let i=0;i<8;i++){if(NET.done.includes(i))continue;if(NET.prog[i]>bp){bp=NET.prog[i];best=i}}
+  for(let i=0;i<N;i++){if(NET.done.includes(i))continue;if(NET.prog[i]>bp){bp=NET.prog[i];best=i}}
   return best<0?NET.done[0]:best}
 function rdNearest(cx,cz){const lead=rdLeader(),c=cars[lead];
   if(Math.hypot(c.position.x-cx,c.position.z-cz)<75)return lead;
   let best=lead,bd=1e9;cars.forEach((q,i)=>{const d=Math.hypot(q.position.x-cx,q.position.z-cz);if(d<bd){bd=d;best=i}});return best}
 const _rd_c={x:0,z:0};
 function rdCentroid(){ /* the front of the pack: the four cars furthest round */
-  const top=[...Array(8).keys()].sort((a,b)=>NET.prog[b]-NET.prog[a]).slice(0,4);
+  const top=[...Array(N).keys()].sort((a,b)=>NET.prog[b]-NET.prog[a]).slice(0,4);
   _rd_c.x=0;_rd_c.z=0;top.forEach(i=>{_rd_c.x+=cars[i].position.x/4;_rd_c.z+=cars[i].position.z/4});return _rd_c}
 function rdEvent(kind,i){const now=performance.now();
   if(kind==='green')rdCut('chase',0,5500,now);
