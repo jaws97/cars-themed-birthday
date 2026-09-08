@@ -35,12 +35,15 @@ function playersCount(){return Object.keys(NET.conns).length}
 function broadcast(m){Object.values(NET.conns).forEach(c=>{try{c.send(m)}catch(e){}})}
 function onMsg(c,d){
   if(d.type==='join'){const i=d.i,cur=NET.conns[i];
-    if(i>=0&&i<N&&(!NET.claimed[i]||!cur||!cur.open)){ /* fresh claim, or reclaiming a dead slot */
-      NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
+    /* fresh claim, a dead slot, or the same phone coming back (its token wins over its own stale pipe) */
+    if(i>=0&&i<N&&(!NET.claimed[i]||!cur||!cur.open||(d.tok&&cur._tok===d.tok))){
+      if(cur&&cur!==c){NET.all.delete(cur);try{cur.close()}catch(e){}}
+      NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;c._tok=d.tok;
+      NET.st[i]=0;RM.gas[i]=0;RM.rev[i]=0; /* pedals start up: a phone that came back isn't still flooring it */
       NET.names[i]=cleanName(d.name);
       c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby();
       if(RM.on&&RM.c[i]&&RM.c[i].ai)rmStage(RM.c[i],i)}
-    else c.send({type:'roster',claimed:NET.claimed})}
+    else{c.send({type:'refused',i});c.send({type:'roster',claimed:NET.claimed})}}
   else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n;
     if(RM.on&&i!==undefined)RM.taps[i]+=d.n}
   else if(d.type==='steer'){const v=Math.max(-1,Math.min(1,+d.v||0));c._st=v;
@@ -51,7 +54,11 @@ function onMsg(c,d){
 /* a guest's own name for the open desert: short, plain text, optional */
 const cleanName=n=>String(n||'').replace(/\s+/g,' ').trim().slice(0,14);
 function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;RM.rev[i]=0;RM.gas[i]=0;
-  if(!NET.live){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
+  if(!NET.live||RM.on){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
+/* every few seconds the host says hello to every phone, so a phone that slept
+   through the intros can tell its pipe is dead and come back */
+let netHiT=0;
+function netHi(now){if(now-netHiT<3000)return;netHiT=now;NET.all.forEach(c=>{if(c.open)try{c.send({type:'hi'})}catch(e){}})}
 
 /* the race is always real: humans drive claimed cars by tapping, AI drives the
    rest. TRACK.LAPS laps of the oval from the grid to the start/finish line. */
@@ -112,7 +119,7 @@ function aiLat(i,u){const S=TRACK.S,R=TRACK.R,L=TRACK.L;
 /* each phone watches its own car from the grid to the flag: pose, the
    pack around it, the tractor, place and lap, ten times a second */
 let netFeedT=0;
-function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
+function netFeed(now){if(now-netFeedT<50)return;netFeedT=now;
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
   const lead=Math.max(...NET.prog),lap=Math.max(1,Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1));
   const order=[...NET.done,...[...Array(N).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
@@ -121,7 +128,7 @@ function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
     try{c.send({type:'rm',me:[r1(m.position.x),r1(m.position.z),r2(m.rotation.y)],cars:others,gone:[],tr,
       st:{place:order.indexOf(i)+1,lap,laps:TRACK.LAPS,done:NET.done.includes(i)}})}catch(e){}}}
 const _tr_p={};
-function netTick(dt,now){if(NET.live)netFeed(now);
+function netTick(dt,now){netHi(now);if(NET.live)netFeed(now);
   if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finished'))return;
   const F=finishProg(),L=TRACK.L,S=TRACK.S,R=TRACK.R,lead=Math.max(...NET.prog);
   /* the tractor ambles across the back straight on the final lap, timed so

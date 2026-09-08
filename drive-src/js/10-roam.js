@@ -29,6 +29,9 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 
 function rmOpen(){if(RM.on)return;RM.on=true;
   netInit();showLobby(true);lobbyEl.classList.add('roam');
+  /* anyone can join the desert: a car whose phone went away is free again */
+  for(let i=0;i<N;i++)if(NET.claimed[i]&&(!NET.conns[i]||!NET.conns[i].open)){NET.claimed[i]=false;delete NET.conns[i]}
+  broadcast({type:'roster',claimed:NET.claimed});updateLobby();
   rmPanel.classList.add('on');
   RM.feat=-1;RM.featT=0;RM.cutT=0;RM.boardT=0;RM.snap=true;
   RM.evT=performance.now()+55000;
@@ -222,7 +225,7 @@ function rmWorld(){if(RM.world)return RM.world;
 /* the race on the phone: the same desert, the race's own cones and oil, no rings */
 function raceWorld(){return{type:'rm-world',...worldBase(),
   cones:NET.hazMeshes.map((m,k)=>[r1(m.position.x),r1(m.position.z),NET.haz[k].type==='cone'?0:1]),cps:[]}}
-function rmFeed(now){if(now-RM.netT<100)return;RM.netT=now;
+function rmFeed(now){if(now-RM.netT<50)return;RM.netT=now;
   const gone=[];RM.cones.forEach((h,k)=>{if(h.gone)gone.push(k)});
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
   for(let i=0;i<N;i++){const c=NET.conns[i],s=RM.c[i];if(!c||!c.open||!s||s.ai)continue;
@@ -259,6 +262,20 @@ function rmDrive(s,i,thr,st,rev,dt){
     s.wl=[lx,lz];s.wr=[rxw,rzw]}
   else s.wl=s.wr=null;
   s.lean=vr}
+/* pinned in a corner with the pedal down and going nowhere for three seconds:
+   the car is set back on the nearest bit of road, pointing the way it was */
+function rmUnstick(s,i,thr,rev,dt){
+  if(!(thr>.3||rev)){s.stuckT=0;s.ax=s.x;s.az=s.z;return}
+  if(s.ax===undefined||Math.hypot(s.x-s.ax,s.z-s.az)>1.5){s.stuckT=0;s.ax=s.x;s.az=s.z;return}
+  s.stuckT=(s.stuckT||0)+dt;if(s.stuckT<3)return;
+  const r=RM.road;let best=-1,bd=1e9;
+  for(let k=0;k<r.length;k+=2){const dx=s.x-r[k],dz=s.z-r[k+1],d=dx*dx+dz*dz;if(d<bd){bd=d;best=k}}
+  if(best>=0){s.x=r[best];s.z=r[best+1];
+    /* face along the road, whichever way is closer to the way the car was pointing */
+    const n=best+2<r.length?best+2:best-2,dx=r[n]-r[best],dz=r[n+1]-r[best+1];
+    if(dx||dz){const h1=Math.atan2(-dx,-dz),h2=h1+Math.PI,ang=h=>Math.abs(Math.atan2(Math.sin(h-s.h),Math.cos(h-s.h)));s.h=ang(h1)<=ang(h2)?h1:h2}}
+  s.vx=s.vz=0;s.sa=0;s.stuckT=0;s.ax=s.x;s.az=s.z;s.wl=s.wr=null;
+  rmFlash(rmName(i)+' is back on the road')}
 function rmPushCircle(s,cx,cz,r){const dx=s.x-cx,dz=s.z-cz,d=Math.hypot(dx,dz),m=r+CAR_R;
   if(d>=m)return false;const nx=d>1e-4?dx/d:1,nz=d>1e-4?dz/d:0;
   s.x=cx+nx*m;s.z=cz+nz*m;const vn=s.vx*nx+s.vz*nz;if(vn<0){s.vx-=vn*nx*1.35;s.vz-=vn*nz*1.35}return true}
@@ -321,6 +338,7 @@ function rmTick(dt,now){if(!RM.on)return;
     else s.rate=0; /* a lost phone: the car rolls to a stop where it is */
     rmDrive(s,i,thr,st,rev,dt);
     rmCollide(s,i,now);
+    rmUnstick(s,i,thr,rev,dt);
     if(s.pz!==null&&s.pz<-700&&s.z>=-700&&Math.abs(s.x)<5.2)rmLine(s,i,now);
     s.pz=s.z}
   /* car on car: equal weights, a bit of bounce; cruisers are immovable */

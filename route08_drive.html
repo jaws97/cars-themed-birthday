@@ -1360,7 +1360,10 @@ function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.
   fneedle.style.transform=`rotate(${(40-62*Math.min(1,Math.max(0,-carZ/730))).toFixed(1)}deg)`;
   tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
   tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
-  sndEngine(vel,RM.on||racing,RM.on?RM.feat:-1);
+  /* the engine runs in the race and the desert, and on the drive from the
+     highway into town (it settles to nothing as you roll up to the board) */
+  const driving=beats[b]&&beats[b].name==='arrive'&&vel>.8;
+  sndEngine(driving?vel*.4:vel,RM.on||racing||driving,RM.on?RM.feat:-1); /* the highway is quick: scaled so the note climbs the whole way */
   renderer.render(scene,camera);requestAnimationFrame(frame)}
 
 
@@ -1444,12 +1447,15 @@ function playersCount(){return Object.keys(NET.conns).length}
 function broadcast(m){Object.values(NET.conns).forEach(c=>{try{c.send(m)}catch(e){}})}
 function onMsg(c,d){
   if(d.type==='join'){const i=d.i,cur=NET.conns[i];
-    if(i>=0&&i<N&&(!NET.claimed[i]||!cur||!cur.open)){ /* fresh claim, or reclaiming a dead slot */
-      NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;
+    /* fresh claim, a dead slot, or the same phone coming back (its token wins over its own stale pipe) */
+    if(i>=0&&i<N&&(!NET.claimed[i]||!cur||!cur.open||(d.tok&&cur._tok===d.tok))){
+      if(cur&&cur!==c){NET.all.delete(cur);try{cur.close()}catch(e){}}
+      NET.claimed[i]=true;NET.conns[i]=c;c._idx=i;c._tok=d.tok;
+      NET.st[i]=0;RM.gas[i]=0;RM.rev[i]=0; /* pedals start up: a phone that came back isn't still flooring it */
       NET.names[i]=cleanName(d.name);
       c.send({type:'assigned',i,phase:NET.phase});broadcast({type:'roster',claimed:NET.claimed});updateLobby();
       if(RM.on&&RM.c[i]&&RM.c[i].ai)rmStage(RM.c[i],i)}
-    else c.send({type:'roster',claimed:NET.claimed})}
+    else{c.send({type:'refused',i});c.send({type:'roster',claimed:NET.claimed})}}
   else if(d.type==='taps'){const i=c._idx;if(i!==undefined&&NET.phase==='green')NET.taps[i]+=d.n;
     if(RM.on&&i!==undefined)RM.taps[i]+=d.n}
   else if(d.type==='steer'){const v=Math.max(-1,Math.min(1,+d.v||0));c._st=v;
@@ -1460,7 +1466,11 @@ function onMsg(c,d){
 /* a guest's own name for the open desert: short, plain text, optional */
 const cleanName=n=>String(n||'').replace(/\s+/g,' ').trim().slice(0,14);
 function dropConn(c){const i=c._idx;if(i===undefined||NET.conns[i]!==c)return;delete NET.conns[i];NET.st[i]=0;RM.rev[i]=0;RM.gas[i]=0;
-  if(!NET.live){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
+  if(!NET.live||RM.on){NET.claimed[i]=false;broadcast({type:'roster',claimed:NET.claimed});updateLobby()}}
+/* every few seconds the host says hello to every phone, so a phone that slept
+   through the intros can tell its pipe is dead and come back */
+let netHiT=0;
+function netHi(now){if(now-netHiT<3000)return;netHiT=now;NET.all.forEach(c=>{if(c.open)try{c.send({type:'hi'})}catch(e){}})}
 
 /* the race is always real: humans drive claimed cars by tapping, AI drives the
    rest. TRACK.LAPS laps of the oval from the grid to the start/finish line. */
@@ -1521,7 +1531,7 @@ function aiLat(i,u){const S=TRACK.S,R=TRACK.R,L=TRACK.L;
 /* each phone watches its own car from the grid to the flag: pose, the
    pack around it, the tractor, place and lap, ten times a second */
 let netFeedT=0;
-function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
+function netFeed(now){if(now-netFeedT<50)return;netFeedT=now;
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
   const lead=Math.max(...NET.prog),lap=Math.max(1,Math.min(TRACK.LAPS,Math.floor((lead-TRACK.SF)/TRACK.L)+1));
   const order=[...NET.done,...[...Array(N).keys()].filter(i=>!NET.done.includes(i)).sort((a,c)=>NET.prog[c]-NET.prog[a])];
@@ -1530,7 +1540,7 @@ function netFeed(now){if(now-netFeedT<100)return;netFeedT=now;
     try{c.send({type:'rm',me:[r1(m.position.x),r1(m.position.z),r2(m.rotation.y)],cars:others,gone:[],tr,
       st:{place:order.indexOf(i)+1,lap,laps:TRACK.LAPS,done:NET.done.includes(i)}})}catch(e){}}}
 const _tr_p={};
-function netTick(dt,now){if(NET.live)netFeed(now);
+function netTick(dt,now){netHi(now);if(NET.live)netFeed(now);
   if(!NET.live||(NET.phase!=='green'&&NET.phase!=='finished'))return;
   const F=finishProg(),L=TRACK.L,S=TRACK.S,R=TRACK.R,lead=Math.max(...NET.prog);
   /* the tractor ambles across the back straight on the final lap, timed so
@@ -1716,6 +1726,9 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 
 function rmOpen(){if(RM.on)return;RM.on=true;
   netInit();showLobby(true);lobbyEl.classList.add('roam');
+  /* anyone can join the desert: a car whose phone went away is free again */
+  for(let i=0;i<N;i++)if(NET.claimed[i]&&(!NET.conns[i]||!NET.conns[i].open)){NET.claimed[i]=false;delete NET.conns[i]}
+  broadcast({type:'roster',claimed:NET.claimed});updateLobby();
   rmPanel.classList.add('on');
   RM.feat=-1;RM.featT=0;RM.cutT=0;RM.boardT=0;RM.snap=true;
   RM.evT=performance.now()+55000;
@@ -1909,7 +1922,7 @@ function rmWorld(){if(RM.world)return RM.world;
 /* the race on the phone: the same desert, the race's own cones and oil, no rings */
 function raceWorld(){return{type:'rm-world',...worldBase(),
   cones:NET.hazMeshes.map((m,k)=>[r1(m.position.x),r1(m.position.z),NET.haz[k].type==='cone'?0:1]),cps:[]}}
-function rmFeed(now){if(now-RM.netT<100)return;RM.netT=now;
+function rmFeed(now){if(now-RM.netT<50)return;RM.netT=now;
   const gone=[];RM.cones.forEach((h,k)=>{if(h.gone)gone.push(k)});
   const tr=trackTractor.visible?[r1(trackTractor.position.x),r1(trackTractor.position.z)]:null;
   for(let i=0;i<N;i++){const c=NET.conns[i],s=RM.c[i];if(!c||!c.open||!s||s.ai)continue;
@@ -1946,6 +1959,20 @@ function rmDrive(s,i,thr,st,rev,dt){
     s.wl=[lx,lz];s.wr=[rxw,rzw]}
   else s.wl=s.wr=null;
   s.lean=vr}
+/* pinned in a corner with the pedal down and going nowhere for three seconds:
+   the car is set back on the nearest bit of road, pointing the way it was */
+function rmUnstick(s,i,thr,rev,dt){
+  if(!(thr>.3||rev)){s.stuckT=0;s.ax=s.x;s.az=s.z;return}
+  if(s.ax===undefined||Math.hypot(s.x-s.ax,s.z-s.az)>1.5){s.stuckT=0;s.ax=s.x;s.az=s.z;return}
+  s.stuckT=(s.stuckT||0)+dt;if(s.stuckT<3)return;
+  const r=RM.road;let best=-1,bd=1e9;
+  for(let k=0;k<r.length;k+=2){const dx=s.x-r[k],dz=s.z-r[k+1],d=dx*dx+dz*dz;if(d<bd){bd=d;best=k}}
+  if(best>=0){s.x=r[best];s.z=r[best+1];
+    /* face along the road, whichever way is closer to the way the car was pointing */
+    const n=best+2<r.length?best+2:best-2,dx=r[n]-r[best],dz=r[n+1]-r[best+1];
+    if(dx||dz){const h1=Math.atan2(-dx,-dz),h2=h1+Math.PI,ang=h=>Math.abs(Math.atan2(Math.sin(h-s.h),Math.cos(h-s.h)));s.h=ang(h1)<=ang(h2)?h1:h2}}
+  s.vx=s.vz=0;s.sa=0;s.stuckT=0;s.ax=s.x;s.az=s.z;s.wl=s.wr=null;
+  rmFlash(rmName(i)+' is back on the road')}
 function rmPushCircle(s,cx,cz,r){const dx=s.x-cx,dz=s.z-cz,d=Math.hypot(dx,dz),m=r+CAR_R;
   if(d>=m)return false;const nx=d>1e-4?dx/d:1,nz=d>1e-4?dz/d:0;
   s.x=cx+nx*m;s.z=cz+nz*m;const vn=s.vx*nx+s.vz*nz;if(vn<0){s.vx-=vn*nx*1.35;s.vz-=vn*nz*1.35}return true}
@@ -2008,6 +2035,7 @@ function rmTick(dt,now){if(!RM.on)return;
     else s.rate=0; /* a lost phone: the car rolls to a stop where it is */
     rmDrive(s,i,thr,st,rev,dt);
     rmCollide(s,i,now);
+    rmUnstick(s,i,thr,rev,dt);
     if(s.pz!==null&&s.pz<-700&&s.z>=-700&&Math.abs(s.x)<5.2)rmLine(s,i,now);
     s.pz=s.z}
   /* car on car: equal weights, a bit of bounce; cruisers are immovable */
