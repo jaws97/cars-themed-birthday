@@ -161,7 +161,7 @@ function buildView(w){
     const pool=new THREE.Mesh(new THREE.PlaneGeometry(8,12),new THREE.MeshBasicMaterial({map:glow,color:0xffe4b8,transparent:true,opacity:.3,depthWrite:false}));pool.rotation.x=-Math.PI/2;pool.position.set(0,.045,-6.2);g.add(pool);
     const tag=new THREE.Sprite(new THREE.SpriteMaterial({map:tagTex(p),transparent:true,depthWrite:false}));tag.scale.set(.85,.85,1);tag.position.y=2.7;g.add(tag);
     g.visible=false;scene.add(g);return g}
-  const carsM=[];for(let i=0;i<8;i++)carsM.push(car(i));
+  const carsM=[];for(let i=0;i<people.length;i++)carsM.push(car(i));
   const tractor=(()=>{const g=new THREE.Group(),green=new THREE.MeshLambertMaterial({color:0x6CC04A});
     B(g,1.1,.7,2.4,green,0,1.05,.1);B(g,1,.8,1,green,0,1.78,.6);
     [[-.66,.8],[.66,.8]].forEach(([x,z])=>{const wh=new THREE.Mesh(new THREE.CylinderGeometry(.75,.75,.4,12),dark);wh.rotation.z=Math.PI/2;wh.position.set(x,.75,z);g.add(wh)});
@@ -194,7 +194,7 @@ function onFeed(d){if(!V)return;
   V.cones.forEach((m,k)=>m.visible=!d.gone.includes(k));
   if(d.tr){V.tractor.visible=true;V.tractor.position.set(d.tr[0],0,d.tr[1])}else V.tractor.visible=false;
   const st=d.st;if(st.k===undefined)return; /* the race keeps its own messages */
-  stats=`${st.k} cone${st.k===1?'':'s'} · ${st.c.length}/8 found`+(st.lap!==null?` · lap ${fmt(st.lap)}`:'');
+  stats=`${st.k} cone${st.k===1?'':'s'} · ${st.c.length}/${people.length} found`+(st.lap!==null?` · lap ${fmt(st.lap)}`:'');
   if(roamOn&&green&&!lapT)setMsg('FREE ROAM',stats)}
 
 if(!hostId){statusEl.textContent='Open this page from the QR code on the big screen.'}
