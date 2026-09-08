@@ -289,20 +289,23 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
 .hud{position:absolute;left:14cqw;bottom:calc(var(--dashH) + 15cqh);display:flex;align-items:center;gap:2.6cqw;opacity:0;transform:translateY(1.4cqh);transition:opacity 900ms var(--out),transform 900ms var(--out);filter:drop-shadow(0 .4cqh 1.6cqh rgba(0,0,0,.6))}
 .hud.on{opacity:1;transform:none}
-.hud.right{left:auto;right:14cqw;flex-direction:row-reverse;text-align:right}
+/* the card mirrors to the right lane, but the face always follows the name:
+   no row-reverse, so the reading order is name, birthday, then the portrait */
+.hud.right{left:auto;right:14cqw;text-align:right}
 .hud .rule{position:absolute;left:0;top:-2.2cqh;width:22cqw;height:1px;background:linear-gradient(90deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
 .hud.right .rule{left:auto;right:0;background:linear-gradient(270deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
-.hud.right .port.pic .num{inset:auto auto -.6cqh -.9cqh}
 .hud .name{font-size:8.5cqh}.hud .team{margin-top:1.1cqh}
 /* driver disc: cream face, rim in the person's colour; a photo fills it and the
-   number shrinks to a badge, otherwise the number is the hero (a roundel) */
-.hud .port{position:relative;width:16cqh;height:16cqh;flex:0 0 auto;border-radius:50%;background:var(--cream);border:.75cqh solid var(--pc,var(--cream));
-  box-shadow:inset 0 -.5cqh 0 rgba(14,18,48,.14)}
+   number shrinks to a badge, otherwise the number is the hero (a roundel).
+   the face is the point of the beat, so it is the biggest thing on the card:
+   a cream inner ring lifts it off the night and the rim colour blooms behind */
+.hud .port{position:relative;width:34cqh;height:34cqh;flex:0 0 auto;border-radius:50%;background:var(--cream);border:1.1cqh solid var(--pc,var(--cream));
+  box-shadow:inset 0 -.5cqh 0 rgba(14,18,48,.14),0 0 0 .38cqh rgba(243,231,207,.55),0 0 6.5cqh var(--pc,transparent),0 1.6cqh 4.2cqh rgba(0,0,0,.55)}
 .hud .port img{display:none;position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
 .hud .port.own img,.finishers .n.own img,#credits .pic.own img{filter:sepia(.3) saturate(.85) contrast(1.08)}
 .hud .port.pic img{display:block}
-.hud .port .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--indigo);font-size:7cqh;padding-top:.5cqh}
-.hud .port.pic .num{inset:auto -.9cqh -.6cqh auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--cream);border:.45cqh solid var(--pc);font-size:2.7cqh;padding-top:.3cqh;box-shadow:0 .3cqh .8cqh rgba(0,0,0,.45)}
+.hud .port .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--indigo);font-size:14cqh;padding-top:1cqh}
+.hud .port.pic .num{inset:auto -1.3cqh -.9cqh auto;width:9.4cqh;height:9.4cqh;border-radius:50%;background:var(--cream);border:.65cqh solid var(--pc);font-size:4.7cqh;padding-top:.5cqh;box-shadow:0 .3cqh .8cqh rgba(0,0,0,.45)}
 
 /* curved windshield corners: an oversized frame whose inner edge is rounded */
 .bezel{position:absolute;inset:-40cqh;pointer-events:none;border:40cqh solid #020308;border-radius:47cqh}

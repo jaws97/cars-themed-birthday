@@ -304,20 +304,23 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
 .hud{position:absolute;left:14cqw;bottom:calc(var(--dashH) + 15cqh);display:flex;align-items:center;gap:2.6cqw;opacity:0;transform:translateY(1.4cqh);transition:opacity 900ms var(--out),transform 900ms var(--out);filter:drop-shadow(0 .4cqh 1.6cqh rgba(0,0,0,.6))}
 .hud.on{opacity:1;transform:none}
-.hud.right{left:auto;right:14cqw;flex-direction:row-reverse;text-align:right}
+/* the card mirrors to the right lane, but the face always follows the name:
+   no row-reverse, so the reading order is name, birthday, then the portrait */
+.hud.right{left:auto;right:14cqw;text-align:right}
 .hud .rule{position:absolute;left:0;top:-2.2cqh;width:22cqw;height:1px;background:linear-gradient(90deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
 .hud.right .rule{left:auto;right:0;background:linear-gradient(270deg,rgba(243,231,207,.7),rgba(243,231,207,0))}
-.hud.right .port.pic .num{inset:auto auto -.6cqh -.9cqh}
 .hud .name{font-size:8.5cqh}.hud .team{margin-top:1.1cqh}
 /* driver disc: cream face, rim in the person's colour; a photo fills it and the
-   number shrinks to a badge, otherwise the number is the hero (a roundel) */
-.hud .port{position:relative;width:16cqh;height:16cqh;flex:0 0 auto;border-radius:50%;background:var(--cream);border:.75cqh solid var(--pc,var(--cream));
-  box-shadow:inset 0 -.5cqh 0 rgba(14,18,48,.14)}
+   number shrinks to a badge, otherwise the number is the hero (a roundel).
+   the face is the point of the beat, so it is the biggest thing on the card:
+   a cream inner ring lifts it off the night and the rim colour blooms behind */
+.hud .port{position:relative;width:34cqh;height:34cqh;flex:0 0 auto;border-radius:50%;background:var(--cream);border:1.1cqh solid var(--pc,var(--cream));
+  box-shadow:inset 0 -.5cqh 0 rgba(14,18,48,.14),0 0 0 .38cqh rgba(243,231,207,.55),0 0 6.5cqh var(--pc,transparent),0 1.6cqh 4.2cqh rgba(0,0,0,.55)}
 .hud .port img{display:none;position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
 .hud .port.own img,.finishers .n.own img,#credits .pic.own img{filter:sepia(.3) saturate(.85) contrast(1.08)}
 .hud .port.pic img{display:block}
-.hud .port .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--indigo);font-size:7cqh;padding-top:.5cqh}
-.hud .port.pic .num{inset:auto -.9cqh -.6cqh auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--cream);border:.45cqh solid var(--pc);font-size:2.7cqh;padding-top:.3cqh;box-shadow:0 .3cqh .8cqh rgba(0,0,0,.45)}
+.hud .port .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--indigo);font-size:14cqh;padding-top:1cqh}
+.hud .port.pic .num{inset:auto -1.3cqh -.9cqh auto;width:9.4cqh;height:9.4cqh;border-radius:50%;background:var(--cream);border:.65cqh solid var(--pc);font-size:4.7cqh;padding-top:.5cqh;box-shadow:0 .3cqh .8cqh rgba(0,0,0,.45)}
 
 /* curved windshield corners: an oversized frame whose inner edge is rounded */
 .bezel{position:absolute;inset:-40cqh;pointer-events:none;border:40cqh solid #020308;border-radius:47cqh}
@@ -436,7 +439,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
 <script>
 const ASSETS={};
-const ASSET_SIZES={"Landing Video.mp4": 10994219, "cars_2_the_video_game_-_chick_hicks_purple_rage.glb": 1591964, "cars_2_the_video_game_-_fire_department_fillmore.glb": 978304, "cars_2_the_videogame_-_custom_disney_100_doc.glb": 3061436, "cars_2_the_videogame_-_disney_100_custom_ramone.glb": 4295176, "cars_2_the_videogame_-_patokaa.glb": 478344, "cars_2_the_videogame_-_pitty.glb": 205128, "cars_2_the_videogame_-_rv_large.glb": 129860, "cars_2_the_videogame_-_the_king.glb": 733172, "cars_2_the_videogame_-_zil.glb": 1079468, "cars_3_driven_to_win_-_chick-a-licious.glb": 660436, "cars_manny_flywheel.glb": 2723272, "cars_winford_bradford.glb": 2852116, "chicago_buildings.glb": 4280928, "derelict_building.glb": 4638808, "disney_infinity_1.0__luigi_updated.glb": 548892, "fatboys_diner.glb": 347168, "free_stylized_cliff_rock.glb": 1544064, "gas_station_props.glb": 4760868, "lizzie.glb": 586368, "low_poly_rocks_hills_trees.glb": 1486580, "max_schnell.glb": 1360000, "pixar_cars_series_lightning_mcqueen.glb": 4049232, "sally__disney-pixar_cars.glb": 2467208, "suzuki_carry_blind_van.glb": 11814040, "tokyo_mater.glb": 975068, "tractors.glb": 269908, "photos/Abhijit Mandal.jpg": 1885868, "photos/Amritanshu Vivek.jpg": 377914, "photos/Arun.jpeg": 223916, "photos/Arushi Garg.jpg": 69478, "photos/Ashmeet.jpeg": 483895, "photos/Ayush Aryan.jpeg": 691387, "photos/Chandru.M.jpeg": 50163, "photos/Divya Dahate.jpg": 1564859, "photos/Gary.jpeg": 252512, "photos/Madhu Babu Kalapala.jpg": 330050, "photos/Madhukar Bhat.jpeg": 1010630, "photos/Mala Dharshini.jpg": 33143, "photos/Pradeep Edwin.png": 1729949, "photos/Raj Fatnani.jpg": 459611, "photos/Rani Jukur.png": 251591, "photos/Rohith Kumar.png": 365368, "photos/Sabila.jpeg": 105355, "photos/Shivank.png": 1939426, "photos/Shruti gangappa.jpeg": 348825, "photos/Tejas Kandachar.jpg": 47437, "photos/Thinesh.png": 3679421, "photos/Vijay Vishnu.png": 621795, "photos/Vismaya.jpeg": 169179, "photos/mickey.png": 350335};
+const ASSET_SIZES={"Landing Video.mp4": 10994219, "cars_2_the_video_game_-_chick_hicks_purple_rage.glb": 1591964, "cars_2_the_video_game_-_fire_department_fillmore.glb": 978304, "cars_2_the_videogame_-_custom_disney_100_doc.glb": 3061436, "cars_2_the_videogame_-_disney_100_custom_ramone.glb": 4295176, "cars_2_the_videogame_-_patokaa.glb": 478344, "cars_2_the_videogame_-_pitty.glb": 205128, "cars_2_the_videogame_-_rv_large.glb": 129860, "cars_2_the_videogame_-_the_king.glb": 733172, "cars_2_the_videogame_-_zil.glb": 1079468, "cars_3_driven_to_win_-_chick-a-licious.glb": 660436, "cars_manny_flywheel.glb": 2723272, "cars_winford_bradford.glb": 2852116, "chicago_buildings.glb": 4280928, "derelict_building.glb": 4638808, "disney_infinity_1.0__luigi_updated.glb": 548892, "fatboys_diner.glb": 347168, "free_stylized_cliff_rock.glb": 1544064, "gas_station_props.glb": 4760868, "lizzie.glb": 586368, "low_poly_rocks_hills_trees.glb": 1486580, "max_schnell.glb": 1360000, "pixar_cars_series_lightning_mcqueen.glb": 4049232, "sally__disney-pixar_cars.glb": 2467208, "suzuki_carry_blind_van.glb": 11814040, "tokyo_mater.glb": 975068, "tractors.glb": 269908, "photos/Abhijit Mandal.jpg": 261888, "photos/Amritanshu Vivek.jpg": 377914, "photos/Angel Yadav.png": 5601754, "photos/Arun.jpeg": 223916, "photos/Arushi Garg.jpg": 69478, "photos/Ashmeet.jpeg": 107608, "photos/Ayush Aryan.png": 791730, "photos/Chandru.M.jpeg": 50163, "photos/Divya Dahate.jpg": 228196, "photos/Gary.jpeg": 252512, "photos/Madhu Babu Kalapala.jpg": 330050, "photos/Madhukar Bhat.jpeg": 1010630, "photos/Mala Dharshini.jpg": 33143, "photos/Pradeep Edwin.png": 1729949, "photos/Raj Fatnani.jpg": 459611, "photos/Rani Jukur.png": 251591, "photos/Rohith Kumar.png": 365368, "photos/Sabila.jpeg": 105355, "photos/Sahu.jpeg": 275787, "photos/Shivank.png": 1939426, "photos/Shruti gangappa.jpeg": 140116, "photos/Tejas Kandachar.jpg": 47437, "photos/Thinesh.png": 3679421, "photos/Vijay Vishnu.png": 621795, "photos/Vismaya.jpeg": 169179, "photos/mickey.png": 350335};
 
 /* ======================= config: everything a presenter edits ======================= */
 /* one line per person: [race number, name, label, colour, model file, model yaw, photo]
@@ -453,11 +456,11 @@ const people=[
   ['04','Chandrashekar Mahadevaiah','August 5','#50ED1D','cars_2_the_videogame_-_custom_disney_100_doc.glb',2,'Chandru.M.jpeg'],
   ['05','Leenu Tiwari','August 5','#E147DA','cars_2_the_video_game_-_fire_department_fillmore.glb',2],
   ['06','Shashikant Dwivedi','August 8','#39D0EF','cars_2_the_video_game_-_chick_hicks_purple_rage.glb',2],
-  ['07','Prashant Sahu','August 8','#E1479A','tokyo_mater.glb',2],
+  ['07','Prashant Sahu','August 8','#E1479A','tokyo_mater.glb',2,'Sahu.jpeg'],
   ['08','Arun Kalimuthu','August 8','#39EF85','lizzie.glb',2,'Arun.jpeg'],
   ['09','Vishnu Vijay','August 15','#A339EF','cars_2_the_videogame_-_the_king.glb',2,'Vijay Vishnu.png'],
   ['10','Pravin Babu','August 15','#47B4E1','cars_2_the_videogame_-_custom_disney_100_doc.glb',2],
-  ['11','Ayush Aryan','August 16','#3957EF','sally__disney-pixar_cars.glb',2,'Ayush Aryan.jpeg'],
+  ['11','Ayush Aryan','August 16','#3957EF','sally__disney-pixar_cars.glb',2,'Ayush Aryan.png'],
   ['12','Arjun B','August 16','#EF3984','cars_2_the_videogame_-_disney_100_custom_ramone.glb',2],
   ['13','Arushi','August 18','#47E1DB','disney_infinity_1.0__luigi_updated.glb',2,'Arushi Garg.jpg'],
   ['14','Shivank','August 18','#8DE147','pixar_cars_series_lightning_mcqueen.glb',2,'Shivank.png'],
@@ -468,7 +471,7 @@ const people=[
   ['19','Rohit Kumar','August 19','#1D84ED','cars_2_the_video_game_-_fire_department_fillmore.glb',2,'Rohith Kumar.png'],
   ['20','Sakthi Gunasekaran','August 19','#ED1DB8','suzuki_carry_blind_van.glb',2],
   ['21','Thinesh S','August 20','#2CDD9B','cars_3_driven_to_win_-_chick-a-licious.glb',2,'Thinesh.png'],
-  ['22','Angel Yadav','August 20','#EFB339','cars_manny_flywheel.glb',2],
+  ['22','Angel Yadav','August 20','#EFB339','cars_manny_flywheel.glb',2,'Angel Yadav.png'],
   ['23','Madhu Babu Kalapala','August 20','#1DEDB9','max_schnell.glb',2,'Madhu Babu Kalapala.jpg'],
   ['24','Siddharth Singh','August 21','#E14767','cars_2_the_videogame_-_pitty.glb',2],
   ['25','Vismaya Jagadish','August 21','#B1EF39','cars_2_the_videogame_-_pitty.glb',2,'Vismaya.jpeg'],
