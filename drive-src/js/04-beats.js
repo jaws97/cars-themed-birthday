@@ -55,6 +55,9 @@ if(SHOW.video){PRELOAD.ready.then(()=>{avid.src=PRELOAD.videoURL||encodeURI('ass
   avid.addEventListener('error',()=>{attractOK=false});
   /* if the browser suspends the video (focus loss, power saving), pick it back up */
   avid.addEventListener('pause',()=>{if(attractOK&&beats[b]&&beats[b].name==='walkin')avid.play().catch(()=>{})})}
+/* point the engine clip at its blob as soon as the tank is full, so the drive
+   into town never waits on a download at the moment of the press */
+if(SHOW.driveAudio)PRELOAD.ready.then(()=>sndDriveEl());
 
 const slot=i=>({x:i%2?3.3:-3.3,z:-565-Math.floor(i/2)*4.2});
 /* parked cars turn to face the cockpit, so their windshield eyes meet the
@@ -122,6 +125,9 @@ function go(i,dir){
     if(attractOK){attractEl.classList.add('on');playAttract()}
     else if(!walkTimer)startWalk()}
   else{attractEl.classList.remove('on');if(!avid.paused)avid.pause()}
+  /* the recorded engine rides the arrival drive: the video stops, the Ford
+     starts. a jump (dir 0) teleports rather than drives, so it stays quiet */
+  if(nx.name==='arrive'&&dir!==0)sndDrive();else sndDriveStop();
   photoEl.classList.toggle('on',nx.name==='photo');
   trophyEl.classList.toggle('on',nx.name==='trophy');
   creditsEl.classList.toggle('on',nx.name==='credits');

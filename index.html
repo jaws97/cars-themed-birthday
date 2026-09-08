@@ -426,6 +426,9 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
   <div id="attract"><video id="avid" muted loop playsinline preload="auto"></video>
     <div class="atitle"><div class="hero" id="atitleTxt"></div><div class="label" id="asubTxt"></div></div></div>
 
+  <!-- the recorded engine for the drive into town; the synth covers the rest -->
+  <audio id="aeng" preload="auto"></audio>
+
   <div id="screenframe"><span>speedway vision · live</span></div>
   <div class="bezel"></div><div class="vignette"></div><div class="grain"></div><div id="blk"></div>
 
@@ -439,7 +442,7 @@ body{display:flex;align-items:center;justify-content:center;color:var(--cream);f
 
 <script>
 const ASSETS={};
-const ASSET_SIZES={"Landing Video.mp4": 10994219, "cars_2_the_video_game_-_chick_hicks_purple_rage.glb": 1591964, "cars_2_the_video_game_-_fire_department_fillmore.glb": 978304, "cars_2_the_videogame_-_custom_disney_100_doc.glb": 3061436, "cars_2_the_videogame_-_disney_100_custom_ramone.glb": 4295176, "cars_2_the_videogame_-_patokaa.glb": 478344, "cars_2_the_videogame_-_pitty.glb": 205128, "cars_2_the_videogame_-_rv_large.glb": 129860, "cars_2_the_videogame_-_the_king.glb": 733172, "cars_2_the_videogame_-_zil.glb": 1079468, "cars_3_driven_to_win_-_chick-a-licious.glb": 660436, "cars_manny_flywheel.glb": 2723272, "cars_winford_bradford.glb": 2852116, "chicago_buildings.glb": 4280928, "derelict_building.glb": 4638808, "disney_infinity_1.0__luigi_updated.glb": 548892, "fatboys_diner.glb": 347168, "free_stylized_cliff_rock.glb": 1544064, "gas_station_props.glb": 4760868, "lizzie.glb": 586368, "low_poly_rocks_hills_trees.glb": 1486580, "max_schnell.glb": 1360000, "pixar_cars_series_lightning_mcqueen.glb": 4049232, "sally__disney-pixar_cars.glb": 2467208, "suzuki_carry_blind_van.glb": 11814040, "tokyo_mater.glb": 975068, "tractors.glb": 269908, "photos/Abhijit Mandal.jpg": 261888, "photos/Amritanshu Vivek.jpg": 377914, "photos/Angel Yadav.png": 5601754, "photos/Arun.jpeg": 223916, "photos/Arushi Garg.jpg": 69478, "photos/Ashmeet.jpeg": 107608, "photos/Ayush Aryan.png": 791730, "photos/Chandru.M.jpeg": 50163, "photos/Divya Dahate.jpg": 228196, "photos/Gary.jpeg": 252512, "photos/Madhu Babu Kalapala.jpg": 330050, "photos/Madhukar Bhat.jpeg": 1010630, "photos/Mala Dharshini.jpg": 33143, "photos/Pradeep Edwin.png": 1729949, "photos/Raj Fatnani.jpg": 459611, "photos/Rani Jukur.png": 251591, "photos/Rohith Kumar.png": 365368, "photos/Sabila.jpeg": 105355, "photos/Sahu.jpeg": 275787, "photos/Shivank.png": 1939426, "photos/Shruti gangappa.jpeg": 140116, "photos/Tejas Kandachar.jpg": 47437, "photos/Thinesh.png": 3679421, "photos/Vijay Vishnu.png": 621795, "photos/Vismaya.jpeg": 169179, "photos/mickey.png": 350335};
+const ASSET_SIZES={"Landing Video.mp4": 10994219, "cars_2_the_video_game_-_chick_hicks_purple_rage.glb": 1591964, "cars_2_the_video_game_-_fire_department_fillmore.glb": 978304, "cars_2_the_videogame_-_custom_disney_100_doc.glb": 3061436, "cars_2_the_videogame_-_disney_100_custom_ramone.glb": 4295176, "cars_2_the_videogame_-_patokaa.glb": 478344, "cars_2_the_videogame_-_pitty.glb": 205128, "cars_2_the_videogame_-_rv_large.glb": 129860, "cars_2_the_videogame_-_the_king.glb": 733172, "cars_2_the_videogame_-_zil.glb": 1079468, "cars_3_driven_to_win_-_chick-a-licious.glb": 660436, "cars_manny_flywheel.glb": 2723272, "cars_winford_bradford.glb": 2852116, "chicago_buildings.glb": 4280928, "derelict_building.glb": 4638808, "disney_infinity_1.0__luigi_updated.glb": 548892, "engine-drive.mp3": 240788, "fatboys_diner.glb": 347168, "free_stylized_cliff_rock.glb": 1544064, "gas_station_props.glb": 4760868, "lizzie.glb": 586368, "low_poly_rocks_hills_trees.glb": 1486580, "max_schnell.glb": 1360000, "pixar_cars_series_lightning_mcqueen.glb": 4049232, "sally__disney-pixar_cars.glb": 2467208, "suzuki_carry_blind_van.glb": 11814040, "tokyo_mater.glb": 975068, "tractors.glb": 269908, "photos/Abhijit Mandal.jpg": 261888, "photos/Amritanshu Vivek.jpg": 377914, "photos/Angel Yadav.png": 5601754, "photos/Arun.jpeg": 223916, "photos/Arushi Garg.jpg": 69478, "photos/Ashmeet.jpeg": 107608, "photos/Ayush Aryan.png": 791730, "photos/Chandru.M.jpeg": 50163, "photos/Divya Dahate.jpg": 228196, "photos/Gary.jpeg": 252512, "photos/Madhu Babu Kalapala.jpg": 330050, "photos/Madhukar Bhat.jpeg": 1010630, "photos/Mala Dharshini.jpg": 33143, "photos/Pradeep Edwin.png": 1729949, "photos/Raj Fatnani.jpg": 459611, "photos/Rani Jukur.png": 251591, "photos/Rohith Kumar.png": 365368, "photos/Sabila.jpeg": 105355, "photos/Sahu.jpeg": 275787, "photos/Shivank.png": 1939426, "photos/Shruti gangappa.jpeg": 140116, "photos/Tejas Kandachar.jpg": 47437, "photos/Thinesh.png": 3679421, "photos/Vijay Vishnu.png": 621795, "photos/Vismaya.jpeg": 169179, "photos/mickey.png": 350335};
 
 /* ======================= config: everything a presenter edits ======================= */
 /* one line per person: [race number, name, label, colour, model file, model yaw, photo]
@@ -501,6 +504,9 @@ const SHOW={
   scrawl:'everyone finished first · august 2026',
   credits:[['made with love and questionable life choices by','Kavya'],['built on claude, coffee and zero sleep by','Jaws']],
   video:'Landing Video.mp4',
+  /* a real engine over the drive into town: a Ford GT, cut from three seconds
+     in, levelled and faded to cover the sixteen-second arrival */
+  driveAudio:'engine-drive.mp3',
   attractTitle:'20 YEARS OF CARS',
   attractSub:'route 08 · the august detour',
   /* roadside scenery models: x/z position, ry in quarter turns, size = width */
@@ -535,13 +541,13 @@ const ignite=p=>{const k=[[0,0],[.14,.9],[.22,.2],[.38,1],[.46,.5],[.6,1],[1,1]]
    parsed straight from the downloaded buffers (no second trip to the
    network). On file:// — or if anything fails — the show starts anyway and
    falls back exactly as before: multiplayer-style, never load-bearing. */
-const PRELOAD={glb:{},videoURL:null,done:false};
+const PRELOAD={glb:{},videoURL:null,audioURL:null,done:false};
 {
   const SIZES=typeof ASSET_SIZES==='undefined'?{}:ASSET_SIZES; /* exact bytes, baked by build.py */
   const files=[...new Set([].concat(
     people.map(p=>p[4]).filter(Boolean),
     (SHOW.props||[]).map(p=>p.file),['tractors.glb']))];
-  const media=SHOW.video?[SHOW.video]:[];
+  const media=[SHOW.video,SHOW.driveAudio].filter(Boolean);
   /* portraits download here too, so the nameplates never wait on a photo */
   const photos=[...new Set(people.map(p=>p[6]).concat([SHOW.portrait]).filter(Boolean))].map(f=>'photos/'+f);
   const state=files.concat(media,photos).map(f=>({f,got:0,total:SIZES[f]||0}));
@@ -563,7 +569,9 @@ const PRELOAD={glb:{},videoURL:null,done:false};
     ?Promise.resolve()
     :Promise.all(state.map((s,i)=>pull(s)
         .then(buf=>{if(i>=files.length+media.length)return; /* photos: warmed the cache, the <img> tags take it from here */
-          if(i>=files.length)PRELOAD.videoURL=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
+          if(i>=files.length){const mp3=/\.mp3$/i.test(s.f);
+            const url=URL.createObjectURL(new Blob([buf],{type:mp3?'audio/mpeg':'video/mp4'}));
+            if(mp3)PRELOAD.audioURL=url;else PRELOAD.videoURL=url}
           else PRELOAD.glb[s.f]=buf.buffer})
         .catch(()=>{s.total=s.got;paint()})));
 }
@@ -1171,6 +1179,9 @@ if(SHOW.video){PRELOAD.ready.then(()=>{avid.src=PRELOAD.videoURL||encodeURI('ass
   avid.addEventListener('error',()=>{attractOK=false});
   /* if the browser suspends the video (focus loss, power saving), pick it back up */
   avid.addEventListener('pause',()=>{if(attractOK&&beats[b]&&beats[b].name==='walkin')avid.play().catch(()=>{})})}
+/* point the engine clip at its blob as soon as the tank is full, so the drive
+   into town never waits on a download at the moment of the press */
+if(SHOW.driveAudio)PRELOAD.ready.then(()=>sndDriveEl());
 
 const slot=i=>({x:i%2?3.3:-3.3,z:-565-Math.floor(i/2)*4.2});
 /* parked cars turn to face the cockpit, so their windshield eyes meet the
@@ -1238,6 +1249,9 @@ function go(i,dir){
     if(attractOK){attractEl.classList.add('on');playAttract()}
     else if(!walkTimer)startWalk()}
   else{attractEl.classList.remove('on');if(!avid.paused)avid.pause()}
+  /* the recorded engine rides the arrival drive: the video stops, the Ford
+     starts. a jump (dir 0) teleports rather than drives, so it stays quiet */
+  if(nx.name==='arrive'&&dir!==0)sndDrive();else sndDriveStop();
   photoEl.classList.toggle('on',nx.name==='photo');
   trophyEl.classList.toggle('on',nx.name==='trophy');
   creditsEl.classList.toggle('on',nx.name==='credits');
@@ -1365,8 +1379,10 @@ function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.
   tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
   tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
   /* the engine runs in the race and the desert, and on the drive from the
-     highway into town (it settles to nothing as you roll up to the board) */
-  const driving=beats[b]&&beats[b].name==='arrive'&&vel>.8;
+     highway into town (it settles to nothing as you roll up to the board) —
+     unless the recorded Ford is carrying that drive, in which case the synth
+     sits it out rather than doubling up */
+  const driving=beats[b]&&beats[b].name==='arrive'&&vel>.8&&!sndDriveLive();
   sndEngine(driving?vel*.4:vel,RM.on||racing||driving,RM.on?RM.feat:-1); /* the highway is quick: scaled so the note climbs the whole way */
   renderer.render(scene,camera);requestAnimationFrame(frame)}
 
@@ -2115,11 +2131,14 @@ function rmDrawMap(){const x=rmMap.getContext('2d');x.clearRect(0,0,RM_MW,RM_MH)
   x.globalAlpha=1}
 
 
-/* ======================= sound: synthesized, no files =======================
+/* ======================= sound: synthesized, bar one =======================
    an engine that follows the speed, a thud for a cone, a crunch for a
    pile-up, a chime for a checkpoint or a lap, a horn for last call. all
    WebAudio, built at the first key press (the same gesture that starts the
-   show), so nothing is loaded and nothing can fail to arrive. M mutes. */
+   show), so nothing is loaded and nothing can fail to arrive. the single
+   exception is the recorded engine over the drive into town, at the foot of
+   this file — if it fails to load the synth covers that beat as before.
+   M mutes. */
 const SND={ctx:null,master:null,eng:null,muted:false,voice:-2};
 /* one voice per roster slot, in roster order: pitch, two waveforms and their
    mix, filter bite, and a chug (lfo) for the old timers. McQueen screams,
@@ -2209,8 +2228,38 @@ function sndMoo(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;
   f.type='lowpass';f.frequency.value=700;f.Q.value=2;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.25,t+.08);g.gain.setValueAtTime(.25,t+.55);g.gain.linearRampToValueAtTime(0,t+.95);
   o.connect(f);f.connect(g);g.connect(SND.master);o.start(t);vib.start(t);o.stop(t+1);vib.stop(t+1)}
+/* ---- the one recorded sound in the show ----------------------------------
+   a real Ford GT over the drive from the highway into town. it is an <audio>
+   tag rather than WebAudio so it plays the same from file:// as from a host,
+   and it plays instead of the synth engine for that one beat — two engines at
+   once is mud. the clip is already trimmed, levelled and faded by hand, so
+   the only ramp here is the one that cuts it short if the beat moves on. */
+const DRIVE_VOL=.55;
+const DRV={el:null,fade:0,on:false};
+function sndDriveEl(){if(DRV.el||!SHOW.driveAudio)return DRV.el;
+  const el=document.getElementById('aeng');if(!el)return null;
+  el.src=PRELOAD.audioURL||encodeURI('assets/'+SHOW.driveAudio);
+  el.volume=DRIVE_VOL;DRV.el=el;return el}
+/* ramp the element's own volume: the master gate is WebAudio's, out of reach */
+function drvRamp(to,ms,then){clearInterval(DRV.fade);const el=DRV.el;if(!el)return;
+  const from=el.volume,t0=performance.now();
+  DRV.fade=setInterval(()=>{const k=Math.min(1,(performance.now()-t0)/ms);
+    el.volume=Math.max(0,Math.min(1,from+(to-from)*k));
+    if(k>=1){clearInterval(DRV.fade);if(then)then()}},40)}
+function sndDrive(){const el=sndDriveEl();if(!el)return;DRV.on=true;
+  clearInterval(DRV.fade);el.volume=SND.muted?0:DRIVE_VOL;
+  try{el.currentTime=0}catch(e){}
+  el.play().catch(()=>{DRV.on=false}) /* autoplay refused: the synth carries it */}
+function sndDriveStop(){const el=DRV.el;if(!el||!DRV.on)return;DRV.on=false;
+  drvRamp(0,700,()=>{el.pause();try{el.currentTime=0}catch(e){}})}
+/* is the recording actually carrying the engine right now? the loop asks
+   before it opens the synth's gate, so the two never overlap */
+const sndDriveLive=()=>DRV.on&&DRV.el&&!DRV.el.paused&&!DRV.el.ended;
+
 function sndMute(){SND.muted=!SND.muted;
-  if(SND.master)SND.master.gain.setTargetAtTime(SND.muted?0:.7,SND.ctx.currentTime,.05);return SND.muted}
+  if(SND.master)SND.master.gain.setTargetAtTime(SND.muted?0:.7,SND.ctx.currentTime,.05);
+  if(DRV.el){clearInterval(DRV.fade);DRV.el.volume=SND.muted?0:DRIVE_VOL}
+  return SND.muted}
 
 </script>
 </body>

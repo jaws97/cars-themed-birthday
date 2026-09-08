@@ -38,7 +38,9 @@ function frame(now){const dtRaw=Math.min(1,Math.max(0,(now-last)/1000)),dt=Math.
   tempDeg+=((-6+sp*9+Math.sin(t*.7)*2)-tempDeg)*Math.min(1,dt*.4);
   tneedle.style.transform=`rotate(${tempDeg.toFixed(1)}deg)`;
   /* the engine runs in the race and the desert, and on the drive from the
-     highway into town (it settles to nothing as you roll up to the board) */
-  const driving=beats[b]&&beats[b].name==='arrive'&&vel>.8;
+     highway into town (it settles to nothing as you roll up to the board) —
+     unless the recorded Ford is carrying that drive, in which case the synth
+     sits it out rather than doubling up */
+  const driving=beats[b]&&beats[b].name==='arrive'&&vel>.8&&!sndDriveLive();
   sndEngine(driving?vel*.4:vel,RM.on||racing||driving,RM.on?RM.feat:-1); /* the highway is quick: scaled so the note climbs the whole way */
   renderer.render(scene,camera);requestAnimationFrame(frame)}

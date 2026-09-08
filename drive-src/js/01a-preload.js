@@ -4,13 +4,13 @@
    parsed straight from the downloaded buffers (no second trip to the
    network). On file:// — or if anything fails — the show starts anyway and
    falls back exactly as before: multiplayer-style, never load-bearing. */
-const PRELOAD={glb:{},videoURL:null,done:false};
+const PRELOAD={glb:{},videoURL:null,audioURL:null,done:false};
 {
   const SIZES=typeof ASSET_SIZES==='undefined'?{}:ASSET_SIZES; /* exact bytes, baked by build.py */
   const files=[...new Set([].concat(
     people.map(p=>p[4]).filter(Boolean),
     (SHOW.props||[]).map(p=>p.file),['tractors.glb']))];
-  const media=SHOW.video?[SHOW.video]:[];
+  const media=[SHOW.video,SHOW.driveAudio].filter(Boolean);
   /* portraits download here too, so the nameplates never wait on a photo */
   const photos=[...new Set(people.map(p=>p[6]).concat([SHOW.portrait]).filter(Boolean))].map(f=>'photos/'+f);
   const state=files.concat(media,photos).map(f=>({f,got:0,total:SIZES[f]||0}));
@@ -32,7 +32,9 @@ const PRELOAD={glb:{},videoURL:null,done:false};
     ?Promise.resolve()
     :Promise.all(state.map((s,i)=>pull(s)
         .then(buf=>{if(i>=files.length+media.length)return; /* photos: warmed the cache, the <img> tags take it from here */
-          if(i>=files.length)PRELOAD.videoURL=URL.createObjectURL(new Blob([buf],{type:'video/mp4'}));
+          if(i>=files.length){const mp3=/\.mp3$/i.test(s.f);
+            const url=URL.createObjectURL(new Blob([buf],{type:mp3?'audio/mpeg':'video/mp4'}));
+            if(mp3)PRELOAD.audioURL=url;else PRELOAD.videoURL=url}
           else PRELOAD.glb[s.f]=buf.buffer})
         .catch(()=>{s.total=s.got;paint()})));
 }

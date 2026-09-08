@@ -1,8 +1,11 @@
-/* ======================= sound: synthesized, no files =======================
+/* ======================= sound: synthesized, bar one =======================
    an engine that follows the speed, a thud for a cone, a crunch for a
    pile-up, a chime for a checkpoint or a lap, a horn for last call. all
    WebAudio, built at the first key press (the same gesture that starts the
-   show), so nothing is loaded and nothing can fail to arrive. M mutes. */
+   show), so nothing is loaded and nothing can fail to arrive. the single
+   exception is the recorded engine over the drive into town, at the foot of
+   this file — if it fails to load the synth covers that beat as before.
+   M mutes. */
 const SND={ctx:null,master:null,eng:null,muted:false,voice:-2};
 /* one voice per roster slot, in roster order: pitch, two waveforms and their
    mix, filter bite, and a chug (lfo) for the old timers. McQueen screams,
@@ -92,5 +95,35 @@ function sndMoo(){const ctx=SND.ctx;if(!ctx)return;const t=ctx.currentTime;
   f.type='lowpass';f.frequency.value=700;f.Q.value=2;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.25,t+.08);g.gain.setValueAtTime(.25,t+.55);g.gain.linearRampToValueAtTime(0,t+.95);
   o.connect(f);f.connect(g);g.connect(SND.master);o.start(t);vib.start(t);o.stop(t+1);vib.stop(t+1)}
+/* ---- the one recorded sound in the show ----------------------------------
+   a real Ford GT over the drive from the highway into town. it is an <audio>
+   tag rather than WebAudio so it plays the same from file:// as from a host,
+   and it plays instead of the synth engine for that one beat — two engines at
+   once is mud. the clip is already trimmed, levelled and faded by hand, so
+   the only ramp here is the one that cuts it short if the beat moves on. */
+const DRIVE_VOL=.55;
+const DRV={el:null,fade:0,on:false};
+function sndDriveEl(){if(DRV.el||!SHOW.driveAudio)return DRV.el;
+  const el=document.getElementById('aeng');if(!el)return null;
+  el.src=PRELOAD.audioURL||encodeURI('assets/'+SHOW.driveAudio);
+  el.volume=DRIVE_VOL;DRV.el=el;return el}
+/* ramp the element's own volume: the master gate is WebAudio's, out of reach */
+function drvRamp(to,ms,then){clearInterval(DRV.fade);const el=DRV.el;if(!el)return;
+  const from=el.volume,t0=performance.now();
+  DRV.fade=setInterval(()=>{const k=Math.min(1,(performance.now()-t0)/ms);
+    el.volume=Math.max(0,Math.min(1,from+(to-from)*k));
+    if(k>=1){clearInterval(DRV.fade);if(then)then()}},40)}
+function sndDrive(){const el=sndDriveEl();if(!el)return;DRV.on=true;
+  clearInterval(DRV.fade);el.volume=SND.muted?0:DRIVE_VOL;
+  try{el.currentTime=0}catch(e){}
+  el.play().catch(()=>{DRV.on=false}) /* autoplay refused: the synth carries it */}
+function sndDriveStop(){const el=DRV.el;if(!el||!DRV.on)return;DRV.on=false;
+  drvRamp(0,700,()=>{el.pause();try{el.currentTime=0}catch(e){}})}
+/* is the recording actually carrying the engine right now? the loop asks
+   before it opens the synth's gate, so the two never overlap */
+const sndDriveLive=()=>DRV.on&&DRV.el&&!DRV.el.paused&&!DRV.el.ended;
+
 function sndMute(){SND.muted=!SND.muted;
-  if(SND.master)SND.master.gain.setTargetAtTime(SND.muted?0:.7,SND.ctx.currentTime,.05);return SND.muted}
+  if(SND.master)SND.master.gain.setTargetAtTime(SND.muted?0:.7,SND.ctx.currentTime,.05);
+  if(DRV.el){clearInterval(DRV.fade);DRV.el.volume=SND.muted?0:DRIVE_VOL}
+  return SND.muted}

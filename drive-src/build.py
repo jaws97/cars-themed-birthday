@@ -19,10 +19,17 @@ if assets_dir.exists():
         if mime:
             assets[f.stem] = f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode()
 
-# 3D models and video are copied beside the show rather than embedded (binary and big)
+# 3D models, video and audio are copied beside the show rather than embedded (binary and big).
+# Sound is the one kind we don't take wholesale: raw recordings live here beside
+# the clips cut from them, and only the clip the config names is worth shipping.
+import re
 import shutil
 
-big = [f for f in sorted(assets_dir.iterdir()) if f.suffix.lower() in (".glb", ".mp4", ".webm")] if assets_dir.exists() else []
+config_src = (root / "js" / "00-config.js").read_text(encoding="utf-8")
+used_audio = set(re.findall(r"['\"]([^'\"]+\.mp3)['\"]", config_src))
+big = [f for f in sorted(assets_dir.iterdir())
+       if f.suffix.lower() in (".glb", ".mp4", ".webm")
+       or (f.suffix.lower() == ".mp3" and f.name in used_audio)] if assets_dir.exists() else []
 # portraits live in assets/photos/ at whatever size they came: copied, never embedded
 photos_dir = assets_dir / "photos"
 photos = [f for f in sorted(photos_dir.iterdir()) if MIME.get(f.suffix.lower())] if photos_dir.exists() else []
@@ -52,10 +59,7 @@ target.write_text(out, encoding="utf-8")
 (root.parent / "index.html").write_text(out, encoding="utf-8")
 
 # the phone controller page, with the roster injected from 00-config.js
-import re
-
-config = (root / "js" / "00-config.js").read_text(encoding="utf-8")
-people = re.search(r"const people=\[.*?\];", config, re.S).group(0)
+people = re.search(r"const people=\[.*?\];", config_src, re.S).group(0)
 play = (root / "play.tpl.html").read_text(encoding="utf-8").replace("//{{PEOPLE}}", people)
 play_dir = root.parent / "play"
 play_dir.mkdir(exist_ok=True)

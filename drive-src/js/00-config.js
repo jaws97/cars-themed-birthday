@@ -58,6 +58,9 @@ const SHOW={
   scrawl:'everyone finished first · august 2026',
   credits:[['made with love and questionable life choices by','Kavya'],['built on claude, coffee and zero sleep by','Jaws']],
   video:'Landing Video.mp4',
+  /* a real engine over the drive into town: a Ford GT, cut from three seconds
+     in, levelled and faded to cover the sixteen-second arrival */
+  driveAudio:'engine-drive.mp3',
   attractTitle:'20 YEARS OF CARS',
   attractSub:'route 08 · the august detour',
   /* roadside scenery models: x/z position, ry in quarter turns, size = width */
